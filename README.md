@@ -1,4 +1,5 @@
-# Leaf • [![Join the chat at https://gitter.im/bklooste/leaf](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/bklooste/leaf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/bklooste/leaf.svg?branch=master)](https://travis-ci.org/bklooste/leaf) [![Coverage Status](https://coveralls.io/repos/bklooste/leaf/badge.svg?branch=master&service=github)](https://coveralls.io/github/bklooste/leaf?branch=master) [![Crates.io](http://meritbadge.herokuapp.com/leaf)](https://crates.io/crates/leaf) [![License](https://img.shields.io/crates/l/leaf.svg)](LICENSE)
+# Leaf • [![Join the chat at https://gitter.im/bklooste/leaf](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/bklooste/leaf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/bklooste/leaf.svg?branch=master)](https://travis-ci.org/bklooste/leaf)
+[![Coverage Status](https://coveralls.io/repos/bklooste/leaf/badge.svg?branch=master&service=github)](https://coveralls.io/github/bklooste/leaf?branch=master) [![Crates.io](http://meritbadge.herokuapp.com/leaf)](https://crates.io/crates/leaf) [![License](https://img.shields.io/crates/l/leaf.svg)](LICENSE)
 
 ## Introduction
 
@@ -93,8 +94,7 @@ You can also reach out to the Maintainers
 
 [contributing]: CONTRIBUTING.md
 [gitter-leaf]: https://gitter.im/autumnai/leaf
-[mj]: https://twitter.com/mjhirn
-[hobofan]: https://twitter.com/hobofan
+
 
 ## Q&A
 
