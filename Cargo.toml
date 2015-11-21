@@ -1,10 +1,9 @@
 [package]
-name = "leaf"
+name = "aNNe"
 description = "Machine Learning Framework"
-version = "0.1.0"
+version = "0.0.1"
 authors = [
-  "Maximilian Goisser <max@autumnai.com>",
-  "Michael Hirn <mj@autumnai.com>"
+  "Ben Kloosterman <bklooste@gmail.com>"
 ]
 repository = "https://github.com/autumnai/leaf"
 homepage = "https://github.com/autumnai/leaf"
@@ -14,11 +13,12 @@ keywords = ["deep-learning", "neural-networks", "machine-learning", "framework"]
 license = "MIT"
 
 [dependencies]
-phloem = "0.2.4"
-rblas = "0.0.9"
-log = "0.3.2"
-clippy = "0.0.23"
+# phloem = "0.2.4"
+# rblas = "0.0.9"
+log = "*"
+num = "*"
+# clippy = "0.0.23"
 
 [features]
 default = []
-dev = [] # possibly for clippy
+# dev = [] # possibly for clippy
