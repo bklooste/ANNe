@@ -46,7 +46,7 @@ pub trait BlockBehaviour {
     // we need to add connection ? eg can you have diffirent full mesh and loom port ?
     // that will in effect move this behaviour to the port.
     fn save_input(&self , data: &[Self::Output] , port: BlockPort  );
-    fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
+    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
 }
 
 
@@ -54,7 +54,7 @@ pub trait Block<W: Num , T: Neuron< W>> : BlockBehaviour {
     //type Output: Num;
     //type Behaviour: BlockBehaviour;
     fn process(&self) -> Vec<Self::Output>;
-    fn load_vector(&self , data: &[Self::Output] , port: BlockPort );
+    fn save_vector(&self , data: &[Self::Output] , port: BlockPort );
 }
 
 

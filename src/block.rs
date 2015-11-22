@@ -16,7 +16,7 @@ struct FullMeshBlock<'a , W: Num + 'a > //) //, O, T:  Neuron<W, Output=O>> //nu
 pub struct BlockwWeightHardening<'a , W: Num + 'a , O, T:  Neuron<W, Output=O>> //num::traits::Num
 {
     weights: &'a [W],
-    weightsHardness: Vec<u8>,
+    weights_hardness: Vec<u8>,
     block: BlockData<'a>,
     behaviour: T //we dont need self here , neuron behaviour  we can just add to impl
 
@@ -49,29 +49,30 @@ impl<'a , W: Num > FullMeshBlock<'a , W  >
 }
 
 
-impl<'a> BlockBehaviour
-for FullMeshBlock<'a, f32>
+impl<'a> BlockBehaviour for FullMeshBlock<'a, f32>
 {
     type Output = f32;
     fn save_input(&self , data: &[Self::Output] , port: BlockPort  )   {}
-
-    fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output] {panic!()}
+    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output] {panic!()}
 }
 
 //type f32 neuron
-impl<'a, T:  Neuron<f32, Output=f32>> Block<f32 ,T> for FullMeshBlock<'a, f32 >
+impl<'a, T:  Neuron<f32, Output=f32>>  Block<f32 ,T> for FullMeshBlock<'a, f32 >
 {
     //type Output = f32;
 //    fn save_input(&self , data: &[Self::Output] , port: BlockPort  );
-    fn load_vector(&self , data: &[f32] , port: BlockPort )  { self.save_input(data , port); }
+    fn save_vector(&self , data: &[f32] , port: BlockPort )  { self.save_input(data , port); }
 
+//after all factors saved
+// need a dirty
     fn process(&self) -> Vec<f32>
     {
         let mut vec  =  Vec::<f32>::with_capacity(self.block.neuron_count as usize);
         for nc in 0..self.block.neuron_count as usize
         {
-            let in_vec_for_neuron : &[f32] = self.get_weights_for_neuron(nc as u32);
-            vec[nc] =  T::calc(self.weights , in_vec_for_neuron);
+            let in_vec_for_neuron : &[f32] = self.get_input_for_neuron( nc as u32);
+            let weights : &[f32] = self.get_weights_for_neuron(nc as u32);
+            vec[nc] =  T::calc(weights , in_vec_for_neuron);
 
         }
         vec
