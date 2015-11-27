@@ -1,7 +1,8 @@
 extern crate num;
 
-use self::num::traits::Num;
 
+
+use self::num::traits::Num;
 use core::*;
 
 struct FullMeshBlock<'a , W: Num + 'a > //) //, O, T:  Neuron<W, Output=O>> //num::traits::Num
@@ -77,8 +78,12 @@ impl<'a, T:  Neuron<f32, Output=f32>>  Block<f32 ,T> for FullMeshBlock<'a, f32 >
         }
         vec
     }
-
 }
+
+pub fn add_three(a: i32) -> i32 {
+    a + 3
+}
+
 
 
 // impl<'a, T:  Neuron<f32, Output=f32> , B: BlockBehaviour<Output=f32> > Block<B>
