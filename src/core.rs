@@ -1,20 +1,23 @@
 extern crate num;
-
 use self::num::traits::Num;
+
+// check following ..
+// https://github.com/ferristseng/rust-nnet/blob/master/rust-nnet/src/prelude.rs
 
 pub type BlockId = u32;
 pub type BlockPort = u32;
 pub type NeuronNum = u32;
 
-
+#[derive(Default , Clone)]
 pub struct ConnectionDestination
 {
         destination : BlockId,
         port : i32
-    ////  type : ConnectionType
 }
 
-pub enum Connection {
+#[derive( Clone)]
+pub enum Connection
+{
     Connector { destination: ConnectionDestination},
     Loom { destination: ConnectionDestination , size:u32 },
     Mesh { destination: ConnectionDestination , interval:u32 , size:u32 },
@@ -23,45 +26,41 @@ pub enum Connection {
     Output { destination: ConnectionDestination}
 }
 
-
-pub trait Neuron<W: Num> {
+// should make activate a seperate trait ?
+pub trait Neuron<W: Num>
+{
     type Output: Num;
-    //type Weights: Num;
-    //fn requires_data if not we can just use static method on the input and skip the allocation
+
     fn calc (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
     fn activate (output : Self::Output )  -> Self::Output ;
     fn calculate_sum  (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
-//    fn process  (&self, weights: &[W] ) -> Self::Output ;
-//    fn load_vector(&self , data: &[Self::Output] );
 }
+    // pub trait ActivationFunction {
+    //   #[allow(missing_docs)] fn activation(x: f64) -> f64;
+    //   #[allow(missing_docs)] fn derivative(x: f64) -> f64;
+    // }
+
+// pub trait WeightFunction {
+//   #[allow(missing_docs)] fn initw(ins: usize, outs: usize) -> f64;
+// }
 
 //manages input data
-pub trait BlockBehaviour {
-    type Output: Num;
-    //type Weights: Num;
-    //fn requires_data if not we can just use static method on the input and skip the allocation
-//    fn process (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
-//    fn process  (&self, weights: &[W] ) -> Self::Output ;
 
-    // we need to add connection ? eg can you have diffirent full mesh and loom port ?
-    // that will in effect move this behaviour to the port.
+pub trait BlockBehaviour
+{
+    type Output: Num;
+
     fn save_input(&self , data: &[Self::Output] , port: BlockPort  );
     fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
 }
 
-
-pub trait Block<W: Num , T: Neuron< W>> : BlockBehaviour {
-    //type Output: Num;
-    //type Behaviour: BlockBehaviour;
+// so a block is defined over its generic neuronbehaviour
+// how does it know how to handle full mesh or not ?
+// in this case the base type has it ..
+// which means the neuron is just the weights calculation and activation behaviour ..
+// eg  sigmoid activation & SIMD weights over full mesh
+pub trait Block<W: Num , T: Neuron< W>> : BlockBehaviour
+{
     fn process(&self) -> Vec<Self::Output>;
-    fn save_vector(&self , data: &[Self::Output] , port: BlockPort );
+    //fn save_vector(&self , data: &[Self::Output] , port: BlockPort );
 }
-
-
-
-
-
-
-// fn main() {
-//
-// }

@@ -12,5 +12,7 @@
 //! It can be seen as a synonym to nonlinear [Activation Functions][2].
 
 pub mod block;
+pub mod neuron;
+
 #[cfg(test)]
 mod block_tst;
