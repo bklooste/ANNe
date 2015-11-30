@@ -1,7 +1,7 @@
 extern crate num;
 use self::num::traits::Num;
 
-use blocks::neuron::Sigmoid;
+
 
 // fixme remove
 
@@ -61,9 +61,15 @@ pub trait Block<W: Num , T: Neuron< W>> : BlockBehaviour
     //fn save_vector(&self , data: &[Self::Output] , port: BlockPort );
 }
 
-// helpers
-trait Blockf32<N:Neuron<f32 , Output = f32>>  : Block<f32 , N  , Output = f32> {}
-trait Blockf32Sigmoid  : Blockf32< Sigmoid> {}
+// helpers for most common weights and outputs f32 floats very common
+pub trait Blockf32<N:Neuron<f32 , Output = f32>>  : Block<f32 , N  , Output = f32> {}
+pub trait Blockf64<N:Neuron<f64 , Output = f64>>  : Block<f64 , N  , Output = f64> {}
+pub trait Blocki8<N:Neuron<i8 , Output = u8>>  : Block<i8 , N  , Output = u8> {}
+
+//todo !
+impl<N: Neuron<f32 , Output = f32>> Blockf32<N> for Block<f32,N , Output = f32> {}
+
+
 
 //type SBlock<W, O, Neuron> = Block<W ,  Neuron< W , Output = O>  ,  Output = O >;
 //type BlockF32<Neuron>  =  Block<f32  ,  Neuron< f32 , Output = f32> , Output = f32>;
