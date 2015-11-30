@@ -1,3 +1,9 @@
+extern crate num;
+
+use self::num::traits::Num;
+use core::*;
+use super::neuron::Sigmoid;
+use super::block::FullMeshBlock;
 
     //use super::block;
 
@@ -11,10 +17,31 @@
     {
 
         let weights  : Vec<f32> = Vec::new();
-        let block  =  super::block::FullMeshBlock::new(1 , 5, 2, &weights[..]) ;
+        let block  =  FullMeshBlock::new(1 , 5, 2, &weights[..]) ;
+
+        //process2::<FullMeshBlock> ( block);
+        // process::<f32 , f32 , Sigmoid <f32 , Output = f32>> ( block);
+        //http://stackoverflow.com/questions/27567849/what-makes-something-a-trait-object
 
         assert_eq!(5, super::block::add_three(2));
     }
+
+    // we can alias these !
+//Neuron<f32, Output=f32>
+    // fn process<W : Num, O : Num ,  T : Neuron< W , Output = O>> ( block : Block<W , T , Output = O>)
+    // {
+    //
+    // }
+
+
+//IoResult<T> type is an alias for the Result<T, IoError> type.
+//type Inch = u64;
+
+// redefine type
+    // fn process2< T : Block> ( block : T)
+    // {
+    //     block.process();
+    // }
 
     // struct C;
     //

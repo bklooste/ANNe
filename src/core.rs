@@ -1,6 +1,11 @@
 extern crate num;
 use self::num::traits::Num;
 
+use blocks::neuron::Sigmoid;
+
+// fixme remove
+
+
 // check following ..
 // https://github.com/ferristseng/rust-nnet/blob/master/rust-nnet/src/prelude.rs
 
@@ -33,18 +38,9 @@ pub trait Neuron<W: Num>
 
     fn calc (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
     fn activate (output : Self::Output )  -> Self::Output ;
+    //fn derivative
     fn calculate_sum  (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
 }
-    // pub trait ActivationFunction {
-    //   #[allow(missing_docs)] fn activation(x: f64) -> f64;
-    //   #[allow(missing_docs)] fn derivative(x: f64) -> f64;
-    // }
-
-// pub trait WeightFunction {
-//   #[allow(missing_docs)] fn initw(ins: usize, outs: usize) -> f64;
-// }
-
-//manages input data
 
 pub trait BlockBehaviour
 {
@@ -64,3 +60,11 @@ pub trait Block<W: Num , T: Neuron< W>> : BlockBehaviour
     fn process(&self) -> Vec<Self::Output>;
     //fn save_vector(&self , data: &[Self::Output] , port: BlockPort );
 }
+
+// helpers
+trait Blockf32<N:Neuron<f32 , Output = f32>>  : Block<f32 , N  , Output = f32> {}
+trait Blockf32Sigmoid  : Blockf32< Sigmoid> {}
+
+//type SBlock<W, O, Neuron> = Block<W ,  Neuron< W , Output = O>  ,  Output = O >;
+//type BlockF32<Neuron>  =  Block<f32  ,  Neuron< f32 , Output = f32> , Output = f32>;
+//Block<W: Num , T: Neuron< W>> : BlockBehaviour
