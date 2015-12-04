@@ -47,6 +47,12 @@ pub trait BlockBehaviour
     type Output: Num;
 
     fn save_input(&self , data: &[Self::Output] , port: BlockPort  );
+//    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
+}
+
+pub trait NeuronBlockBehaviour : BlockBehaviour
+{
+//    type Output: Num;
     fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
 }
 
@@ -57,6 +63,20 @@ pub trait BlockBehaviour
 // eg  sigmoid activation & SIMD weights over full mesh
 pub trait Block<W: Num , T: Neuron< W>> : BlockBehaviour
 {
+    // this is the key
+    // ideas
+           //allow the output ti be written in a swappable buffer eg toggle in and outputs
+           // we can add a get byte[] but may not be needed in rustc
+           // we save inputs and then process output a 2 phase step.. needed for multiple inputs.
+           // I think this code should be change to work with references since the module
+           // can own all data and know the maximum this is a key concept that must be retained.
+                // however this can be hard with non linear mappings eg a random input to neuron map.
+                // this must be solved and their are a number of ways including special blocks eg randomizer ,junction
+           // note the design shows the type
+           // having code work with multiple types of inputs is invaluable for code
+
+
+
     fn process(&self) -> Vec<Self::Output>;
     //fn save_vector(&self , data: &[Self::Output] , port: BlockPort );
 }

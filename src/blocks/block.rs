@@ -38,7 +38,7 @@ impl BlockData
 
 impl<'a , W: Num + Default > FullMeshBlock<'a , W  >
 {
-     pub fn new(id: BlockId , neurons: NeuronNum , input_size: u32 , allWeights: & 'a [W])  -> FullMeshBlock<'a , W>      
+     pub fn new(id: BlockId , neurons: NeuronNum , input_size: u32 , allWeights: & 'a [W])  -> FullMeshBlock<'a , W>
      {
          FullMeshBlock { block : BlockData::new(id) , weights: allWeights ,  ..Default::default() }
      }
@@ -50,7 +50,7 @@ impl<'a , W: Num + Default > FullMeshBlock<'a , W  >
          self.block.synapse_count
      }
 
-     fn get_weights_for_neuron(&self , neuron_num:u32 ) -> &[W] { self.weights}
+    fn get_weights_for_neuron(&self , neuron_num:u32 ) -> &[W] { self.weights}
 
 }
 
@@ -58,6 +58,13 @@ impl<'a> BlockBehaviour for FullMeshBlock<'a, f32>
 {
     type Output = f32;
     fn save_input(&self , data: &[Self::Output] , port: BlockPort  )   {}
+//    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output] {panic!()}
+}
+
+impl<'a> NeuronBlockBehaviour for FullMeshBlock<'a, f32>
+{
+    //type Output = f32;
+    //fn save_input(&self , data: &[Self::Output] , port: BlockPort  )   {}
     fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output] {panic!()}
 }
 
