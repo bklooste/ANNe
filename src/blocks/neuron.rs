@@ -9,25 +9,25 @@ pub struct Sigmoid;
 
 
 //type f32 neuron
-impl<T: Num + Copy>   Neuron<T> for Sigmoid
-{
-    type Output = T;
-
-    fn calc (weights: &[T] ,  inputs: &[Self::Output] ) -> Self::Output
-    {
-        let r = Self::calculate_sum(weights , inputs);
-        Self::activate(r)
-    }
-
-    fn activate (output : Self::Output )  -> Self::Output { output }
-
-    fn calculate_sum  (weights: &[T] ,  inputs: &[Self::Output] ) -> Self::Output
-    {
-        weights[0] * inputs[0]
-    }
-
-
-}
+// impl<T: Num + Copy>   Neuron<T> for Sigmoid
+// {
+//     type Output = T;
+//
+//     fn calc (weights: &[T] ,  inputs: &[Self::Output] ) -> Self::Output
+//     {
+//         let r = Self::calculate_sum(weights , inputs);
+//         Self::activate(r)
+//     }
+//
+//     fn activate (output : Self::Output )  -> Self::Output { output }
+//
+//     fn calculate_sum  (weights: &[T] ,  inputs: &[Self::Output] ) -> Self::Output
+//     {
+//         weights[0] * inputs[0]
+//     }
+//
+//
+// }
 
 
 
