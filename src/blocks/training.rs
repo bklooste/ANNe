@@ -1,28 +1,62 @@
+
+
 use num::traits::Num;
-use num::{Float};
-//use num::integer::Integer;
-use num::Integer;
+use num::traits::One;
 
+use num::Float;
 use prelude::*;
+use rand::thread_rng;
+use rand::distributions::IndependentSample;
+use rand::distributions::range::Range;
 
-//sigmoid activation & SIMD weights
+use super::neuron::*;
+
+
+
 
 /// Activation Function
 ///
-pub trait ActivationFunction<O : Num>
-{
-   fn activation(x: O) -> O;
+pub trait TrainingActivationFunction<O : Num> : ActivationFunction<O>{
+   //fn activation(x: O) -> O;
+   fn derivative(x: O) -> O;
 }
 
-pub trait WeightFunction<W : Num , O: Num >
-{
-   fn calc_weight(ins: &[O], outs: &[W]) -> O;
+/// The weight function to generate the initial weights.
+///
+pub trait GenerateWeightFunction<W : Num > {
+   fn initw(ins: usize, outs: usize) -> W;
 }
 
-pub trait NeuralNetParameters<W : Num , O: Num >
-{
-   type ActivationFunction : ActivationFunction<O>;
-   type WeightFunction : WeightFunction<W, O>;
+
+
+/// The weight function to generate the bias nodes' weights.
+///
+pub trait GenerateBiasWeightFunction<W : Num> {
+   fn biasw() -> W;
+}
+
+pub trait TrainNetParameters<W : Num , O: Num > : NeuralNetParameters<W,O> {
+   type TrainingActivationFunction : TrainingActivationFunction<O>;
+   type GenerateWeightFunction : GenerateWeightFunction<W>;
+   type GenerateBiasWeightFunction : GenerateBiasWeightFunction<W>;
+}
+
+
+#[derive(Copy, Clone)]
+pub struct DefaultGenerateWeightFunction;
+
+impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
+
+  #[inline]
+  fn initw(ins: usize, _: usize) -> O {
+    // let lb =   - O::one()  / (ins ).sqrt();
+    // let ub =  O::one()/ (ins ).sqrt();
+    // let range = Range::new(lb, ub);
+    //
+    // range.ind_sample(&mut thread_rng())
+
+    O::one()
+  }
 }
 
 //type f32 neuron
@@ -75,22 +109,17 @@ pub trait NeuralNetParameters<W : Num , O: Num >
 
 //move to activbation
 
-
-
-#[derive(Copy, Clone, RustcEncodable, RustcDecodable)]
-pub struct LogisticNeuralNet;
-
-impl ActivationFunction<u8> for LogisticNeuralNet {
-  #[inline(always)] fn activation(x: u8) -> u8 { 1  }
-}
-
-impl ActivationFunction<f32> for LogisticNeuralNet {
-  #[inline(always)] fn activation(x: f32) -> f32 { 1f32 / (1f32 + (-x).exp()) }
-}
-
-impl ActivationFunction<f64> for LogisticNeuralNet {
-  #[inline(always)] fn activation(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
-}
+//
+//
+// /// Default Parameters for a Logistic Neural Net.
+// ///
+// #[derive(Copy, Clone, RustcEncodable, RustcDecodable)]
+// pub struct LogisticNeuralNet;
+//
+// impl ActivationFunction for LogisticNeuralNet {
+//   #[inline(always)] fn activation(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
+//   #[inline(always)] fn derivative(x: f64) -> f64 { x * (1f64 - x) }
+// }
 //
 // impl NeuralNetParameters for LogisticNeuralNet {
 //   type ActivationFunction = LogisticNeuralNet;
@@ -116,18 +145,20 @@ impl ActivationFunction<f64> for LogisticNeuralNet {
 // }
 //
 //
-
-#[derive(Copy, Clone)] pub struct DefaultWeightFunction;
-
-impl<W : Num , O: Num + Default> WeightFunction<W , O > for DefaultWeightFunction
-{
-    #[inline]
-    fn calc_weight(ins: &[O], outs: &[W]) -> O
-    {
-        let sum = O::default();
-        sum
-    }
-}
+// /// Default weight function that is dependent on the input size.
+// ///
+// #[derive(Copy, Clone)] pub struct DefaultWeightFunction;
+//
+// impl WeightFunction for DefaultWeightFunction {
+//   #[inline]
+//   fn initw(ins: usize, _: usize) -> f64 {
+//     let lb = -1f64 / (ins as f64).sqrt();
+//     let ub =  1f64 / (ins as f64).sqrt();
+//     let range = Range::new(lb, ub);
+//
+//     range.ind_sample(&mut thread_rng())
+//   }
+// }
 //
 //
 // /// Default Error Gradient functions.

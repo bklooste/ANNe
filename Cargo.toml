@@ -17,6 +17,8 @@ license = "MIT"
 # rblas = "0.0.9"
 log = "*"
 num = "*"
+rand = "*"
+rustc-serialize = "*"
 # clippy = "0.0.23"
 
 [features]

@@ -1,8 +1,8 @@
-extern crate num;
 
-use self::num::traits::Num;
+use num::traits::Num;
 use std::marker::PhantomData;
 use core::*;
+use super::neuron::*;
 
 fn standard_calc <W, O, N> (weights: &[W] , inputs: &[O] ) -> O
 where W: Num , O: Num , N: NeuralNetParameters <W,O>
@@ -55,7 +55,7 @@ where W: Num + 'static , O: Num + 'static , N: NeuralNetParameters <W,O>
     //      FullMeshBlock { block : BlockData::new(id) , weights: allWeights ,  outputs: output_buf  }
     //  }
 
-     pub fn new_wblock(block_data: BlockData , all_weights: & 'static [W] , output_buf: & 'static mut [O], input_buf: & 'static  [O])  -> FullMeshBlock< W , O , N>
+     pub fn new(block_data: BlockData , all_weights: & 'static [W] , output_buf: & 'static mut [O], input_buf: & 'static  [O])  -> FullMeshBlock< W , O , N>
      {
          FullMeshBlock { block : block_data , weights: all_weights ,  outputs: output_buf ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
      }

@@ -1,5 +1,6 @@
-extern crate num;
-use self::num::traits::Num;
+
+use num::traits::Num;
+use blocks::neuron::NeuralNetParameters;
 //use core::marker::Sized;
 
 
@@ -60,38 +61,6 @@ pub trait BlockBehaviour < O : Num>
 //    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
 }
 
-/// Activation Function
-///
-pub trait ActivationFunction<O : Num> {
-   fn activation(x: O) -> O;
-   fn derivative(x: O) -> O;
-}
-
-/// The weight function to generate the initial weights.
-///
-pub trait GenerateWeightFunction<W : Num > {
-   fn initw(ins: usize, outs: usize) -> W;
-}
-
-pub trait WeightFunction<W : Num , O: Num > {
-   fn calc_weight(ins: &[O], outs: &[W]) -> O;
-}
-
-
-/// The weight function to generate the bias nodes' weights.
-///
-pub trait GenerateBiasWeightFunction<W : Num> {
-   fn biasw() -> W;
-}
-
-pub trait NeuralNetParameters<W : Num , O: Num > {
-   type ActivationFunction : ActivationFunction<O>;
-   type WeightFunction : WeightFunction<W, O>;
-
-  // below are generation so should be diffirent
-
-//   type BiasWeightFunction : BiasWeightFunction;
-}
 
 
 pub trait NeuronBlockBehaviour < W : Num , O : Num , N: NeuralNetParameters<W, O >>

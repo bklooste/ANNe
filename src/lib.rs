@@ -89,8 +89,14 @@
 // pub mod solver;
 // pub mod solvers;
 
+extern crate num;
+extern crate rand;
+extern crate rustc_serialize;
+
+//use num::traits::Num;
+
 mod network;
-//mod neuron;
+
 pub mod blocks;
 pub mod core;
 pub mod prelude;

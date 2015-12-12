@@ -71,10 +71,8 @@ pub use self::common::{Convolution};
 #[allow(unused_import_braces)]
 pub use self::loss::{Softmax};
 
-#[allow(unused_import_braces)]
-pub use self::utility::{Flatten};
+
 
 pub mod activation;
 pub mod common;
 pub mod loss;
-pub mod utility;

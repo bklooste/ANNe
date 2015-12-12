@@ -11,8 +11,13 @@
 //! of the same size as the bottom Blob.
 //! It can be seen as a synonym to nonlinear [Activation Functions][2].
 
+#[allow(unused_import_braces)]
+pub use self::neuron::NeuralNetParameters;
+
 pub mod block;
 pub mod neuron;
+pub mod training;
+pub mod activation;
 
 #[cfg(test)]
 mod block_tst;

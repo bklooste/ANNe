@@ -1,6 +1,6 @@
-extern crate num;
 
-use self::num::traits::Num;
+
+use num::traits::Num;
 use core::*;
 use super::neuron::Sigmoid;
 use super::block::FullMeshBlock;
@@ -17,7 +17,7 @@ use super::block::FullMeshBlock;
     {
 
         let weights  : Vec<f32> = Vec::new();
-        let block  =  FullMeshBlock::new(1 , 5, 2, &weights[..]) ;
+        let block  =  FullMeshBlock::<i32,i32,Sigmoid>::new(1 , 5, 2, &weights[..]) ;
 
         //process2::<FullMeshBlock> ( block);
         // process::<f32 , f32 , Sigmoid <f32 , Output = f32>> ( block);
