@@ -93,9 +93,11 @@ extern crate num;
 extern crate rand;
 extern crate rustc_serialize;
 
-//use num::traits::Num;
+#[macro_use]
+extern crate log;
 
 mod network;
+mod util;
 
 pub mod blocks;
 pub mod core;

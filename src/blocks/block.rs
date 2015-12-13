@@ -50,9 +50,18 @@ impl BlockData
 impl<W,O,N>  FullMeshBlock<W,O,N>
 where W: Num + 'static , O: Num + 'static , N: NeuralNetParameters <W,O>
 {
-    //  pub fn new(id: BlockId , neurons: NeuronNum , input_size: u32 , allWeights: & 'static [W])  -> FullMeshBlock< W , O , N>
+    //  pub fn qnew(id: BlockId , neurons: NeuronNum , input_size: u32 , allWeights: & 'static [W])  -> FullMeshBlock< W , O , N>
     //  {
-    //      FullMeshBlock { block : BlockData::new(id) , weights: allWeights ,  outputs: output_buf  }
+    //      // create a static output buffer
+     //
+    //     let input_array  =  Vec::new();
+    //     let input_buf = &input_array;
+     //
+    //     let mut output_array  = Vec::new();
+    //     let mut output_buf1 = &output_array;
+    //     //      let mut array = [0u8; 3];
+    //     //  let output_buf
+    //      FullMeshBlock { block : BlockData::new(id) , weights: allWeights  ,inputs: input_buf ,  outputs: output_buf1   }
     //  }
 
      pub fn new(block_data: BlockData , all_weights: & 'static [W] , output_buf: & 'static mut [O], input_buf: & 'static  [O])  -> FullMeshBlock< W , O , N>

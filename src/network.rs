@@ -15,6 +15,9 @@ extern crate num;
 //     }
 
 trait Network {
+//use num::traits::Num;
+
+//pub use log;
     fn new(name: &'static str) -> Self;
 
     // // Instance methods, only signatures

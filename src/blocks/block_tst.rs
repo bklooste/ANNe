@@ -2,8 +2,9 @@
 
 use num::traits::Num;
 use core::*;
-use super::neuron::Sigmoid;
+use super::activation::Sigmoid;
 use super::block::FullMeshBlock;
+use super::block::BlockData;
 
     //use super::block;
 
@@ -15,9 +16,17 @@ use super::block::FullMeshBlock;
     #[test]
     fn create_fullmesh_bloc ()
     {
-
+        let id = 5;
+        let input_buf  : Vec<f32> = Vec::new();
+        let mut output_buf  : Vec<f32> = Vec::new();
         let weights  : Vec<f32> = Vec::new();
-        let block  =  FullMeshBlock::<i32,i32,Sigmoid>::new(1 , 5, 2, &weights[..]) ;
+        //let block  =  FullMeshBlock::<f32,f32,Sigmoid>::qnew(1 , 5, 2, &weights[..]) ;
+        let block  =  FullMeshBlock::<f32,f32,Sigmoid>::new(BlockData::new(id)
+                , &weights[..]            
+                , &mut output_buf[..]
+                , &input_buf[..]
+        );
+
 
         //process2::<FullMeshBlock> ( block);
         // process::<f32 , f32 , Sigmoid <f32 , Output = f32>> ( block);
@@ -46,9 +55,7 @@ use super::block::FullMeshBlock;
     // struct C;
     //
     // struct B<'b> {
-    //     c: &'b C,
-    // }
-    //
+    //     c: &'b C,2
     // struct A<'a> {
     //     b: B<'a>,
     //     c: &'a C
@@ -100,7 +107,7 @@ use super::block::FullMeshBlock;
 //
 // ]
 // public void set_vector_0_offset(byte[] value , uint offset)
-// {
+// {2
 //     SetAndRetrieve(value, (uint) value.Length, offset);
 //
 // }
