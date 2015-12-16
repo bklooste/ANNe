@@ -3,7 +3,7 @@
 use num::traits::Num;
 use core::*;
 use super::activation::Sigmoid;
-use super::block::FullMeshBlock;
+use super::fullmesh::FullMeshBlock;
 use super::block::BlockData;
 
     //use super::block;
@@ -37,8 +37,7 @@ use super::block::BlockData;
         // static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
         static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
         static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-
-        static  weights: & 'static  [f32] = & [1f32, 2f32, 3f32, 4f32, 5f32];
+        static  weights: & 'static  [f32] = & [0f32; 500];
 
         //let weights  : Vec<f32> = Vec::new();
         //let block  =  FullMeshBlock::<f32,f32,Sigmoid>::qnew(1 , 5, 2, &weights[..]) ;

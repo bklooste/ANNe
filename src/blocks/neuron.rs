@@ -1,9 +1,6 @@
 use num::traits::Num;
 use num::{Float};
-//use num::integer::Integer;
-use num::Integer;
 
-use prelude::*;
 
 //sigmoid activation & SIMD weights
 

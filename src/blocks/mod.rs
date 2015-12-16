@@ -19,5 +19,7 @@ pub mod neuron;
 pub mod training;
 pub mod activation;
 
+pub mod fullmesh; pub mod blockwweighthardening;
+
 #[cfg(test)]
 mod block_tst;

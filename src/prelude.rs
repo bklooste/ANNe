@@ -1,6 +1,10 @@
 
 pub use core::{ConnectionDestination, Connection,  Block  , BlockBehaviour };
 
+
+// standard impl for all neuron blocks
+//impl<N: Neuron<f32 , Output = f32>> Blockf32<N> for Block<f32,N , Output = f32> {}
+
 //pub use blocks::neuron::Sigmoid;
 //pub use blocks::block::{FullMeshBlock , BlockwWeightHardening};
 
