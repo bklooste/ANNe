@@ -1,7 +1,6 @@
-
-
 use num::traits::Num;
 use core::*;
+
 use super::activation::Sigmoid;
 use super::fullmesh::FullMeshBlock;
 use super::block::BlockData;
