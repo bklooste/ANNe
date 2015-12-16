@@ -8,25 +8,47 @@ use super::block::BlockData;
 
     //use super::block;
 
+    //static input_buf: Vec<f32> = Vec::new();
+
+    //  input_buf: &'static [f32] = &'static[1f32, 2f32, 3f32, 4f32, 5f32];
+    // output_buf: & mut 'static [f32] = & mut 'static [1f32, 2f32, 3f32, 4f32, 5f32];
+
+    // let input_buf  : Vec<f32> = Vec::new();
+    // let mut output_buf  : Vec<f32> = Vec::new();
+
     #[test]
     fn it_works3() {
         assert_eq!(5, super::block::add_three(2));
     }
 
+
+
     #[test]
     fn create_fullmesh_bloc ()
     {
+        unsafe {
         let id = 5;
-        let input_buf  : Vec<f32> = Vec::new();
-        let mut output_buf  : Vec<f32> = Vec::new();
-        let weights  : Vec<f32> = Vec::new();
+        // let input_buf  : Vec<f32> = Vec::new();
+        // let mut output_buf  : Vec<f32> = Vec::new();
+
+        //static x: &'static [u8] = &[1,2,3];
+
+        // static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        // static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+        static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+
+        static  weights: & 'static  [f32] = & [1f32, 2f32, 3f32, 4f32, 5f32];
+
+        //let weights  : Vec<f32> = Vec::new();
         //let block  =  FullMeshBlock::<f32,f32,Sigmoid>::qnew(1 , 5, 2, &weights[..]) ;
         let block  =  FullMeshBlock::<f32,f32,Sigmoid>::new(BlockData::new(id)
-                , &weights[..]            
-                , &mut output_buf[..]
-                , &input_buf[..]
+                , weights
+                , output_buf
+                , input_buf
         );
 
+    };
 
         //process2::<FullMeshBlock> ( block);
         // process::<f32 , f32 , Sigmoid <f32 , Output = f32>> ( block);

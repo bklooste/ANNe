@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 use core::*;
 use super::neuron::*;
 
-fn standard_calc <W, O, N> (weights: &[W] , inputs: &[O] ) -> O
+pub fn standard_calc <W, O, N> (weights: &[W] , inputs: &[O] ) -> O
 where W: Num , O: Num , N: NeuralNetParameters <W,O>
 {
     let result =  N::WeightFunction::calc_weight( inputs ,  weights  ) ;
