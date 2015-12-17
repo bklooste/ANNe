@@ -1,7 +1,7 @@
 use num::traits::Num;
 use core::*;
 
-use super::activation::Sigmoid;
+use super::neural::Sigmoid;
 use super::fullmesh::FullMeshBlock;
 use super::block::BlockData;
 
@@ -45,125 +45,76 @@ use super::block::BlockData;
                 , output_buf
                 , input_buf
         );
+    }; //unsafe
+}
 
-    };
 
-        //process2::<FullMeshBlock> ( block);
-        // process::<f32 , f32 , Sigmoid <f32 , Output = f32>> ( block);
-        //http://stackoverflow.com/questions/27567849/what-makes-something-a-trait-object
-
-        assert_eq!(5, super::block::add_three(2));
-    }
-
-    // we can alias these !
-//Neuron<f32, Output=f32>
-    // fn process<W : Num, O : Num ,  T : Neuron< W , Output = O>> ( block : Block<W , T , Output = O>)
+    //
+    // [Theory, MemberData("WeightDataOne")]
+    // public void simple_process_tests(byte[] value, uint numneurons, sbyte[][] weights, byte[] expected)
+    // {
+    //     var options = new NeuronBlockOptions() { inputSize = (uint)value.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(1) };
+    //     var result = SetAndProcess(  options, value, weights);
+    //     //var result = SetAndRetrieve(value, size, offset);
+    //     Assert.Equal (expected , result );
+    //     //AssertOffsetArrayEqual(value, offset, result);
+    //
+    // }
+    //
+    // [Theory
+    // , InlineData(new byte[] { 1 }, 1, 1, 1, new byte[] { 1 })
+    // , InlineData(new byte[] { 1 }, 1, 1, 0, new byte[] { 0 })
+    // ]
+    // public void test_activation_is_returned(byte[] inputs, uint numneurons, sbyte weightsValue, float activationValue, byte[] expected)
+    // {
+    //     var weights = GetWeightsAndSetValue(inputs.Length, numneurons, weightsValue);
+    //     var options = new NeuronBlockOptions() { inputSize = (uint)inputs.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(activationValue) };
+    //     var result = SetAndProcess(options, inputs, weights);
+    //     Assert.Equal(expected, result);
+    //
+    // }
+    //
+    // // this willl only work with an sbyte block not all
+    // [Theory
+    // //, InlineData(new byte[] { 1 }, 1, 1, 1)
+    // //, InlineData(new byte[] { 1 }, 1, 1, 0)
+    //     , InlineData(new byte[] { 1 }, 1, 1, -1)
+    // ]
+    // public void test_activation_signed_is_returned(byte[] inputs, uint numneurons, sbyte weightsValue, float activationValue)
     // {
     //
+    //     if (typeof(U) == typeof(byte))
+    //         return;
+    //
+    //     byte[] expected = new byte[1];
+    //     if (activationValue.GetType() == typeof(float))
+    //         expected[0] =  (byte) Convert.ToSByte((float)activationValue);  // fixme crimp ?
+    //     else
+    //         expected[0] = (byte)activationValue;
+    //
+    //     var weights = GetWeightsAndSetValue(inputs.Length, numneurons, weightsValue);
+    //     var options = new NeuronBlockOptions() { inputSize = (uint)inputs.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(activationValue) };
+    //     var result = SetAndProcess(options, inputs, weights);
+    //     Assert.Equal(expected, result);
+    //
     // }
-
-
-//IoResult<T> type is an alias for the Result<T, IoError> type.
-//type Inch = u64;
-
-// redefine type
-    // fn process2< T : Block> ( block : T)
+    //
+    // sbyte[][] GetWeightsAndSetValue(int inputLength, uint numneurons, sbyte weightsValue)
     // {
-    //     block.process();
-    // }
-
-    // struct C;
-    //
-    // struct B<'b> {
-    //     c: &'b C,2
-    // struct A<'a> {
-    //     b: B<'a>,
-    //     c: &'a C
+    //     sbyte[][] weights = new sbyte[numneurons][];
+    //     for (int i = 0; i < numneurons; i++)
+    //     {
+    //         weights[i] = new sbyte[inputLength + 4];
+    //         for (int j = 0; j < inputLength; j++)
+    //             weights[i][j] = weightsValue;
+    //     }
+    //     return weights;
     // }
     //
-    // fn main1() {
-    //     let c1 = C;
-    //     let _ = A::new(&c1);
+    // [Theory ,MemberData("WeightData")]
+    // public void simple_process_w_weights_tests(byte[] value, uint numneurons, sbyte[][] weights, byte[] expected)
+    // {
+    //     var options = new NeuronBlockOptions() { inputSize = (uint)value.Length, numNeurons = numneurons, behaviour = new TestNeuronwWeights<U>() };
+    //     var result = SetAndProcess(options, value, weights);
+    //     Assert.Equal(expected, result);
     // }
-
-
-
-//     [Fact]
-// public void size_0_is_illegal()
-// {
-//     Assert.Throws<System.ArgumentException>(() => new FullMeshNeuronProcessingBehaviour(0));
-// }
-//
-// [Fact]
-// public void get_vector_with_no_set_illegal()
-// {
-//     Assert.Throws<System.InvalidOperationException>(() =>
-//     {
-//         var mesh = new FullMeshNeuronProcessingBehaviour(10);
-//         mesh.GetVectorForNeuron(1);
-//
-//     });
-// }
-//
-//
-// [Fact]
-// public void get_vector_with_set()
-// {
-//     Assert.Throws<System.InvalidOperationException>(() =>
-//     {
-//         var mesh = new FullMeshNeuronProcessingBehaviour(10);
-//         mesh.GetVectorForNeuron(1);
-//
-//     });
-// }
-//
-//
-// [Theory
-//     , InlineData(new byte[] {1, 2, 3} ,  0 )
-//     , InlineData(new byte[] {  }, 0)
-//     , InlineData(new byte[] { 6, 7 , 8, 1, 2, 3 }, 0)
-//     , InlineData(new byte[] { 0 }, 0)
-//     , InlineData(new byte[] { 1,1,1,1,1,1,1,1,1,1,1,1 }, 0)
-//
-// ]
-// public void set_vector_0_offset(byte[] value , uint offset)
-// {2
-//     SetAndRetrieve(value, (uint) value.Length, offset);
-//
-// }
-//
-// [Theory
-// , InlineData(new byte[] { 1, 2, 3 }, 3, 0)
-// , InlineData(new byte[] { }, 5, 0)
-// , InlineData(new byte[] { 6, 7, 8, 1, 2, 3 }, 20, 0)
-// ]
-// public void set_vector_0_offset_bigger_size(byte[] value, uint size, uint offset)
-// {
-//
-//     SetAndRetrieve(value, size, offset);
-//
-// }
-//
-// [Theory
-//     , InlineData(new byte[] {1, 2, 3} , 3,  1 )
-//     , InlineData(new byte[] {  }, 5 , 2)
-//     , InlineData(new byte[] { 6, 7 , 8, 1, 2, 3 },  20 ,3)
-//     , InlineData(new byte[] { 0 }, 1, 4)
-//     , InlineData(new byte[] { 1,1,1,1,1,1,1,1,1,1,1,1 }, 100, 5)
-//
-// ]
-// public void set_vector_n_offset(byte[] value , uint size , uint offset)
-// {
-//
-//     SetAndRetrieve(value, size,  offset);
-//
-// }
-//
-// void SetAndRetrieve(byte[] value, uint initialLength ,  uint offset)
-// {
-//     var mesh = new FullMeshNeuronProcessingBehaviour(initialLength);
-//     mesh.LoadVector(value, offset);
-//     var result = mesh.GetVectorForNeuron(1);
-//
-//     Assert.Equal(value , result);
-// }

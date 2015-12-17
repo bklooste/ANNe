@@ -1,6 +1,6 @@
 
 use num::traits::Num;
-use blocks::neuron::NeuralNetParameters;
+use blocks::neural::neuron::NeuralNetParameters;
 //use core::marker::Sized;
 
 

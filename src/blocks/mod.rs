@@ -12,12 +12,10 @@
 //! It can be seen as a synonym to nonlinear [Activation Functions][2].
 
 #[allow(unused_import_braces)]
-pub use self::neuron::NeuralNetParameters;
+pub use self::neural::neuron::NeuralNetParameters;
 
 pub mod block;
-pub mod neuron;
-pub mod training;
-pub mod activation;
+pub mod neural;
 
 pub mod fullmesh; pub mod blockwweighthardening;
 

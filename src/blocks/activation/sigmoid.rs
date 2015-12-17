@@ -1,9 +1,8 @@
 use num::traits::Num;
 use blocks::neuron::*;
-use blocks::training::*;
 
 #[derive(Debug, Copy, Clone)]
-pub struct Sigmoid;
+pub struct Unit;
 
 // waiting on specialization
 // impl <W : Num , O: Num + Default > NeuralNetParameters<W, O> for Sigmoid
@@ -12,19 +11,19 @@ pub struct Sigmoid;
 //     type WeightFunction = DefaultWeightFunction;
 // }
 
-impl <W : Num > NeuralNetParameters<W, f32> for Sigmoid
+impl <W : Num > NeuralNetParameters<W, f32> for Unit
 {
     type ActivationFunction = LogisticNeuralNet;
     type WeightFunction = DefaultWeightFunction;
 }
 
-impl <W : Num> NeuralNetParameters<W, u8> for Sigmoid
+impl <W : Num> NeuralNetParameters<W, u8> for Unit
 {
     type ActivationFunction = LogisticNeuralNet;
     type WeightFunction = DefaultWeightFunction;
 }
 
-impl <W : Num > NeuralNetParameters<W, f64> for Sigmoid
+impl <W : Num > NeuralNetParameters<W, f64> for Unit
 {
     type ActivationFunction = LogisticNeuralNet;
     type WeightFunction = DefaultWeightFunction;
