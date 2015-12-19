@@ -28,6 +28,8 @@ trait Network {
     // fn talk(&self) {
     //     // These definitions can access other methods declared in the same
     //     // trait
+
+// should make activate a seperate trait ?
     //     println!("{} says {}", self.name(), self.noise());
     // }
     // void LoadInputsIntoModules();
@@ -88,6 +90,8 @@ trait Network {
 //         "woof!"
 //     }
 //
+
+// should make activate a seperate trait ?
 //     // Default trait methods can be overridden
 //     fn talk(&self) {
 //         // Traits methods can access the implementor methods

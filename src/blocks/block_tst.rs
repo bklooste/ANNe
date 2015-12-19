@@ -38,7 +38,7 @@ use super::block::BlockData;
         static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
         static  weights: & 'static  [f32] = & [0f32; 500];
 
-        //let weights  : Vec<f32> = Vec::new();
+        //let weights  : Vec<f32> ,2f32,3f32= Vec::new();
         //let block  =  FullMeshBlock::<f32,f32,Sigmoid>::qnew(1 , 5, 2, &weights[..]) ;
         let block  =  FullMeshBlock::<f32,f32,Sigmoid>::new(BlockData::new(id)
                 , weights
@@ -54,7 +54,7 @@ use super::block::BlockData;
     // public void simple_process_tests(byte[] value, uint numneurons, sbyte[][] weights, byte[] expected)
     // {
     //     var options = new NeuronBlockOptions() { inputSize = (uint)value.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(1) };
-    //     var result = SetAndProcess(  options, value, weights);
+    //     va    assert_eq!(6, super::neuron::add_foura(2));r result = SetAndProcess(  options, value, weights);
     //     //var result = SetAndRetrieve(value, size, offset);
     //     Assert.Equal (expected , result );
     //     //AssertOffsetArrayEqual(value, offset, result);

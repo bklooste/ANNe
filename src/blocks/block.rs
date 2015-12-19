@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use num::traits::Num;
 
 use core::*;
