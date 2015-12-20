@@ -1,5 +1,4 @@
-use num::traits::Num;
-use core::*;
+//use core::*;
 
 use super::neural::Sigmoid;
 use super::fullmesh::FullMeshBlock;
@@ -27,23 +26,17 @@ use super::block::BlockData;
     {
         unsafe {
         let id = 5;
-        // let input_buf  : Vec<f32> = Vec::new();
-        // let mut output_buf  : Vec<f32> = Vec::new();
 
-        //static x: &'static [u8] = &[1,2,3];
-
-        // static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-        // static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-        static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static  weights: & 'static  [f32] = & [0f32; 500];
+        static _input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        static mut _output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+        static  _weights: & 'static  [f32] = & [0f32; 500];
 
         //let weights  : Vec<f32> ,2f32,3f32= Vec::new();
         //let block  =  FullMeshBlock::<f32,f32,Sigmoid>::qnew(1 , 5, 2, &weights[..]) ;
         let block  =  FullMeshBlock::<f32,f32,Sigmoid>::new(BlockData::new(id)
-                , weights
-                , output_buf
-                , input_buf
+                , _weights
+                , _output_buf
+                , _input_buf
         );
     }; //unsafe
 }

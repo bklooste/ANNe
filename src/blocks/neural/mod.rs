@@ -17,11 +17,14 @@
 //! The activation function is also sometimes called transfer function.
 pub use self::sigmoid::Sigmoid;
 
+pub mod testdata;
 pub mod sigmoid;
 pub mod training;
 
 pub mod unit;
 pub mod neuron;
+
+pub mod defaultweight;
 
 #[cfg(test)]
 mod neural_tst;
