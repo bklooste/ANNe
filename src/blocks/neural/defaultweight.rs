@@ -62,7 +62,9 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightFunction
 
         let mut sum = 0usize;
         for (vn , weight) in v.iter().zip(weights.iter()) {
-                sum = sum + (vn * weight.to_u8().unwrap()) as usize;
+            let add = weight.to_u8().unwrap() as usize;
+            let mult = *vn as usize * add;
+            sum = sum + (mult) as usize;
         }
         if sum > 255{ return 255u8; }
         sum.to_u8().unwrap()
@@ -80,13 +82,11 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , i8 > for DefaultWeightFunction
 
         let mut sum = 0isize;
         for (vn , weight) in v.iter().zip(weights.iter()) {
-             println!("sum bef {}",  sum);
+
              let add = weight.to_i8().unwrap() as isize;
-             println!("sum add {}",  add);
-             println!("sum vn {}",  vn);
              let mult = *vn as isize * add;
-                sum = sum + (mult) as isize;
-                     println!("sum aft {}",  sum);
+             sum = sum + (mult) as isize;
+
         }
         if  sum > 128 {
                  println!("sum exceeded {}",  sum);
@@ -140,11 +140,46 @@ fn test_default_weight_function_i8() {
 }
 
 #[test]
-fn test_default_weight_function_many() {
+fn test_default_weight_function_i8_many() {
     //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
     info!("running default_weight_tests");
 
-    for (v1, v2,result) in getdata()
+    for (v1, v2,result) in geti8data()
+    {
+        //println!("{:?}",testdata );
+        let sum = DefaultWeightFunction::calc_weight(v1 , v2 ) ;
+        if sum != result {
+            //let str1 = ;
+             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
+        }
+        assert_eq!(result, sum);
+    }
+}
+
+
+#[test]
+fn test_default_weight_function_u8_many() {
+    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
+    info!("running default_weight_tests");
+
+    for (v1, v2,result) in getu8data()
+    {
+        //println!("{:?}",testdata );
+        let sum = DefaultWeightFunction::calc_weight(v1 , v2 ) ;
+        if sum != result {
+            //let str1 = ;
+             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
+        }
+        assert_eq!(result, sum);
+    }
+}
+
+#[test]
+fn test_default_weight_function_f32_many() {
+    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
+    info!("running default_weight_tests");
+
+    for (v1, v2,result) in getf32data()
     {
         //println!("{:?}",testdata );
         let sum = DefaultWeightFunction::calc_weight(v1 , v2 ) ;
