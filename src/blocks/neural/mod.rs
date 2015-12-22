@@ -25,6 +25,7 @@ pub mod unit;
 pub mod neuron;
 
 pub mod defaultweight;
+pub mod defaultweightwbias;
 
 #[cfg(test)]
 mod neural_tst;

@@ -9,6 +9,7 @@ use blocks::neural::testdata::*;
 #[derive(Copy, Clone)]
 pub struct DefaultWeightFunction;
 
+
 // fixme DefaultWeightFunction should return usize for integer types.
 //enum_primitive crate,
 // we will need custom version of toprimative which checks ranges and never fails nor construct a option
