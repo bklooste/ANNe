@@ -22,6 +22,8 @@ pub struct DefaultWeightwBiasFunction;
 // fixme DefaultWeightwBiasFunction should return usize for integer types.
 //enum_primitive crate,
 // we will need custom version of toprimative which checks ranges and never fails nor construct a option
+
+// f32 could be more efficient if bias was inluded in v.
 impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightwBiasFunction
 {
     #[inline]
@@ -35,14 +37,17 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightwBiasFuncti
             panic!("weight length  not the same as input vector");
         }
 
+        if v.len() == 0 { return 0f32;}
+
 
         let mut sum = 0f32;
         for (vn , weight) in v.iter().zip(weights.iter()) {
                 sum = sum + vn * weight.to_f32().unwrap();
         }
-        sum -  weights[weights.len()].to_f32().unwrap()
+        sum -  weights[weights.len() -1 ].to_f32().unwrap()
     }
 }
+
 
 impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightwBiasFunction
 {
@@ -62,7 +67,7 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightwBiasFuncti
         for (vn , weight) in v.iter().zip(weights.iter()) {
                 sum = sum + vn * weight.to_f64().unwrap();
         }
-        sum - weights[weights.len()].to_f64().unwrap()
+        sum - weights[weights.len() -1].to_f64().unwrap()
     }
 }
 
@@ -107,13 +112,9 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , i8 > for DefaultWeightwBiasFunction
         let bias = get_bias_from_end(weights);
         let mut sum = 0isize;
         for (vn , weight) in v.iter().zip(weights.iter()) {
-             println!("sum bef {}",  sum);
              let add = weight.to_i8().unwrap() as isize;
-             println!("sum add {}",  add);
-             println!("sum vn {}",  vn);
              let mult = *vn as isize * add;
-                sum = sum + (mult) as isize;
-                     println!("sum aft {}",  sum);
+             sum = sum + (mult) as isize;
         }
         sum = sum - bias as isize;
         if  sum > 128 {
@@ -139,5 +140,46 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , i32 > for DefaultWeightwBiasFunctio
                 sum = sum + (vn * weight.to_i32().unwrap()) as isize ;
         }
         sum.to_i32().unwrap()
+    }
+}
+
+
+    //    vec.push( (F32_VECTOR8 , F32_VECTOR8_1, 26f32)  );
+
+    // #[test]
+    // #[should_panic(expected = "weight length")]
+    // fn test_default_weight_function_dif_len_input()
+    // {
+    //     let sum = DefaultWeightFunction::calc_weight(I8_VECTOR1 , I8_VECTOR3 ) ;
+    // }
+    //
+    // #[test]
+    // fn test_default_weight_function_i8() {
+    //     //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
+    //
+    //     info!("running default_weight_tests");
+    //
+    //
+    //     let sum = DefaultWeightFunction::calc_weight(I8_VECTOR1 , I8_VECTOR1 ) ;
+    //     assert_eq!(1, sum);
+    //         let sum = DefaultWeightFunction::calc_weight(&[1 ,2, 3 ] , &[1,2,3] ) ;
+    //         assert_eq!(14, sum);
+    //         let sum = DefaultWeightFunction::calc_weight(&[1f32 ; 3 ] , &[1f32 ; 3 ] ) ;
+    //         assert_eq!(3f32, sum);
+    // }
+
+#[test]
+fn test_default_weight_function_w_bias_f32_many() {
+    info!("running default_weight_tests");
+
+    for (v1, v2,result) in getf32datawbias()
+    {
+        //println!("{:?}",testdata );
+        let sum = DefaultWeightwBiasFunction::calc_weight(v1 , v2 ) ;
+        if sum != result {
+            //let str1 = ;
+             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
+        }
+        assert_eq!(result, sum);
     }
 }

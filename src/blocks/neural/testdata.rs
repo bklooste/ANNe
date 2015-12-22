@@ -197,3 +197,54 @@ pub fn geti8data<'a>() -> Vec<(& 'a [i8] , & 'a [i8] ,i8)>
         // array of tupples
         vec
     }
+
+
+    pub static F32_WEIGHT0   :& 'static[f32] = &[10f32];
+    pub static F32_WEIGHT1_N1   :& 'static[f32] = &[-1f32, 10f32];
+    pub static F32_WEIGHT1   :& 'static[f32] = &[1f32 , 10f32];
+    pub static F32_WEIGHT1_0 :& 'static[f32] = &[0f32, 10f32];
+    pub static F32_WEIGHT3   :& 'static[f32] = &[1f32 ,2f32, 3f32 , 10f32];
+    pub static F32_WEIGHT8   :& 'static[f32] = &[1f32 ,2f32 , 3f32 ,4f32 ,5f32 ,6f32 ,7f32 ,8f32 , 10f32];
+    pub static F32_WEIGHT8_M   :& 'static[f32] = &[1f32 ,-2f32, 3f32 ,-4f32 ,5f32 ,-6f32 ,7f32 ,-8f32 , 10f32];
+    pub static F32_WEIGHT8_0   :& 'static[f32] = &[0f32 ;9 ];
+    pub static F32_WEIGHT8_1   :& 'static[f32] = &[1f32 ;9 ];
+    pub static F32_WEIGHT4096_0   :& 'static[f32] = &[0f32 ;4097 ];
+    pub static F32_WEIGHT4096_1   :& 'static[f32] = &[1f32 ;4097 ];
+    pub static F32_WEIGHT4096_N1   :& 'static[f32] = &[-1f32 ;4097 ];
+    pub static F32_WEIGHT4096_100   :& 'static[f32] = &[100f32 ;4097 ];  // large for Over flow
+    pub static F32_WEIGHT4096_N100   :& 'static[f32] = &[-100f32 ;4097 ];
+
+    pub fn getf32datawbias<'a>() -> Vec<(& 'a [f32] , & 'a [f32] ,f32)>
+    {
+        let mut vec = Vec::new();
+        //same size
+        vec.push( (F32_VECTOR0 , F32_WEIGHT0, 0f32)  );
+        vec.push( (F32_VECTOR1_N1 , F32_WEIGHT1_N1, -9f32)  );
+        vec.push( (F32_VECTOR1 , F32_WEIGHT1, -9f32)  );
+        vec.push( (F32_VECTOR1_0 , F32_WEIGHT1_0, -10f32)  );
+        vec.push( (F32_VECTOR3 , F32_WEIGHT3, 4f32)  );
+        vec.push( (F32_VECTOR8 , F32_WEIGHT8, 194f32)  );
+        vec.push( (F32_VECTOR8_1 , F32_WEIGHT8_1, 7f32)  );
+
+        vec.push( (F32_VECTOR4096_0 , F32_WEIGHT4096_0, 0f32)  );
+        vec.push( (F32_VECTOR4096_1 , F32_WEIGHT4096_1, 4095f32)  );
+        vec.push( (F32_VECTOR4096_N1 , F32_WEIGHT4096_N1, 4097f32)  );
+        vec.push( (F32_VECTOR4096_100 , F32_WEIGHT4096_100, 40959900f32)  );
+        vec.push( (F32_VECTOR4096_N100 , F32_WEIGHT4096_100, -40960100f32)  );
+
+        // mixed
+        vec.push( (F32_VECTOR8_1 , F32_WEIGHT8_M, -14f32)  );
+        vec.push( (F32_VECTOR8 , F32_WEIGHT8_M, -46f32)  );
+        vec.push( (F32_VECTOR8_M , F32_WEIGHT8_M, 194f32)  );
+
+
+        //dif
+        vec.push( (F32_VECTOR8_0 , F32_WEIGHT8_1, -1f32)  );
+        vec.push( (F32_VECTOR8 , F32_WEIGHT8_1, 35f32)  );
+        vec.push( (F32_VECTOR1 , F32_WEIGHT1_N1, -11f32)  );
+
+
+        //Vec
+        // array of tupples
+        vec
+    }

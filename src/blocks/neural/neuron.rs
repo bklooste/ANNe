@@ -4,6 +4,8 @@ use num::{Float};
 
 //sigmoid activation & SIMD weights
 
+// fast logistic
+
 /// Activation Function
 ///
 pub trait ActivationFunction<O : Num>

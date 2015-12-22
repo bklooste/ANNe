@@ -34,6 +34,177 @@ impl <W : Num +ToPrimitive > NeuralNetParameters<W, f64> for Sigmoid
 
 
 
+    //    The functions are described with functions where
+    //x is the input to the activation function,
+    //y is the output,
+    //s is the steepness and
+    //d is the derivation.
+    //FANN_LINEAR Linear activation function.
+    //span: -inf<y<inf
+    //y = x*s, d = 1*s
+    //Can NOT be used in fixed point.
+    //FANN_THRESHOLD  Threshold activation function.
+    //x< 0 -> y = 0, x >= 0 -> y = 1
+    //Can NOT be used during training.
+    //FANN_THRESHOLD_SYMMETRIC    Threshold activation function.
+    //x< 0 -> y = 0, x >= 0 -> y = 1
+    //Can NOT be used during training.
+    //FANN_SIGMOID    Sigmoid activation function.
+    //One of the most used activation functions.
+    //span: 0 < y< 1
+    //y = 1/(1 + exp(-2*s*x))
+    //d = 2* s* y*(1 - y)
+    //FANN_SIGMOID_STEPWISE Stepwise linear approximation to sigmoid.
+    //Faster than sigmoid but a bit less precise.
+    //FANN_SIGMOID_SYMMETRIC Symmetric sigmoid activation function, aka.tanh.
+    //One of the most used activation functions.
+    //span: -1 < y< 1
+    //y = tanh(s*x) = 2/(1 + exp(-2*s* x)) - 1
+    //d = s*(1-(y* y))
+    //FANN_SIGMOID_SYMMETRIC_STEPWISE Stepwise linear approximation to symmetric sigmoid.
+    //Faster than symmetric sigmoid but a bit less precise.
+    //FANN_GAUSSIAN Gaussian activation function.
+    //0 when x = -inf, 1 when x = 0 and 0 when x = inf
+    //span: 0 < y< 1
+    //y = exp(-x*s*x*s)
+    //d = -2* x* s* y* s
+    //FANN_GAUSSIAN_SYMMETRIC Symmetric gaussian activation function.
+    //-1 when x = -inf, 1 when x = 0 and 0 when x = inf
+    //span: -1 < y< 1
+    //y = exp(-x* s* x* s)*2-1
+    //d = -2* x* s*(y+1)* s
+    //FANN_ELLIOT Fast(sigmoid like) activation function defined by David Elliott
+    //span: 0 < y< 1
+    //y = ((x* s) / 2) / (1 + |x* s|) + 0.5
+    //d = s*1/(2*(1+|x* s|)*(1+|x* s|))
+    //FANN_ELLIOT_SYMMETRIC Fast(symmetric sigmoid like) activation function defined by David Elliott
+    //span: -1 < y< 1
+    //y = (x* s) / (1 + |x* s|)
+    //d = s*1/((1+|x* s|)*(1+|x* s|))
+    //FANN_LINEAR_PIECE Bounded linear activation function.
+    //span: 0 < y< 1
+    //y = x*s, d = 1*s
+    //FANN_LINEAR_PIECE_SYMMETRIC Bounded Linear activation function.
+    //span: -1 < y< 1
+    //y = x*s, d = 1*s
+    //FANN_SIN_SYMMETRIC  Periodical sinus activation function.
+    //span: -1 <= y <= 1
+    //y = sin(x* s)
+    //d = s* cos(x* s)
+    //FANN_COS_SYMMETRIC Periodical cosinus activation function.
+    //span: -1 <= y <= 1
+    //y = cos(x* s)
+    //d = s*-sin(x* s)
+
+
+        // note int and byte functions are always quant. to 0 and 1 or -1 to1.
+
+
+
+        //        atan(pi* x/2)*2/pi   24.1 ns
+        // atan(x)             23.0 ns
+        //1/(1+exp(-x))       20.4 ns
+        //1/sqrt(1+x^2)       13.4 ns  // great for parralel
+        //erf(sqrt(pi)* x/2)    6.7 ns
+        // tanh(x)              5.5 ns
+        //x/(1+|x|)            5.5 ns
+
+        // there are really 3 forms of each case
+        // standard eg 0-1 output  where 0 = 0.5
+        // Symmetric eg -1 to 1 output  where 0 = 0
+        // Positive eg symetric where -1 output is 0 . Can use Symetric if input positive
+
+
+//         public static double Tanh(double weightCalculation)
+//         {
+//             return Math.Tanh(weightCalculation);
+//         }
+//
+//         // 0.5 * (x * alpha / (1 + abs(x*alpha)) + 0.5 is eqivalent to logistic
+//         public static float ElliotSigmoid(float value)
+//         {
+//             return ( (value/2) / (1 + Math.Abs(value))) +0.5f;
+//         }
+//
+//         public static float ElliotSigmoidPositive(float value)
+//         {
+//             if (value <= 0)
+//                 return 0;
+//             return SymmetricElliotSigmoid(value);
+//         }
+//
+//         public static float SymmetricElliotSigmoid(float value)
+//         {
+//             return ((value / 2) / (1 + Math.Abs(value))) + 0.5f;
+//         }
+//
+//         //        f(x) = x / (1 + abs(x))
+//         //g(x) = ax / (a + abs(x) + 1)
+//         //h(x) = ax / (a + abs(x) – 1)
+//
+//         // eg 1 = 1/2  , 2 = 2/3 etc max output is lim 1.
+//
+//
+//             //0 -255 pos input
+//         public static int ElliotSigmoidPositive(int value , int maxOut )
+//     }
+//
+//         public static int ElliotSigmoidSymmetric(int value, int maxOut)
+//         {
+//             // quite a few optomizations can be made
+//             if (value > maxOut * 64)
+//                 return maxOut;
+//             return (maxOut * value) / (maxOut + abs(value));  //  eg
+//         }
+//
+//         public static int ElliotSigmoid(int value, int maxOut)
+//         {
+//             if (value > maxOut * 64)
+//                 return maxOut;
+//             return (maxOut * value /2) / (maxOut + abs(value)) + maxOut/2;  //  eg
+//         }
+//
+//         //candidate to replace fast sig.
+//         public static float FastSigmoid3(float signal)
+//         {
+//             if (signal >= 4f) return 1f;
+//             float tmp = 1f - 0.25f * signal;
+//             tmp *= tmp;
+//             tmp *= tmp;
+//             tmp *= tmp;
+//             tmp *= tmp;
+//             return 1f / (1f + tmp);
+//         }
+//
+//
+//
+//         //1/(1 + 0.3678749025^x)
+//
+//         static int abs(int weightCalculation)
+//         {
+//             var mask = weightCalculation >> 31;
+//             weightCalculation ^= mask;
+//             weightCalculation += mask & 1;
+//             return weightCalculation;
+//         }
+//
+//         public static float SigmoidSymmetric(float weightCalculation)
+//         {
+//             return (float)(2.0f / (1.0f + Math.Exp(-2.0f * weightCalculation)) - 1.0f );
+//         }
+//
+//         public static float LogisticFunction(float weightCalculation)
+//         {
+//             return (float) (1.0f / (1.0f + Math.Exp(-2.0f * weightCalculation)));
+//         }
+//
+//
+//
+//
+//     }
+// }
+
+
 
 
 // impl ILayer for Sigmoid {
