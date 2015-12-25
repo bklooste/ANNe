@@ -1,8 +1,9 @@
 use num::traits::Num;
 use num::traits::ToPrimitive;
-use num::{Float};
+
 
 use blocks::neural::neuron::*;
+#[allow(unused_imports)]
 use blocks::neural::testdata::*;
 
  fn get_bias_from_end<W: ToPrimitive>( array : &[W]  ) -> u32

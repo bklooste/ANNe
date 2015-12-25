@@ -1,6 +1,6 @@
 
 use num::traits::Num;
-use blocks::neural::neuron::NeuralNetParameters;
+use blocks::neural::neuron::WeightFunction;
 //use core::marker::Sized;
 
 
@@ -63,7 +63,7 @@ pub trait BlockBehaviour < O : Num>
 
 
 
-pub trait NeuronBlockBehaviour < W : Num , O : Num , N: NeuralNetParameters<W, O >>
+pub trait NeuronBlockBehaviour < W : Num , O : Num , N: WeightFunction<W, O >>
 {
     // fn calc (weights: &[W] ,  inputs: &[O] ) -> Self::Output ;
     // fn activate (output : Self::Output )  -> Self::Output ;
@@ -77,17 +77,17 @@ pub trait NeuronBlockBehaviour < W : Num , O : Num , N: NeuralNetParameters<W, O
 
 
 
-pub trait FloatNeuronBlockBehaviour<N : NeuralNetParameters<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
+pub trait FloatNeuronBlockBehaviour<N : WeightFunction<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
 {
 
 }
 
-pub trait ByteNeuronBlockBehaviour<N: NeuralNetParameters<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
+pub trait ByteNeuronBlockBehaviour<N: WeightFunction<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
 {
 
 }
 
-impl<N : NeuralNetParameters<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
+impl<N : WeightFunction<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
 
 // // get input for neuron is not needed for full mesh so this is a specialization
 // pub trait NeuronBlockBehaviour<W: Num> : BlockBehaviour

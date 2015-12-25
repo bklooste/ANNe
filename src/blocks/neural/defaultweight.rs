@@ -1,20 +1,23 @@
+use std::marker::PhantomData;
+
 use num::traits::Num;
 use num::traits::ToPrimitive;
 
 use blocks::neural::neuron::*;
+#[allow(unused_imports)]
 use blocks::neural::testdata::*;
 
 
 // basic non performant weights good for debugging and comparisons
 #[derive(Copy, Clone)]
-pub struct DefaultWeightFunction;
-
+pub struct DefaultWeightFunction<T> where T:ActivationFunction<f32,f32> {    _m: PhantomData<T> }
 
 // fixme DefaultWeightFunction should return usize for integer types.
 //enum_primitive crate,
-// we will need custom version of toprimative which checks ranges and never fails nor construct a option
-impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightFunction
+// we will need custom version WeightFunctionWeightFunctionWeightFunction toprimative which checks ranges and never fails nor construct a option
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f32 > for DefaultWeightFunction<N>
 {
+    //type ActivationFunction = N;
     #[inline]
     fn calc_weight(v: &[f32], weights: &[W]) -> f32
     {
@@ -26,7 +29,7 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightFunction
         for (vn , weight) in v.iter().zip(weights.iter()) {
                 sum = sum + vn * weight.to_f32().unwrap();
         }
-        sum
+        N::activation(sum)
 //unsafe {
 //     let a = [0u8, 0u8, 0u8, 0u8];
 //
@@ -34,7 +37,8 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightFunction
     }
 }
 
-impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightFunction
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f64 > for DefaultWeightFunction<N>
+//impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightFunction
 {
     #[inline]
     fn calc_weight(v: &[f64], weights: &[W]) -> f64
@@ -48,11 +52,14 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightFunction
         for (vn , weight) in v.iter().zip(weights.iter()) {
                 sum = sum + vn * weight.to_f64().unwrap();
         }
-        sum
+
+        N::activation(sum as f32) as f64
     }
 }
 
-impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightFunction
+//floats with byte weights
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , u8 > for DefaultWeightFunction<N>
+//impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightFunction
 {
     #[inline]
     fn calc_weight(v: &[u8], weights: &[W]) -> u8
@@ -68,11 +75,12 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightFunction
             sum = sum + (mult) as usize;
         }
         if sum > 255{ return 255u8; }
-        sum.to_u8().unwrap()
+
+        N::activation(sum as f32) as u8
     }
 }
 
-impl <W:Num+ ToPrimitive> WeightFunction<W , i8 > for DefaultWeightFunction
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , i8 > for DefaultWeightFunction<N>
 {
     #[inline]
     fn calc_weight(v: &[i8], weights: &[W]) -> i8
@@ -94,103 +102,11 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , i8 > for DefaultWeightFunction
             return 127i8;
         }
         if  sum < -127 { return -128i8;}
-        sum.to_i8().unwrap()
-    }
-}
-
-impl <W:Num+ ToPrimitive> WeightFunction<W , i32 > for DefaultWeightFunction
-{
-    #[inline]
-    fn calc_weight(v: &[i32], weights: &[W]) -> i32
-    {
-        if  v.len() != weights.len()         {
-            panic!("weight length not the same as input vector");
-        }
-
-        let mut sum = 0isize;
-        for (vn , weight) in v.iter().zip(weights.iter()) {
-                sum = sum + (vn * weight.to_i32().unwrap()) as isize ;
-        }
-        sum.to_i32().unwrap()
+        N::activation(sum as f32) as i8
     }
 }
 
 
-
-
-#[test]
-#[should_panic(expected = "weight length")]
-fn test_default_weight_function_dif_len_input()
-{
-    let sum = DefaultWeightFunction::calc_weight(I8_VECTOR1 , I8_VECTOR3 ) ;
-}
-
-#[test]
-fn test_default_weight_function_i8() {
-    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
-
-    info!("running default_weight_tests");
-
-
-    let sum = DefaultWeightFunction::calc_weight(I8_VECTOR1 , I8_VECTOR1 ) ;
-    assert_eq!(1, sum);
-        let sum = DefaultWeightFunction::calc_weight(&[1 ,2, 3 ] , &[1,2,3] ) ;
-        assert_eq!(14, sum);
-        let sum = DefaultWeightFunction::calc_weight(&[1f32 ; 3 ] , &[1f32 ; 3 ] ) ;
-        assert_eq!(3f32, sum);
-}
-
-#[test]
-fn test_default_weight_function_i8_many() {
-    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
-    info!("running default_weight_tests");
-
-    for (v1, v2,result) in geti8data()
-    {
-        //println!("{:?}",testdata );
-        let sum = DefaultWeightFunction::calc_weight(v1 , v2 ) ;
-        if sum != result {
-            //let str1 = ;
-             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
-        }
-        assert_eq!(result, sum);
-    }
-}
-
-
-#[test]
-fn test_default_weight_function_u8_many() {
-    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
-    info!("running default_weight_tests");
-
-    for (v1, v2,result) in getu8data()
-    {
-        //println!("{:?}",testdata );
-        let sum = DefaultWeightFunction::calc_weight(v1 , v2 ) ;
-        if sum != result {
-            //let str1 = ;
-             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
-        }
-        assert_eq!(result, sum);
-    }
-}
-
-#[test]
-fn test_default_weight_function_f32_many() {
-    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
-    info!("running default_weight_tests");
-
-    for (v1, v2,result) in getf32data()
-    {
-        //println!("{:?}",testdata );
-        let sum = DefaultWeightFunction::calc_weight(v1 , v2 ) ;
-        if sum != result {
-            //let str1 = ;
-             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
-        }
-        assert_eq!(result, sum);
-    }
-}
 
 //uper::block::
 // #[derive(Copy, Cltion = DefaultWeightFunction;

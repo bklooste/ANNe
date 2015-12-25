@@ -11,7 +11,7 @@ use super::block::*;
 // dont enhance it build new ones this is a basic impl.
 //#[derive(Default)]
 pub struct BlockwWeightHardening<W, O, N>
-where W: Num + 'static , O: Num + 'static , N: NeuralNetParameters <W,O>
+where W: Num + 'static , O: Num + 'static , N: WeightFunction <W,O>
 {
     weights: & 'static [W],
     weights_hardness: Vec<i8> , // = size of weights
@@ -24,7 +24,7 @@ where W: Num + 'static , O: Num + 'static , N: NeuralNetParameters <W,O>
 
 
 impl<W,O,N>  BlockwWeightHardening<W,O,N>
-where W: Num + 'static , O: Num + 'static , N: NeuralNetParameters <W,O>
+where W: Num + 'static , O: Num + 'static , N: WeightFunction <W,O>
 {
      pub fn new(block_data: BlockData , all_weights: & 'static [W] , output_buf: & 'static mut [O], input_buf: & 'static  [O])  -> BlockwWeightHardening< W , O , N>
      {
@@ -37,7 +37,7 @@ where W: Num + 'static , O: Num + 'static , N: NeuralNetParameters <W,O>
 }
 
 impl<W ,O ,N>  BlockBehaviour < O > for BlockwWeightHardening<W ,O ,N>
-where W: Num + 'static, O: Num + 'static, N: NeuralNetParameters <W,O>
+where W: Num + 'static, O: Num + 'static, N: WeightFunction <W,O>
 {
     fn set_buffers(& mut self , inputs: &[& 'static [O]] , outputs: & 'static mut [O])
     {
@@ -48,7 +48,7 @@ where W: Num + 'static, O: Num + 'static, N: NeuralNetParameters <W,O>
 }
 
 impl<W ,O ,N>  Block  for BlockwWeightHardening<W ,O ,N>
-where W: Num + 'static , O: Num + 'static, N: NeuralNetParameters <W,O>
+where W: Num + 'static , O: Num + 'static, N: WeightFunction <W,O>
 {
     fn process_buffers(& mut self)
     {
@@ -60,7 +60,7 @@ where W: Num + 'static , O: Num + 'static, N: NeuralNetParameters <W,O>
                 let activated:O =
                  {
                      let in_vec_for_neuron = self.get_input_for_neuron( nc as u32);
-                     standard_calc::<W,O,N>( weights_for_neuron, in_vec_for_neuron )
+                     N::calc_weight( in_vec_for_neuron ,   weights_for_neuron  )
                  };
 
                 self.outputs[nc] = activated;
@@ -71,7 +71,7 @@ where W: Num + 'static , O: Num + 'static, N: NeuralNetParameters <W,O>
 }
 
 impl<W, O, N>  NeuronBlockBehaviour <W, O, N>  for BlockwWeightHardening<W, O, N>
-where W: Num + 'static , O: Num +'static , N: NeuralNetParameters <W,O>
+where W: Num + 'static , O: Num +'static , N: WeightFunction <W,O>
 {
     fn get_input_for_neuron (&self  , _neuron_num : u32 ) -> &[O] { self.inputs }
     fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W] { self.weights_for_neuron(neuron_num)}

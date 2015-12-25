@@ -16,7 +16,7 @@ use super::neuron::*;
 
 /// Activation Function
 ///
-pub trait TrainingActivationFunction<O : Num> : ActivationFunction<O>{
+pub trait TrainingActivationFunction<O : Num , I : Num> : ActivationFunction<O, I>{
    //fn activation(x: O) -> O;
    fn derivative(x: O) -> O;
 }
@@ -35,8 +35,8 @@ pub trait GenerateBiasWeightFunction<W : Num> {
    fn biasw() -> W;
 }
 
-pub trait TrainNetParameters<W : Num , O: Num > : NeuralNetParameters<W,O> {
-   type TrainingActivationFunction : TrainingActivationFunction<O>;
+pub trait TrainNetParameters<W : Num , O: Num > {
+   type TrainingActivationFunction : TrainingActivationFunction<O , O>;
    type GenerateWeightFunction : GenerateWeightFunction<W>;
    type GenerateBiasWeightFunction : GenerateBiasWeightFunction<W>;
 }

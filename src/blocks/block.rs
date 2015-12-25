@@ -1,14 +1,12 @@
-use num::traits::Num;
-
 use core::*;
-use super::neural::neuron::*;
 
-pub fn standard_calc <W, O, N> (weights: &[W] , inputs: &[O] ) -> O
-where W: Num , O: Num , N: NeuralNetParameters <W,O>
-{
-    let result =  N::WeightFunction::calc_weight( inputs ,  weights  ) ;
-    N::ActivationFunction::activation(result)
-}
+// this is not needed function for 1 line,,
+// #[inline]
+// pub fn standard_calc <W, O, N > (weights: &[W] , inputs: &[O] ) -> O
+// where W: Num , O: Num , N: WeightFunction <W,O >
+// {
+//     let result =  N::calc_weight( inputs ,  weights  ) ;
+// }
 
 #[derive(Default , Clone)]
 pub struct BlockData

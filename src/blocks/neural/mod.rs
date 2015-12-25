@@ -15,7 +15,7 @@
 //! results.
 //!
 //! The activation function is also sometimes called transfer function.
-pub use self::sigmoid::Sigmoid;
+//pub use self::sigmoid::Sigmoid;
 
 pub mod testdata;
 pub mod sigmoid;
