@@ -1,24 +1,24 @@
-//! Provides nonlinear activation methods.
+//! Provides nonlinear activate methods.
 //!
-//! Activation Layers take a bottom Blob, provide the activation operation and
+//! Activation Layers take a bottom Blob, provide the activate operation and
 //! produce a top Blob.
-//! Thanks to the nonlinearity of the activation methods, we can 'learn' and
+//! Thanks to the nonlinearity of the activate methods, we can 'learn' and
 //! detect nonlinearities
 //! in our (complex) datasets.
 //!
-//! The activation operation used should depend on the task at hand. For binary
+//! The activate operation used should depend on the task at hand. For binary
 //! classification a
 //! step function might be very useful. For more complex tasks continious
-//! activation functions such
+//! activate functions such
 //! as Sigmoid, TanH, Softmax or ReLU should be used. In most cases ReLU might
 //! prove the best
 //! results.
 //!
-//! The activation function is also sometimes called transfer function.
+//! The activate function is also sometimes called transfer function.
 //pub use self::sigmoid::Sigmoid;
 
 pub mod testdata;
-pub mod sigmoid;
+pub mod activation;
 pub mod training;
 
 pub mod unit;

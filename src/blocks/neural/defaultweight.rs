@@ -10,16 +10,16 @@ use blocks::neural::testdata::*;
 
 // basic non performant weights good for debugging and comparisons
 #[derive(Copy, Clone)]
-pub struct DefaultWeightFunction<T> where T:ActivationFunction<f32,f32> {    _m: PhantomData<T> }
+pub struct DefaultNeuron<T> where T:ActivationFunction<f32,f32> {    _m: PhantomData<T> }
 
-// fixme DefaultWeightFunction should return usize for integer types.
+// fixme DefaultNeuron should return usize for integer types.
 //enum_primitive crate,
-// we will need custom version WeightFunctionWeightFunctionWeightFunction toprimative which checks ranges and never fails nor construct a option
-impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f32 > for DefaultWeightFunction<N>
+// we will need custom version NeuronNeuronNeuron toprimative which checks ranges and never fails nor construct a option
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for DefaultNeuron<N>
 {
     //type ActivationFunction = N;
     #[inline]
-    fn calc_weight(v: &[f32], weights: &[W]) -> f32
+    fn eval(v: &[f32], weights: &[W]) -> f32
     {
         if  v.len() != weights.len()         {
             panic!("weight length not the same as input vector");
@@ -29,7 +29,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f
         for (vn , weight) in v.iter().zip(weights.iter()) {
                 sum = sum + vn * weight.to_f32().unwrap();
         }
-        N::activation(sum)
+        N::activate(sum)
 //unsafe {
 //     let a = [0u8, 0u8, 0u8, 0u8];
 //
@@ -37,11 +37,11 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f
     }
 }
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f64 > for DefaultWeightFunction<N>
-//impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightFunction
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f64 > for DefaultNeuron<N>
+//impl <W:Num + ToPrimitive> Neuron<W , f64 > for DefaultNeuron
 {
     #[inline]
-    fn calc_weight(v: &[f64], weights: &[W]) -> f64
+    fn eval(v: &[f64], weights: &[W]) -> f64
     {
         if  v.len() != weights.len()         {
             panic!("weight length not the same as input vector");
@@ -53,16 +53,16 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , f
                 sum = sum + vn * weight.to_f64().unwrap();
         }
 
-        N::activation(sum as f32) as f64
+        N::activate(sum as f32) as f64
     }
 }
 
 //floats with byte weights
-impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , u8 > for DefaultWeightFunction<N>
-//impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightFunction
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , u8 > for DefaultNeuron<N>
+//impl <W:Num+ ToPrimitive> Neuron<W , u8 > for DefaultNeuron
 {
     #[inline]
-    fn calc_weight(v: &[u8], weights: &[W]) -> u8
+    fn eval(v: &[u8], weights: &[W]) -> u8
     {
         if  v.len() != weights.len()         {
             panic!("weight length not the same as input vector");
@@ -76,14 +76,14 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , u
         }
         if sum > 255{ return 255u8; }
 
-        N::activation(sum as f32) as u8
+        N::activate(sum as f32) as u8
     }
 }
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , i8 > for DefaultWeightFunction<N>
+impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , i8 > for DefaultNeuron<N>
 {
     #[inline]
-    fn calc_weight(v: &[i8], weights: &[W]) -> i8
+    fn eval(v: &[i8], weights: &[W]) -> i8
     {
         if  v.len() != weights.len()         {
             panic!("weight length not the same as input vector");
@@ -102,15 +102,15 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , i
             return 127i8;
         }
         if  sum < -127 { return -128i8;}
-        N::activation(sum as f32) as i8
+        N::activate(sum as f32) as i8
     }
 }
 
 
 
 //uper::block::
-// #[derive(Copy, Cltion = DefaultWeightFunction;
-//   type BiasWeightFunction = PositiveOneBiasFunction;
+// #[derive(Copy, Cltion = DefaultNeuron;
+//   type BiasNeuron = PositiveOneBiasFunction;
 // }
 //one)] pub struct DefaultErrorGradient;
 //
@@ -128,7 +128,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , i
 //
 // /// Bias function that returns a random weight between -0.5 and 0.5.
 // ///
-// #[derive(Copy, Clone)] pub struct RandomBiasWeightFunction;
+// #[derive(Copy, Clone)] pub struct RandomBiasNeuron;
 //,2f32,3f32{
 //     let range = Range::new(-0.5f64, 0.5f64);
 //     range.ind_sample(&mut thread_rng())
@@ -140,7 +140,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , i
 // ///
 // #[derive(Copy, Clone)] pub struct NegativeOneBiasFunction;
 //
-// impl BiasWeightFunction for NegativeOneBiasFunction {
+// impl BiasNeuron for NegativeOneBiasFunction {
 //   #[inline] fn biasw() -> f64 { -1f64 }
 // }
 //
@@ -149,7 +149,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> WeightFunction<W , i
 // ///
 // #[derive(Copy, Clone)] pub struct PositiveOneBiasFunction;
 //
-// impl BiasWeightFunction for PositiveOneBiasFunction {
+// impl BiasNeuron for PositiveOneBiasFunction {
 //   #[inline] fn biasw() -> f64 { 1f64 }
 // }
 //

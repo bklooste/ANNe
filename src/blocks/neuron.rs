@@ -5,39 +5,39 @@ use num::{Float};
 
 pub trait ActivationFunction<O : Num>
 {
-   fn activation(x: O) -> O;
+   fn activate(x: O) -> O;
 }
 
-pub trait WeightFunction<W : Num , O: Num >
+pub trait Neuron<W : Num , O: Num >
 {
-   fn calc_weight(ins: &[O], outs: &[W]) -> O;
+   fn eval(ins: &[O], outs: &[W]) -> O;
 }
 
 pub trait NeuralNetParameters<W : Num , O: Num >
 {
    type ActivationFunction : ActivationFunction<O>;
-   type WeightFunction : WeightFunction<W, O>;
+   type Neuron : Neuron<W, O>;
 }
 
 #[derive(Copy, Clone, RustcEncodable, RustcDecodable)]
 pub struct LogisticNeuralNet;
 
 impl ActivationFunction<u8> for LogisticNeuralNet {
-  #[inline(always)] fn activation(x: u8) -> u8 { 1  }
+  #[inline(always)] fn activate(x: u8) -> u8 { 1  }
 }
 
 impl ActivationFunction<f32> for LogisticNeuralNet {
-  #[inline(always)] fn activation(x: f32) -> f32 { 1f32 / (1f32 + (-x).exp()) }
+  #[inline(always)] fn activate(x: f32) -> f32 { 1f32 / (1f32 + (-x).exp()) }
 }
 
 impl ActivationFunction<f64> for LogisticNeuralNet {
-  #[inline(always)] fn activation(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
+  #[inline(always)] fn activate(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
 }
 //
 // impl NeuralNetParameters for LogisticNeuralNet {
 //   type ActivationFunction = LogisticNeuralNet;
-//   type WeightFunction = DefaultWeightFunction;
-//   //type BiasWeightFunction = NegativeOneBiasFunction;
+//   type Neuron = DefaultNeuron;
+//   //type BiasNeuron = NegativeOneBiasFunction;
 // }
 //
 //
@@ -47,24 +47,24 @@ impl ActivationFunction<f64> for LogisticNeuralNet {
 // pub struct TanhNeuralNet;
 //
 // impl ActivationFunction for TanhNeuralNet {
-//   #[inline(always)] fn activation(x: f64) -> f64 { x.tanh() }
+//   #[inline(always)] fn activate(x: f64) -> f64 { x.tanh() }
 //   #[inline(always)] fn derivative(x: f64) -> f64 { 1f64 - x.tanh().powi(2) }
 // }
 //
 // impl NeuralNetParameters for TanhNeuralNet {
 //   type ActivationFunction = TanhNeuralNet;
-//   type WeightFunction = DefaultWeightFunction;
-//   type BiasWeightFunction = PositiveOneBiasFunction;
+//   type Neuron = DefaultNeuron;
+//   type BiasNeuron = PositiveOneBiasFunction;
 // }
 //
 //
 
-#[derive(Copy, Clone)] pub struct DefaultWeightFunction;
+#[derive(Copy, Clone)] pub struct DefaultNeuron;
 
-impl<W : Num , O: Num + Default> WeightFunction<W , O > for DefaultWeightFunction
+impl<W : Num , O: Num + Default> Neuron<W , O > for DefaultNeuron
 {
     #[inline]
-    fn calc_weight(ins: &[O], outs: &[W]) -> O
+    fn eval(ins: &[O], outs: &[W]) -> O
     {
         if ( ins.len() != outs.let())
             panic!("lenght of input and output slices do not match!");
@@ -92,9 +92,9 @@ impl<W : Num , O: Num + Default> WeightFunction<W , O > for DefaultWeightFunctio
 //
 // /// Bias function that returns a random weight between -0.5 and 0.5.
 // ///
-// #[derive(Copy, Clone)] pub struct RandomBiasWeightFunction;
+// #[derive(Copy, Clone)] pub struct RandomBiasNeuron;
 //
-// impl BiasWeightFunction for RandomBiasWeightFunction {
+// impl BiasNeuron for RandomBiasNeuron {
 //   #[inline]
 //   fn biasw() -> f64 {
 //     let range = Range::new(-0.5f64, 0.5f64);
@@ -107,7 +107,7 @@ impl<W : Num , O: Num + Default> WeightFunction<W , O > for DefaultWeightFunctio
 // ///
 // #[derive(Copy, Clone)] pub struct NegativeOneBiasFunction;
 //
-// impl BiasWeightFunction for NegativeOneBiasFunction {
+// impl BiasNeuron for NegativeOneBiasFunction {
 //   #[inline] fn biasw() -> f64 { -1f64 }
 // }
 //
@@ -116,7 +116,7 @@ impl<W : Num , O: Num + Default> WeightFunction<W , O > for DefaultWeightFunctio
 // ///
 // #[derive(Copy, Clone)] pub struct PositiveOneBiasFunction;
 //
-// impl BiasWeightFunction for PositiveOneBiasFunction {
+// impl BiasNeuron for PositiveOneBiasFunction {
 //   #[inline] fn biasw() -> f64 { 1f64 }
 // }
 //

@@ -6,7 +6,7 @@
 // //! To build a Deep Neural Network you first need to create a
 // //! [Network][network] which is a container for all different types of
 // //! [Layers][layers]. These layers are grouped in different types such as
-// //! [Activation Layers][activation] and [Loss Layers][loss] (these state the
+// //! [Activation Layers][activate] and [Loss Layers][loss] (these state the
 // //! characteristics of the layer).
 // //!
 // //! Now to train your network you can use one of the [Solvers][solvers]. The
@@ -53,18 +53,18 @@
 // //! Progress is tracked at<br/>
 // //!
 // //! - [Issue #18 for Loss Layers][issue-loss]
-// //! - [Issue #19 for Activation Layers][issue-activation]
+// //! - [Issue #19 for Activation Layers][issue-activate]
 // //! - [Issue #20 for Common Layers][issue-common]
 // //!
 // //! [network]: ./network/index.html
 // //! [layers]: ./layers/index.html
-// //! [activation]: ./layers/activation/index.html
+// //! [activate]: ./layers/activate/index.html
 // //! [loss]: ./layers/loss/index.html
 // //! [solvers]: ./solvers/index.html
 // //! [optimization]: https://en.wikipedia.org/wiki/Stochastic_optimization
 // //!
 // //! [issue-loss]: https://github.com/autumnai/leaf/issues/18
-// //! [issue-activation]: https://github.com/autumnai/leaf/issues/19
+// //! [issue-activate]: https://github.com/autumnai/leaf/issues/19
 // //! [issue-common]: https://github.com/autumnai/leaf/issues/20
 // #![feature(plugin)]
 // #![feature(augmented_assignments)]

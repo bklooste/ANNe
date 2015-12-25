@@ -17,13 +17,13 @@ use super::neuron::*;
 /// Activation Function
 ///
 pub trait TrainingActivationFunction<O : Num , I : Num> : ActivationFunction<O, I>{
-   //fn activation(x: O) -> O;
+   //fn activate(x: O) -> O;
    fn derivative(x: O) -> O;
 }
 
 /// The weight function to generate the initial weights.
 ///
-pub trait GenerateWeightFunction<W : Num > {
+pub trait GenerateNeuron<W : Num > {
    fn initw(ins: usize, outs: usize) -> W;
 }
 
@@ -31,21 +31,21 @@ pub trait GenerateWeightFunction<W : Num > {
 
 /// The weight function to generate the bias nodes' weights.
 ///
-pub trait GenerateBiasWeightFunction<W : Num> {
+pub trait GenerateBiasNeuron<W : Num> {
    fn biasw() -> W;
 }
 
 pub trait TrainNetParameters<W : Num , O: Num > {
    type TrainingActivationFunction : TrainingActivationFunction<O , O>;
-   type GenerateWeightFunction : GenerateWeightFunction<W>;
-   type GenerateBiasWeightFunction : GenerateBiasWeightFunction<W>;
+   type GenerateNeuron : GenerateNeuron<W>;
+   type GenerateBiasNeuron : GenerateBiasNeuron<W>;
 }
 
 
 #[derive(Copy, Clone)]
-pub struct DefaultGenerateWeightFunction;
+pub struct DefaultGenerateNeuron;
 
-impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
+impl <O:Num + One> GenerateNeuron<O> for DefaultGenerateNeuron {
 
   #[inline]
   fn initw(_ins: usize, _: usize) -> O {
@@ -116,14 +116,14 @@ impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
 // pub struct LogisticNeuralNet;
 //
 // impl ActivationFunction for LogisticNeuralNet {
-//   #[inline(always)] fn activation(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
+//   #[inline(always)] fn activate(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
 //   #[inline(always)] fn derivative(x: f64) -> f64 { x * (1f64 - x) }
 // }
 //
 // impl NeuralNetParameters for LogisticNeuralNet {
 //   type ActivationFunction = LogisticNeuralNet;
-//   type WeightFunction = DefaultWeightFunction;
-//   //type BiasWeightFunction = NegativeOneBiasFunction;
+//   type Neuron = DefaultNeuron;
+//   //type BiasNeuron = NegativeOneBiasFunction;
 // }
 //
 //
@@ -133,22 +133,22 @@ impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
 // pub struct TanhNeuralNet;
 //
 // impl ActivationFunction for TanhNeuralNet {
-//   #[inline(always)] fn activation(x: f64) -> f64 { x.tanh() }
+//   #[inline(always)] fn activate(x: f64) -> f64 { x.tanh() }
 //   #[inline(always)] fn derivative(x: f64) -> f64 { 1f64 - x.tanh().powi(2) }
 // }
 //
 // impl NeuralNetParameters for TanhNeuralNet {
 //   type ActivationFunction = TanhNeuralNet;
-//   type WeightFunction = DefaultWeightFunction;
-//   type BiasWeightFunction = PositiveOneBiasFunction;
+//   type Neuron = DefaultNeuron;
+//   type BiasNeuron = PositiveOneBiasFunction;
 // }
 //
 //
 // /// Default weight function that is dependent on the input size.
 // ///
-// #[derive(Copy, Clone)] pub struct DefaultWeightFunction;
+// #[derive(Copy, Clone)] pub struct DefaultNeuron;
 //
-// impl WeightFunction for DefaultWeightFunction {
+// impl Neuron for DefaultNeuron {
 //   #[inline]
 //   fn initw(ins: usize, _: usize) -> f64 {
 //     let lb = -1f64 / (ins as f64).sqrt();
@@ -178,9 +178,9 @@ impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
 //
 // /// Bias function that returns a random weight between -0.5 and 0.5.
 // ///
-// #[derive(Copy, Clone)] pub struct RandomBiasWeightFunction;
+// #[derive(Copy, Clone)] pub struct RandomBiasNeuron;
 //
-// impl BiasWeightFunction for RandomBiasWeightFunction {
+// impl BiasNeuron for RandomBiasNeuron {
 //   #[inline]
 //   fn biasw() -> f64 {
 //     let range = Range::new(-0.5f64, 0.5f64);
@@ -193,7 +193,7 @@ impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
 // ///
 // #[derive(Copy, Clone)] pub struct NegativeOneBiasFunction;
 //
-// impl BiasWeightFunction for NegativeOneBiasFunction {
+// impl BiasNeuron for NegativeOneBiasFunction {
 //   #[inline] fn biasw() -> f64 { -1f64 }
 // }
 //
@@ -202,7 +202,7 @@ impl <O:Num + One> GenerateWeightFunction<O> for DefaultGenerateWeightFunction {
 // ///
 // #[derive(Copy, Clone)] pub struct PositiveOneBiasFunction;
 //
-// impl BiasWeightFunction for PositiveOneBiasFunction {
+// impl BiasNeuron for PositiveOneBiasFunction {
 //   #[inline] fn biasw() -> f64 { 1f64 }
 // }
 //

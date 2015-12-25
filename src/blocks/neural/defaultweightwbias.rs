@@ -25,10 +25,10 @@ pub struct DefaultWeightwBiasFunction;
 // we will need custom version of toprimative which checks ranges and never fails nor construct a option
 
 // f32 could be more efficient if bias was inluded in v.
-impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightwBiasFunction
+impl <W:Num + ToPrimitive> Neuron<W , f32 > for DefaultWeightwBiasFunction
 {
     #[inline]
-    fn calc_weight(v: &[f32], weights: &[W]) -> f32
+    fn eval(v: &[f32], weights: &[W]) -> f32
     {
         if  v.len() +1 != weights.len() {
             if  v.len() == weights.len() {
@@ -50,10 +50,10 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f32 > for DefaultWeightwBiasFuncti
 }
 
 
-impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightwBiasFunction
+impl <W:Num + ToPrimitive> Neuron<W , f64 > for DefaultWeightwBiasFunction
 {
     #[inline]
-    fn calc_weight(v: &[f64], weights: &[W]) -> f64
+    fn eval(v: &[f64], weights: &[W]) -> f64
     {
         if  v.len() +1 != weights.len()         {
             if  v.len() == weights.len()         {
@@ -72,10 +72,10 @@ impl <W:Num + ToPrimitive> WeightFunction<W , f64 > for DefaultWeightwBiasFuncti
     }
 }
 
-impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightwBiasFunction
+impl <W:Num+ ToPrimitive> Neuron<W , u8 > for DefaultWeightwBiasFunction
 {
     #[inline]
-    fn calc_weight(v: &[u8], weights: &[W]) -> u8
+    fn eval(v: &[u8], weights: &[W]) -> u8
     {
         if  v.len() +4 != weights.len()         {
             if  v.len() == weights.len()         {
@@ -98,10 +98,10 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , u8 > for DefaultWeightwBiasFunction
     }
 }
 
-impl <W:Num+ ToPrimitive> WeightFunction<W , i8 > for DefaultWeightwBiasFunction
+impl <W:Num+ ToPrimitive> Neuron<W , i8 > for DefaultWeightwBiasFunction
 {
     #[inline]
-    fn calc_weight(v: &[i8], weights: &[W]) -> i8
+    fn eval(v: &[i8], weights: &[W]) -> i8
     {
         if  v.len() +4 != weights.len()         {
             if  v.len() == weights.len()         {
@@ -127,10 +127,10 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , i8 > for DefaultWeightwBiasFunction
     }
 }
 
-impl <W:Num+ ToPrimitive> WeightFunction<W , i32 > for DefaultWeightwBiasFunction
+impl <W:Num+ ToPrimitive> Neuron<W , i32 > for DefaultWeightwBiasFunction
 {
     #[inline]
-    fn calc_weight(v: &[i32], weights: &[W]) -> i32
+    fn eval(v: &[i32], weights: &[W]) -> i32
     {
         if  v.len() != weights.len()         {
             panic!("weight length not the same as input vector");
@@ -151,21 +151,21 @@ impl <W:Num+ ToPrimitive> WeightFunction<W , i32 > for DefaultWeightwBiasFunctio
     // #[should_panic(expected = "weight length")]
     // fn test_default_weight_function_dif_len_input()
     // {
-    //     let sum = DefaultWeightFunction::calc_weight(I8_VECTOR1 , I8_VECTOR3 ) ;
+    //     let sum = DefaultNeuron::eval(I8_VECTOR1 , I8_VECTOR3 ) ;
     // }
     //
     // #[test]
     // fn test_default_weight_function_i8() {
-    //     //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultWeightFunction;
+    //     //let weightFunction : &Neuron<f32 ,f32 > = &DefaultNeuron;
     //
     //     info!("running default_weight_tests");
     //
     //
-    //     let sum = DefaultWeightFunction::calc_weight(I8_VECTOR1 , I8_VECTOR1 ) ;
+    //     let sum = DefaultNeuron::eval(I8_VECTOR1 , I8_VECTOR1 ) ;
     //     assert_eq!(1, sum);
-    //         let sum = DefaultWeightFunction::calc_weight(&[1 ,2, 3 ] , &[1,2,3] ) ;
+    //         let sum = DefaultNeuron::eval(&[1 ,2, 3 ] , &[1,2,3] ) ;
     //         assert_eq!(14, sum);
-    //         let sum = DefaultWeightFunction::calc_weight(&[1f32 ; 3 ] , &[1f32 ; 3 ] ) ;
+    //         let sum = DefaultNeuron::eval(&[1f32 ; 3 ] , &[1f32 ; 3 ] ) ;
     //         assert_eq!(3f32, sum);
     // }
 
@@ -176,7 +176,7 @@ fn test_default_weight_function_w_bias_f32_many() {
     for (v1, v2,result) in getf32datawbias()
     {
         //println!("{:?}",testdata );
-        let sum = DefaultWeightwBiasFunction::calc_weight(v1 , v2 ) ;
+        let sum = DefaultWeightwBiasFunction::eval(v1 , v2 ) ;
         if sum != result {
             //let str1 = ;
              println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));

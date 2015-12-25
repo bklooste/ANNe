@@ -20,14 +20,14 @@ pub use core::{ConnectionDestination, Connection,  Block  , BlockBehaviour };
 // pub struct LogisticNeuralNet;
 //
 // impl ActivationFunction for LogisticNeuralNet {
-//   #[inline(always)] fn activation(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
+//   #[inline(always)] fn activate(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
 //   #[inline(always)] fn derivative(x: f64) -> f64 { x * (1f64 - x) }
 // }
 //
 // impl NeuralNetParameters for LogisticNeuralNet {
 //   type ActivationFunction = LogisticNeuralNet;
-//   type WeightFunction = DefaultWeightFunction;
-//   type BiasWeightFunction = NegativeOneBiasFunction;
+//   type Neuron = DefaultNeuron;
+//   type BiasNeuron = NegativeOneBiasFunction;
 // }
 
 
@@ -179,14 +179,14 @@ pub use core::{ConnectionDestination, Connection,  Block  , BlockBehaviour };
 //
 // /// The weight function to generate the initial weights.
 // ///
-// pub trait WeightFunction {
+// pub trait Neuron {
 //   #[allow(missing_docs)] fn initw(ins: usize, outs: usize) -> f64;
 // }
 //
 //
 // /// The weight function to generate the bias nodes' weights.
 // ///
-// pub trait BiasWeightFunction {
+// pub trait BiasNeuron {
 //   #[allow(missing_docs)] fn biasw() -> f64;
 // }
 //

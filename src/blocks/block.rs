@@ -3,7 +3,7 @@ use core::*;
 // this is not needed function for 1 line,,
 // #[inline]
 // pub fn standard_calc <W, O, N > (weights: &[W] , inputs: &[O] ) -> O
-// where W: Num , O: Num , N: WeightFunction <W,O >
+// where W: Num , O: Num , N: Neuron <W,O >
 // {
 //     let result =  N::calc_weight( inputs ,  weights  ) ;
 // }

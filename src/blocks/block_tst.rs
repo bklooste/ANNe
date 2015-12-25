@@ -1,6 +1,6 @@
 //use core::*;
 
-use super::neural::Sigmoid;
+
 use super::fullmesh::FullMeshBlock;
 use super::block::BlockData;
 
@@ -58,10 +58,10 @@ use super::block::BlockData;
     // , InlineData(new byte[] { 1 }, 1, 1, 1, new byte[] { 1 })
     // , InlineData(new byte[] { 1 }, 1, 1, 0, new byte[] { 0 })
     // ]
-    // public void test_activation_is_returned(byte[] inputs, uint numneurons, sbyte weightsValue, float activationValue, byte[] expected)
+    // public void test_activate_is_returned(byte[] inputs, uint numneurons, sbyte weightsValue, float activateValue, byte[] expected)
     // {
     //     var weights = GetWeightsAndSetValue(inputs.Length, numneurons, weightsValue);
-    //     var options = new NeuronBlockOptions() { inputSize = (uint)inputs.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(activationValue) };
+    //     var options = new NeuronBlockOptions() { inputSize = (uint)inputs.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(activateValue) };
     //     var result = SetAndProcess(options, inputs, weights);
     //     Assert.Equal(expected, result);
     //
@@ -73,20 +73,20 @@ use super::block::BlockData;
     // //, InlineData(new byte[] { 1 }, 1, 1, 0)
     //     , InlineData(new byte[] { 1 }, 1, 1, -1)
     // ]
-    // public void test_activation_signed_is_returned(byte[] inputs, uint numneurons, sbyte weightsValue, float activationValue)
+    // public void test_activate_signed_is_returned(byte[] inputs, uint numneurons, sbyte weightsValue, float activateValue)
     // {
     //
     //     if (typeof(U) == typeof(byte))
     //         return;
     //
     //     byte[] expected = new byte[1];
-    //     if (activationValue.GetType() == typeof(float))
-    //         expected[0] =  (byte) Convert.ToSByte((float)activationValue);  // fixme crimp ?
+    //     if (activateValue.GetType() == typeof(float))
+    //         expected[0] =  (byte) Convert.ToSByte((float)activateValue);  // fixme crimp ?
     //     else
-    //         expected[0] = (byte)activationValue;
+    //         expected[0] = (byte)activateValue;
     //
     //     var weights = GetWeightsAndSetValue(inputs.Length, numneurons, weightsValue);
-    //     var options = new NeuronBlockOptions() { inputSize = (uint)inputs.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(activationValue) };
+    //     var options = new NeuronBlockOptions() { inputSize = (uint)inputs.Length, numNeurons = numneurons, behaviour = new TestNeuron<U>(activateValue) };
     //     var result = SetAndProcess(options, inputs, weights);
     //     Assert.Equal(expected, result);
     //

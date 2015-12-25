@@ -12,7 +12,7 @@
 //! It can be seen as a synonym to nonlinear [Activation Functions][2].
 
 #[allow(unused_import_braces)]
-pub use self::neural::neuron::WeightFunction;
+pub use self::neural::neuron::Neuron;
 
 pub mod block;
 pub mod neural;

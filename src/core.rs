@@ -1,6 +1,6 @@
 
 use num::traits::Num;
-use blocks::neural::neuron::WeightFunction;
+use blocks::neural::neuron::*;
 //use core::marker::Sized;
 
 
@@ -63,7 +63,7 @@ pub trait BlockBehaviour < O : Num>
 
 
 
-pub trait NeuronBlockBehaviour < W : Num , O : Num , N: WeightFunction<W, O >>
+pub trait NeuronBlockBehaviour < W : Num , O : Num , N: Neuron<W, O >>
 {
     // fn calc (weights: &[W] ,  inputs: &[O] ) -> Self::Output ;
     // fn activate (output : Self::Output )  -> Self::Output ;
@@ -77,17 +77,17 @@ pub trait NeuronBlockBehaviour < W : Num , O : Num , N: WeightFunction<W, O >>
 
 
 
-pub trait FloatNeuronBlockBehaviour<N : WeightFunction<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
+pub trait FloatNeuronBlockBehaviour<N : Neuron<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
 {
 
 }
 
-pub trait ByteNeuronBlockBehaviour<N: WeightFunction<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
+pub trait ByteNeuronBlockBehaviour<N: Neuron<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
 {
 
 }
 
-impl<N : WeightFunction<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
+impl<N : Neuron<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
 
 // // get input for neuron is not needed for full mesh so this is a specialization
 // pub trait NeuronBlockBehaviour<W: Num> : BlockBehaviour
@@ -119,8 +119,8 @@ pub trait Block
 // // so a block is defined over its generic neuronbehaviour
 // // how does it know how to handle full mesh or not ?
 // // in this case the base type has it ..
-// // which means the neuron is just the weights calculation and activation behaviour ..
-// // eg  sigmoid activation & SIMD weights over full mesh
+// // which means the neuron is just the weights calculation and activate behaviour ..
+// // eg  sigmoid activate & SIMD weights over full mesh
 // pub trait Block<W: Num , T: Neuron< W>> : NeuronBlockBehaviour<W>
 // {
 //     // this is the key
