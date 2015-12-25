@@ -1,5 +1,6 @@
 use num::traits::Num;
-
+use blocks::neural::activation::Logistic;
+use blocks::neural::defaultweight;
 
 pub trait ActivationFunction<I : Num , O : Num>
 {
@@ -17,7 +18,7 @@ pub fn add_foura(a: i32) -> i32 {
     a + 4
 }
 
-//DefaultLogistic = DefaultNeuron<Sigmoid>;
+//pub type DefaultLogistic = defaultweight::DefaultNeuron<Logistic>;
 
 // impl<f32,f32> Neuron<f32,f32> for DefaultLogistic;
 // #[derive(Copy, Clone)]
