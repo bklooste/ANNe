@@ -4,6 +4,10 @@ use std::marker::PhantomData;
 use num::traits::Num;
 
 use core::*;
+#[allow(unused_imports)]
+use blocks::neural::defaultweight::DefaultNeuron;
+#[allow(unused_imports)]
+use blocks::neural::activation::Logistic;
 use super::neural::neuron::*;
 use super::block::*;
 
@@ -93,7 +97,8 @@ fn block_w_hardening_create_bloc ()
         static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
         static  weights: & 'static  [f32] = & [0f32; 500];
 
-        let block  =  BlockwWeightHardening::<f32,f32,super::neural::Sigmoid>::new(BlockData::new(5)
+
+        let block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<Logistic>>::new(BlockData::new(5)
                 , weights
                 , output_buf
                 , input_buf

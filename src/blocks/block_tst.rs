@@ -1,8 +1,8 @@
-//use core::*;
-
-
 use super::fullmesh::FullMeshBlock;
 use super::block::BlockData;
+#[allow(unused_imports)]
+use blocks::neural::defaultweight::DefaultNeuron;
+use blocks::neural::activation::Logistic;
 
     //use super::block;
 
@@ -24,22 +24,23 @@ use super::block::BlockData;
     #[test]
     fn create_fullmesh_bloc ()
     {
-        unsafe {
-        let id = 5;
 
-        static _input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-        static mut _output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static  _weights: & 'static  [f32] = & [0f32; 500];
+        unsafe
+        {
+            static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+            static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+            static  weights: & 'static  [f32] = & [0f32; 500];
 
-        //let weights  : Vec<f32> ,2f32,3f32= Vec::new();
-        //let block  =  FullMeshBlock::<f32,f32,Sigmoid>::qnew(1 , 5, 2, &weights[..]) ;
-        let block  =  FullMeshBlock::<f32,f32,Sigmoid>::new(BlockData::new(id)
-                , _weights
-                , _output_buf
-                , _input_buf
-        );
-    }; //unsafe
-}
+            let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<Logistic>>::new(BlockData::new(5)
+                    , weights
+                    , output_buf
+                    , input_buf
+            );
+        }// unsafe
+    }
+
+
+
 
 
     //

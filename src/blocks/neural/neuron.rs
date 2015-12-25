@@ -18,7 +18,7 @@ pub fn add_foura(a: i32) -> i32 {
     a + 4
 }
 
-//pub type DefaultLogistic = defaultweight::DefaultNeuron<Logistic>;
+pub type DefaultLogistic = defaultweight::DefaultNeuron<Logistic>;
 
 // impl<f32,f32> Neuron<f32,f32> for DefaultLogistic;
 // #[derive(Copy, Clone)]
