@@ -1,8 +1,8 @@
 use std::marker::PhantomData;
-
 use num::traits::Num;
 use num::traits::ToPrimitive;
 
+use blocks::neural::activation::*;
 use blocks::neural::neuron::*;
 #[allow(unused_imports)]
 use blocks::neural::testdata::*;
@@ -106,7 +106,54 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , i8 > for 
     }
 }
 
+#[test]
+#[should_panic(expected = "weight length")]
+fn test_default_weight_function_dif_len_input()
+{
+    let sum = DefaultNeuron::<Linear>::eval(I8_VECTOR1 , I8_VECTOR3 ) ;
+}
 
+#[test]
+fn test_default_weight_function_i8() {
+    info!("running default_weight_tests");
+
+    let sum = DefaultNeuron::<Linear>::eval(I8_VECTOR1 , I8_VECTOR1 ) ;
+    assert_eq!(1, sum);
+}
+
+#[test]
+fn test_default_weightf32_function_many() {
+    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultNeuron;
+    info!("running default_weight_tests");
+
+    for (v1, v2,result) in getf32data()
+    {
+        //println!("{:?}",testdata );
+        let sum = DefaultNeuron::<Linear>::eval(v1 , v2 ) ;
+        if sum != result {
+            //let str1 = ;
+             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
+        }
+        assert_eq!(result, sum);
+    }
+}
+
+#[test]
+fn test_default_weighti8_function_many() {
+    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultNeuron;
+    info!("running default_weight_tests");
+
+    for (v1, v2,result) in geti8data()
+    {
+        //println!("{:?}",testdata );
+        let sum = DefaultNeuron::<Linear>::eval(v1 , v2 ) ;
+        if sum != result {
+            //let str1 = ;
+             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
+        }
+        assert_eq!(result, sum);
+    }
+}
 
 //uper::block::
 // #[derive(Copy, Cltion = DefaultNeuron;

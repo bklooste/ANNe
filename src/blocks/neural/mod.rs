@@ -20,8 +20,6 @@
 pub mod testdata;
 pub mod activation;
 pub mod training;
-
-pub mod unit;
 pub mod neuron;
 
 pub mod defaultweight;

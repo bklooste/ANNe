@@ -1,6 +1,31 @@
-use blocks::neural::neuron::*;
+//use blocks::neural::neuron::*;
+use num::traits::Num;
 
-// logistic
+pub trait ActivationFunction<I : Num , O : Num>
+{
+   fn activate(x: I) -> O;
+}
+
+// unit used for test
+#[derive(Debug, Copy, Clone)]  // RustcEncodable, RustcDecodable
+pub struct Linear;  // logistic
+
+impl ActivationFunction<f32, f32> for Linear {
+    #[inline(always)] fn activate(x: f32) -> f32 { x }
+}
+
+impl ActivationFunction<f64, f64> for Linear {
+    #[inline(always)] fn activate(x: f64) -> f64 { x }
+}
+
+impl ActivationFunction<isize, u8> for Linear {
+    #[inline(always)] fn activate(x: isize) -> u8 { x as u8 }
+}
+
+impl ActivationFunction<isize, i8> for Linear {
+    #[inline(always)] fn activate(x: isize) -> i8 { x as i8 }
+}
+
 
 #[derive(Debug, Copy, Clone)]  // RustcEncodable, RustcDecodable
 pub struct Logistic;  // logistic
@@ -12,7 +37,6 @@ impl ActivationFunction<f32, f32> for Logistic {
 impl ActivationFunction<f64, f64> for Logistic {
     #[inline(always)] fn activate(x: f64) -> f64 { 1f64 / (1f64 + (-x).exp()) }
 }
-
 
 
 

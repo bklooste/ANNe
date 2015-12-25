@@ -8,8 +8,9 @@ use num::traits::One;
 // use rand::thread_rng;
 // use rand::distributions::IndependentSample;
 // use rand::distributions::range::Range;
-
+use super::activation::*;
 use super::neuron::*;
+
 
 
 
