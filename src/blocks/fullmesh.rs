@@ -34,7 +34,7 @@ where W: Num + 'static , O: Num + 'static , N: Neuron <W,O>
      pub fn new(block_data: BlockData , all_weights: & 'static [W] , output_buf: & 'static mut [O], input_buf: & 'static  [O])  -> FullMeshBlock< W , O , N>
      {
          if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
-         if block_data.neuron_count != block_data.synapse_count  {  panic!("neuron should = synapse_count"); };
+         // if block_data.neuron_count != block_data.synapse_count  {  panic!("neuron should = synapse_count"); };
          FullMeshBlock { block : block_data , weights: all_weights ,  outputs: output_buf ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
      }
 

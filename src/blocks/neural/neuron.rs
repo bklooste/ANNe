@@ -16,5 +16,5 @@ pub fn add_foura(a: i32) -> i32 {
 }
 
 pub type DefaultLogistic = defaultweight::DefaultNeuron<f32,f32,Logistic>;
-pub type DefaultLogisticB =  defaultweight::DefaultNeuron<f32,f32,Logistic>;
-//defaultweightwbias::DefaultWeightwBiasFunction<Logistic>;
+pub type DefaultLogisticB =  defaultweightwbias::DefaultWeightwBias<f32,f32,Logistic>;
+//defaultweightwbias::DefaultWeightwBias<Logistic>;

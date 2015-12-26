@@ -1,4 +1,6 @@
 use std::marker::PhantomData;
+use std::fmt::Debug;
+
 use num::traits::Num;
 use num::traits::ToPrimitive;
 
@@ -18,22 +20,24 @@ use blocks::neural::testdata::*;
  }
 
 #[derive(Copy, Clone)]
-pub struct DefaultWeightwBiasFunction<I, O, T> where T:ActivationFunction<I,O> {    _m: PhantomData<T>  , _i: PhantomData<I> , _o: PhantomData<O> }
+pub struct DefaultWeightwBias<I, O, T> where T:ActivationFunction<I,O> {    _m: PhantomData<T>  , _i: PhantomData<I> , _o: PhantomData<O> }
 
 
-// fixme DefaultWeightwBiasFunction should return isize for integer types.
+// fixme DefaultWeightwBias should return isize for integer types.
 //enum_primitive crate,
 // we will need custom version of toprimative which checks ranges and never fails nor construct a option
 
 // f32 could be more efficient if bias was inluded in v.
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for DefaultWeightwBiasFunction<f32,f32,N>
+impl <W:Num + Debug + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for DefaultWeightwBias<f32,f32,N>
 {
     #[inline]
     fn eval(v: &[f32], weights: &[W]) -> f32
     {
         if  v.len() +1 != weights.len() {
             if  v.len() == weights.len() {
+                println!("v {:?} ", v );
+                println!("weights {:?} ", weights );
                 panic!("weight does not have bias");
             }
 
@@ -54,7 +58,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for
 }
 
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<f64,f64>> Neuron<W , f64 > for DefaultWeightwBiasFunction<f64,f64,N>
+impl <W:Num + ToPrimitive , N: ActivationFunction<f64,f64>> Neuron<W , f64 > for DefaultWeightwBias<f64,f64,N>
 {
     #[inline]
     fn eval(v: &[f64], weights: &[W]) -> f64
@@ -78,7 +82,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f64,f64>> Neuron<W , f64 > for
     }
 }
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for DefaultWeightwBiasFunction<isize,u8,N>
+impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for DefaultWeightwBias<isize,u8,N>
 {
     #[inline]
     fn eval(v: &[u8], weights: &[W]) -> u8
@@ -103,7 +107,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for
     }
 }
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<isize,i8>> Neuron<W , i8 > for DefaultWeightwBiasFunction<isize,i8,N>
+impl <W:Num + ToPrimitive , N: ActivationFunction<isize,i8>> Neuron<W , i8 > for DefaultWeightwBias<isize,i8,N>
 {
     #[inline]
     fn eval(v: &[i8], weights: &[W]) -> i8
@@ -128,7 +132,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<isize,i8>> Neuron<W , i8 > for
         }
 }
 //
-// impl <W:Num+ ToPrimitive> Neuron<W , i32 > for DefaultWeightwBiasFunction
+// impl <W:Num+ ToPrimitive> Neuron<W , i32 > for DefaultWeightwBias
 // {
 //     #[inline]
 //     fn eval(v: &[i32], weights: &[W]) -> i32
@@ -177,7 +181,7 @@ fn test_default_weight_function_w_bias_f32_many() {
     for (v1, v2,result) in getf32datawbias()
     {
         //println!("{:?}",testdata );
-        let sum = DefaultWeightwBiasFunction::<f32, f32,Linear>::eval(v1 , v2 ) ;
+        let sum = DefaultWeightwBias::<f32, f32,Linear>::eval(v1 , v2 ) ;
         if sum != result {
             //let str1 = ;
              println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
