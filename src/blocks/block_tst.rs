@@ -1,5 +1,5 @@
 use super::fullmesh::FullMeshBlock;
-use super::block::BlockData;
+use blocks::BlockData;
 #[allow(unused_imports)]
 use blocks::neural::defaultweight::DefaultNeuron;
 use blocks::neural::activation::Logistic;
@@ -16,7 +16,7 @@ use blocks::neural::activation::Logistic;
 
     #[test]
     fn it_works3() {
-        assert_eq!(5, super::block::add_three(2));
+        assert_eq!(5, ::blocks::add_three(2));
     }
 
 
@@ -31,7 +31,11 @@ use blocks::neural::activation::Logistic;
             static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
             static  weights: & 'static  [f32] = & [0f32; 500];
 
-            let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<Logistic>>::new(BlockData::new(5)
+            let mut block_data = BlockData::new(5);
+            block_data.neuron_count = 5;
+            block_data.synapse_count = 5;
+
+            let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<Logistic>>::new(block_data
                     , weights
                     , output_buf
                     , input_buf

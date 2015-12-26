@@ -1,5 +1,7 @@
 extern crate anne;
 
+pub mod network_specs;
+
 #[test]
 fn it_works() {
     assert_eq!(4, anne::add_two(2));

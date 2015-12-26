@@ -75,21 +75,21 @@ pub trait NeuronBlockBehaviour < W : Num , O : Num , N: Neuron<W, O >>
 }
 
 
-
-
-pub trait FloatNeuronBlockBehaviour<N : Neuron<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
-{
-
-}
-
-pub trait ByteNeuronBlockBehaviour<N: Neuron<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
-{
-
-}
-
-impl<N : Neuron<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
-
-// // get input for neuron is not needed for full mesh so this is a specialization
+//
+//
+// pub trait FloatNeuronBlockBehaviour<N : Neuron<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
+// {
+//
+// }
+//
+// pub trait ByteNeuronBlockBehaviour<N: Neuron<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
+// {
+//
+// }
+//
+// impl<N : Neuron<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
+//
+// // // get input for neuron is not needed for full mesh so this is a specialization
 // pub trait NeuronBlockBehaviour<W: Num> : BlockBehaviour
 // {
 // //    fn get_neuron_behaviour (&self) -> Neuron<W , Output = Self::Output>;

@@ -1,5 +1,6 @@
 
 use std::marker::PhantomData;
+use std::fmt::Debug;
 
 use num::traits::Num;
 
@@ -9,7 +10,8 @@ use super::neural::neuron::*;
 use blocks::neural::defaultweight::DefaultNeuron;
 #[allow(unused_imports)]
 use blocks::neural::activation::Logistic;
-use super::block::*;
+
+use super::BlockData;
 
 
 // dont enhance it build new ones this is a basic impl.
@@ -31,6 +33,7 @@ where W: Num + 'static , O: Num + 'static , N: Neuron <W,O>
 {
      pub fn new(block_data: BlockData , all_weights: & 'static [W] , output_buf: & 'static mut [O], input_buf: & 'static  [O])  -> FullMeshBlock< W , O , N>
      {
+         if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
          FullMeshBlock { block : block_data , weights: all_weights ,  outputs: output_buf ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
      }
 
@@ -52,10 +55,12 @@ where W: Num + 'static, O: Num + 'static, N: Neuron <W,O>
 }
 
 impl<W ,O ,N>  Block  for FullMeshBlock<W ,O ,N>
-where W: Num + 'static , O: Num + 'static, N: Neuron <W,O>
+where W: Num + 'static , O: Num + 'static +Debug, N: Neuron <W,O>
 {
     fn process_buffers(& mut self)
     {
+        println!("starting process buffer");
+        println!("{:?}", self.block.synapse_count  );
         let mut nc = 0;
         for weights_for_neuron in self.weights.chunks( self.block.synapse_count as usize )
         {
@@ -68,6 +73,8 @@ where W: Num + 'static , O: Num + 'static, N: Neuron <W,O>
                  };
 
                 self.outputs[nc] = activated;
+                println!("{:?}", self.outputs );
+
             }
             nc = nc + 1;
         }
@@ -98,7 +105,11 @@ fn fullmesh_create_fullmesh_bloc ()
         static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
         static  weights: & 'static  [f32] = & [0f32; 500];
 
-        let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<Logistic>>::new(BlockData::new(5)
+        let mut block_data = BlockData::new(5);
+        block_data.neuron_count = 5;
+        block_data.synapse_count = 5;
+
+        let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<Logistic>>::new(block_data
                 , weights
                 , output_buf
                 , input_buf

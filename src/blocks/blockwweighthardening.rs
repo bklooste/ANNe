@@ -9,7 +9,7 @@ use blocks::neural::defaultweight::DefaultNeuron;
 #[allow(unused_imports)]
 use blocks::neural::activation::Logistic;
 use super::neural::neuron::*;
-use super::block::*;
+use super::BlockData;
 
 
 // dont enhance it build new ones this is a basic impl.
