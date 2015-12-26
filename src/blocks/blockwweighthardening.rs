@@ -98,7 +98,7 @@ fn block_w_hardening_create_bloc ()
         static  weights: & 'static  [f32] = & [0f32; 500];
 
 
-        let block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<Logistic>>::new(BlockData::new(5)
+        let block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5)
                 , weights
                 , output_buf
                 , input_buf

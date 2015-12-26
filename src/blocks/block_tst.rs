@@ -35,7 +35,7 @@ use blocks::neural::activation::Logistic;
             block_data.neuron_count = 5;
             block_data.synapse_count = 5;
 
-            let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<Logistic>>::new(block_data
+            let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<f32,f32, Logistic>>::new(block_data
                     , weights
                     , output_buf
                     , input_buf

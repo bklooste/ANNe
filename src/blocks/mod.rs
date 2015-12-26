@@ -43,5 +43,5 @@ pub fn add_three(a: i32) -> i32 {
     a + 3
 }
 
-
+pub type LogisticBBlock = ::blocks::fullmesh::FullMeshBlock<f32,f32,DefaultLogisticB>;
 pub type LogisticBlock = ::blocks::fullmesh::FullMeshBlock<f32,f32,DefaultLogistic>;

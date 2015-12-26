@@ -1,6 +1,6 @@
 use num::traits::Num;
 use blocks::neural::activation::Logistic;
-use blocks::neural::defaultweight;
+use blocks::neural::{defaultweight ,defaultweightwbias};
 
 
 
@@ -15,4 +15,6 @@ pub fn add_foura(a: i32) -> i32 {
     a + 4
 }
 
-pub type DefaultLogistic = defaultweight::DefaultNeuron<Logistic>;
+pub type DefaultLogistic = defaultweight::DefaultNeuron<f32,f32,Logistic>;
+pub type DefaultLogisticB =  defaultweight::DefaultNeuron<f32,f32,Logistic>;
+//defaultweightwbias::DefaultWeightwBiasFunction<Logistic>;
