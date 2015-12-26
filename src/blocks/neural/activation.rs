@@ -18,18 +18,30 @@ impl ActivationFunction<f64, f64> for Linear {
     #[inline(always)] fn activate(x: f64) -> f64 { x }
 }
 
-impl ActivationFunction<isize, u8> for Linear {
-    #[inline(always)] fn activate(x: isize) -> u8 { x as u8 }
+impl ActivationFunction<isize, i8> for Linear {
+    #[inline(always)] fn activate(x: isize) -> i8
+    {
+        if x > ::std::i8::MAX as isize { return  ::std::i8::MAX}
+        if x < ::std::i8::MIN as isize { return  ::std::i8::MIN}
+        x as i8
+    }
 }
 
-impl ActivationFunction<isize, i8> for Linear {
-    #[inline(always)] fn activate(x: isize) -> i8 { x as i8 }
+impl ActivationFunction<isize, u8> for Linear {
+    #[inline(always)] fn activate(x: isize) -> u8
+    {
+        if x > ::std::u8::MAX as isize { return  ::std::u8::MAX}
+        if x < 0 { return 0u8};
+        x as u8
+    }
 }
 
 
 #[derive(Debug, Copy, Clone)]  // RustcEncodable, RustcDecodable
 pub struct Logistic;  // logistic
 
+
+//#[warn(non_upper_case_globals)]
 impl ActivationFunction<f32, f32> for Logistic {
     #[inline(always)] fn activate(x: f32) -> f32 { 1f32 / (1f32 + (-x).exp()) }
 }
@@ -59,6 +71,81 @@ impl ActivationFunction<f32,f32> for TanhNeuralNet {
 impl ActivationFunction<f64,f64> for TanhNeuralNet {
   #[inline(always)] fn activate(x: f64) -> f64 { x.tanh() }
   //derivative #[inline(always)] fn derivative(x: f64) -> f64 { 1f64 - x.tanh().powi(2) }
+}
+
+
+// fn test<T: Num , U: Num ,A: ActivationFunction<T, U> > ( x: T)-> U
+// {
+//     A::activate(x)
+// }
+
+#[test]
+fn test_sigmoid_activations() {
+    assert_eq!(Logistic::activate(::std::f64::MAX), 1f64);
+    assert_eq!(Logistic::activate(0f64), 0.5f64);
+    assert_eq!(Logistic::activate(1f64), 0.7310585786300049f64);
+    assert_eq!(Logistic::activate(-1f64), 0.2689414213699951f64);
+
+    assert_eq!(Logistic::activate(::std::f64::MIN), 0f64);
+}
+
+#[test]
+fn test_linear_activations() {
+    assert_eq!(Linear::activate(::std::f32::MAX), ::std::f32::MAX);
+    assert_eq!(Linear::activate(0f32), 0f32);
+    assert_eq!(Linear::activate(1f32), 1f32);
+    assert_eq!(Linear::activate(-1f32), -1f32);
+    assert_eq!(Linear::activate(::std::f32::MIN), ::std::f32::MIN);
+
+    assert_eq!(Linear::activate(::std::f64::MAX), ::std::f64::MAX);
+    assert_eq!(Linear::activate(0f64), 0f64);
+    assert_eq!(Linear::activate(1f64), 1f64);
+    assert_eq!(Linear::activate(-1f64), -1f64);
+    assert_eq!(Linear::activate(::std::f64::MIN), ::std::f64::MIN);
+
+    // assert_eq!(Linear::activate(::std::u8::MAX), ::std::u8::MAX);
+    // assert_eq!(Linear::activate(0u8), 0u8);
+    // assert_eq!(Linear::activate(1u8), 1u8);
+    // assert_eq!(Linear::activate(-1u8), -1u8);
+    // assert_eq!(Linear::activate(::std::u8::MIN), ::std::u8::MIN);
+    //
+    // assert_eq!(Linear::activate(::std::i8::MAX), ::std::i8::MAX);
+    // assert_eq!(Linear::activate(0i8), 0i8);
+    // assert_eq!(Linear::activate(1i8), 1i8);
+    // assert_eq!(Linear::activate(-1i8), -1i8);
+    // assert_eq!(Linear::activate(::std::i8::MIN), ::std::i8::MIN);
+
+    let mut u8res :u8 = Linear::activate(::std::isize::MAX);
+    assert_eq!(u8res, ::std::u8::MAX);
+    // assert_eq!(Linear::activate(0isize), 0u8);
+    // assert_eq!(Linear::activate(1isize), 1u8);
+    // assert_eq!(Linear::activate(-1isize), 0u8);
+    // assert_eq!(Linear::activate(::std::isize::MIN), ::std::u8::MIN);
+
+    u8res = Linear::activate(::std::isize::MIN);
+    assert_eq!( u8res , 0u8);
+
+    let mut i8res:i8 = Linear::activate(::std::isize::MAX);
+    assert_eq!( i8res , ::std::i8::MAX);
+    // assert_eq!(Linear::activate(0isize), 0i8);
+    // assert_eq!(Linear::activate(1isize), 1i8);
+    // assert_eq!(Linear::activate(-1isize), -1i8);
+
+    i8res = Linear::activate(::std::isize::MIN);
+    assert_eq!( i8res , ::std::i8::MIN);
+
+    // assert_eq!(Linear::activate(::std::isize::MIN), ::std::i8::MIN);
+
+    //let result:f64 =  Linear::activate(1.0f64);
+    //let result:f64 =    test<f64,f64, Linear<f64,f64>>(::std::f64::MAX);
+    //  let act:  ActivationFunction<f64, f64> =  Linear::ActivationFunction<f64, f64>;
+    //  let result:f64 = act.activate(::std::f64::MAX);
+
+
+        //  let act2:  ActivationFunction<f64, f64> =  Logistic::ActivationFunction<f64, f64>;
+        //  let result2:f64 = act.activate(::std::f64::MAX);
+        //   assert_eq!(result2, ::std::f64::MAX);
+
 }
 
 

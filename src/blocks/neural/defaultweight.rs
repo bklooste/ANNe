@@ -12,12 +12,8 @@ use blocks::neural::testdata::*;
 #[derive(Copy, Clone)]
 pub struct DefaultNeuron<T> where T:ActivationFunction<f32,f32> {    _m: PhantomData<T> }
 
-// fixme DefaultNeuron should return usize for integer types.
-//enum_primitive crate,
-// we will need custom version NeuronNeuronNeuron toprimative which checks ranges and never fails nor construct a option
 impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for DefaultNeuron<N>
 {
-    //type ActivationFunction = N;
     #[inline]
     fn eval(v: &[f32], weights: &[W]) -> f32
     {
@@ -30,15 +26,10 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for
                 sum = sum + vn * weight.to_f32().unwrap();
         }
         N::activate(sum)
-//unsafe {
-//     let a = [0u8, 0u8, 0u8, 0u8];
-//
-//     let b = mem::transmute::<[u8; 4], u32>(a);
     }
 }
 
 impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f64 > for DefaultNeuron<N>
-//impl <W:Num + ToPrimitive> Neuron<W , f64 > for DefaultNeuron
 {
     #[inline]
     fn eval(v: &[f64], weights: &[W]) -> f64
@@ -57,9 +48,8 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f64 > for
     }
 }
 
-//floats with byte weights
+
 impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , u8 > for DefaultNeuron<N>
-//impl <W:Num+ ToPrimitive> Neuron<W , u8 > for DefaultNeuron
 {
     #[inline]
     fn eval(v: &[u8], weights: &[W]) -> u8
@@ -123,15 +113,12 @@ fn test_default_weight_function_i8() {
 
 #[test]
 fn test_default_weightf32_function_many() {
-    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultNeuron;
     info!("running default_weight_tests");
 
     for (v1, v2,result) in getf32data()
     {
-        //println!("{:?}",testdata );
         let sum = DefaultNeuron::<Linear>::eval(v1 , v2 ) ;
         if sum != result {
-            //let str1 = ;
              println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
         }
         assert_eq!(result, sum);
@@ -140,7 +127,6 @@ fn test_default_weightf32_function_many() {
 
 #[test]
 fn test_default_weighti8_function_many() {
-    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultNeuron;
     info!("running default_weight_tests");
 
     for (v1, v2,result) in geti8data()
@@ -148,7 +134,21 @@ fn test_default_weighti8_function_many() {
         //println!("{:?}",testdata );
         let sum = DefaultNeuron::<Linear>::eval(v1 , v2 ) ;
         if sum != result {
-            //let str1 = ;
+             println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
+        }
+        assert_eq!(result, sum);
+    }
+}
+
+#[test]
+fn test_default_weightu8_function_many() {
+    //let weightFunction : &WeightFunction<f32 ,f32 > = &DefaultNeuron;
+    info!("running default_weight_tests");
+
+    for (v1, v2,result) in getu8data()
+    {
+        let sum = DefaultNeuron::<Linear>::eval(v1 , v2 ) ;
+        if sum != result {
              println!("{}", format! ( "test fail v {:?} w {:?} expected {:?}" , v1 ,v2 , result ));
         }
         assert_eq!(result, sum);
