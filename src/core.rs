@@ -1,16 +1,5 @@
 
 use num::traits::Num;
-use blocks::neural::neuron::*;
-//use core::marker::Sized;
-
-
-
-
-// fixme remove
-
-
-// check following ..
-// https://github.com/ferristseng/rust-nnet/blob/master/rust-nnet/src/prelude.rs
 
 pub type BlockId = u32;
 pub type BlockPort = u32;
@@ -63,16 +52,7 @@ pub trait BlockBehaviour < O : Num>
 
 
 
-pub trait NeuronBlockBehaviour < W : Num , O : Num , N: Neuron<W, O >>
-{
-    // fn calc (weights: &[W] ,  inputs: &[O] ) -> Self::Output ;
-    // fn activate (output : Self::Output )  -> Self::Output ;
-    // //fn derivative
-    // fn calculate_sum  (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
-    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[O];
-    fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W];
 
-}
 
 
 //

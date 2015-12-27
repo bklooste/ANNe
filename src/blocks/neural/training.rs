@@ -9,7 +9,7 @@ use num::traits::One;
 // use rand::distributions::IndependentSample;
 // use rand::distributions::range::Range;
 use super::activation::*;
-use super::neuron::*;
+
 
 
 

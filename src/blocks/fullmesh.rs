@@ -38,9 +38,9 @@ where W: Num + 'static , O: Num + 'static , N: Neuron <W,O>
          FullMeshBlock { block : block_data , weights: all_weights ,  outputs: output_buf ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
      }
 
-//obviously faILTU
+     // not needed for simple chunking
      // this could change if we have dimensional support
-    fn weights_for_neuron(&self , neuron_num:u32 ) -> &[W] { self.weights}
+    //fn weights_for_neuron(&self , neuron_num:u32 ) -> &[W] { self.weights}
 
 }
 
@@ -56,25 +56,24 @@ where W: Num + 'static, O: Num + 'static, N: Neuron <W,O>
 }
 
 impl<W ,O ,N>  Block  for FullMeshBlock<W ,O ,N>
-where W: Num + 'static , O: Num + 'static +Debug, N: Neuron <W,O>
+where W: Num + Debug +  'static , O: Num + 'static +Debug, N: Neuron <W,O>
 {
     fn process_buffers(& mut self)
     {
         println!("starting process buffer");
         println!("{:?}", self.block.synapse_count  );
         let mut nc = 0;
+
         for weights_for_neuron in self.weights.chunks( self.block.synapse_count as usize )
         {
+                println!("W {:?}", self.weights );
+                println!("I {:?}", self.inputs );
+
             for nc in 0..self.block.neuron_count as usize
             {
-                let activated:O =
-                 {
-                     let in_vec_for_neuron = self.get_input_for_neuron( nc as u32);
-                     N::eval( in_vec_for_neuron ,   weights_for_neuron  )
-                 };
-
+                let activated:O =  { N::eval( self.inputs ,   weights_for_neuron  )};
                 self.outputs[nc] = activated;
-                println!("{:?}", self.outputs );
+                println!("O {:?}", self.outputs );
 
             }
             nc = nc + 1;
@@ -82,13 +81,13 @@ where W: Num + 'static , O: Num + 'static +Debug, N: Neuron <W,O>
     }
 }
 
-impl<W, O, N>  NeuronBlockBehaviour <W, O, N>  for FullMeshBlock<W, O, N>
-where W: Num + 'static , O: Num +'static , N: Neuron <W,O>
-{
-    // full mesh returns all inputs for every neuron
-    fn get_input_for_neuron (&self  , _neuron_num : u32 ) -> &[O] { self.inputs }
-    fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W] { self.weights_for_neuron(neuron_num)}
-}
+// impl<W, O, N>  NeuronBlockBehaviour <W, O, N>  for FullMeshBlock<W, O, N>
+// where W: Num + 'static , O: Num +'static , N: Neuron <W,O>
+// {
+//     // full mesh returns all inputs for every neuron
+//     fn get_input_for_neuron (&self  , _neuron_num : u32 ) -> &[O] { self.inputs }
+//     fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W] { self.weights_for_neuron(neuron_num)}
+// }
 
 
 pub fn add_four(a: i32) -> i32 {

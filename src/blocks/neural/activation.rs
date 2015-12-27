@@ -60,10 +60,6 @@ impl ActivationFunction<f64, f64> for Logistic {
 #[derive(Copy, Clone, RustcEncodable, RustcDecodable)]
 pub struct TanhNeuralNet;
 
-impl ActivationFunction<u8,u8> for TanhNeuralNet {
-  #[inline(always)] fn activate(x: u8) -> u8 { 1  }
-}
-
 impl ActivationFunction<f32,f32> for TanhNeuralNet {
   #[inline(always)] fn activate(x: f32) -> f32 { x.tanh() }
 }

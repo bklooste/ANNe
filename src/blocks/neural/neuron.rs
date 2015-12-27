@@ -1,5 +1,5 @@
 use num::traits::Num;
-use blocks::neural::activation::Logistic;
+use blocks::neural::activation::{Logistic , Linear};
 use blocks::neural::{defaultweight ,defaultweightwbias};
 
 
@@ -10,11 +10,25 @@ pub trait Neuron<W : Num , O: Num  >
     fn eval(data: &[O], weights: &[W]) -> O;
 }
 
+pub trait NeuronBlockBehaviour < W : Num , O : Num , N: Neuron<W, O >>
+{
+    // fn calc (weights: &[W] ,  inputs: &[O] ) -> Self::Output ;
+    // fn activate (output : Self::Output )  -> Self::Output ;
+    // //fn derivative
+    // fn calculate_sum  (weights: &[W] ,  inputs: &[Self::Output] ) -> Self::Output ;
+    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[O];
+    fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W];
+
+}
+
 
 pub fn add_foura(a: i32) -> i32 {
-    a + 4
+    a + 3 + 1
 }
 
 pub type DefaultLogistic = defaultweight::DefaultNeuron<f32,f32,Logistic>;
 pub type DefaultLogisticB =  defaultweightwbias::DefaultWeightwBias<f32,f32,Logistic>;
+pub type LinearByteB =  defaultweightwbias::DefaultWeightwBias<isize,u8,Linear>;
+
+
 //defaultweightwbias::DefaultWeightwBias<Logistic>;

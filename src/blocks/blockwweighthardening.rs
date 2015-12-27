@@ -1,5 +1,6 @@
 
 use std::marker::PhantomData;
+use std::fmt::Debug;
 
 use num::traits::Num;
 
@@ -18,6 +19,7 @@ pub struct BlockwWeightHardening<W, O, N>
 where W: Num + 'static , O: Num + 'static , N: Neuron <W,O>
 {
     weights: & 'static [W],
+    #[allow(dead_code)]
     weights_hardness: Vec<i8> , // = size of weights
     inputs: & 'static [O],
     outputs: & 'static mut  [O],
@@ -34,14 +36,10 @@ where W: Num + 'static , O: Num + 'static , N: Neuron <W,O>
      {
          BlockwWeightHardening { block : block_data , weights: all_weights , weights_hardness: Vec::new() ,  outputs: output_buf ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
      }
-
-     // this could change if we have dimensional support
-    fn weights_for_neuron(&self , neuron_num:u32 ) -> &[W] { self.weights}
-
 }
 
 impl<W ,O ,N>  BlockBehaviour < O > for BlockwWeightHardening<W ,O ,N>
-where W: Num + 'static, O: Num + 'static, N: Neuron <W,O>
+where W: Num + 'static, O: Num + 'static + Debug , N: Neuron <W,O>
 {
     fn set_buffers(& mut self , inputs: &[& 'static [O]] , outputs: & 'static mut [O])
     {
@@ -52,34 +50,34 @@ where W: Num + 'static, O: Num + 'static, N: Neuron <W,O>
 }
 
 impl<W ,O ,N>  Block  for BlockwWeightHardening<W ,O ,N>
-where W: Num + 'static , O: Num + 'static, N: Neuron <W,O>
+where W: Num + Debug + 'static , O: Num + Debug +  'static, N: Neuron <W,O>
 {
     fn process_buffers(& mut self)
     {
         let mut nc = 0;
         for weights_for_neuron in self.weights.chunks( self.block.synapse_count as usize )
         {
+            println!("W {:?}", self.weights );
+            println!("I {:?}", self.inputs );
+
             for nc in 0..self.block.neuron_count as usize
             {
-                let activated:O =
-                 {
-                     let in_vec_for_neuron = self.get_input_for_neuron( nc as u32);
-                     N::eval( in_vec_for_neuron ,   weights_for_neuron  )
-                 };
-
+                let activated:O =  { N::eval( self.inputs ,   weights_for_neuron  )};
                 self.outputs[nc] = activated;
+                println!("O {:?}", self.outputs );
+
             }
             nc = nc + 1;
         }
     }
 }
 
-impl<W, O, N>  NeuronBlockBehaviour <W, O, N>  for BlockwWeightHardening<W, O, N>
-where W: Num + 'static , O: Num +'static , N: Neuron <W,O>
-{
-    fn get_input_for_neuron (&self  , _neuron_num : u32 ) -> &[O] { self.inputs }
-    fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W] { self.weights_for_neuron(neuron_num)}
-}
+// impl<W, O, N>  NeuronBlockBehaviour <W, O, N>  for BlockwWeightHardening<W, O, N>
+// where W: Num + 'static , O: Num +'static , N: Neuron <W,O>
+// {
+//     fn get_input_for_neuron (&self  , _neuron_num : u32 ) -> &[O] { self.inputs }
+//     fn get_weights_for_neuron (&self  , neuron_num : u32 ) -> &[W] { self.weights_for_neuron(neuron_num)}
+// }
 
 
 pub fn add_four(a: i32) -> i32 {

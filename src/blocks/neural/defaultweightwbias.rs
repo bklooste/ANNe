@@ -9,14 +9,17 @@ use blocks::neural::activation::*;
 #[allow(unused_imports)]
 use blocks::neural::testdata::*;
 
- fn get_bias_from_end<W: ToPrimitive>( array : &[W]  ) -> u32
+ fn get_bias_from_end<W: ToPrimitive + Debug>( array : &[W]  ) -> u32
  {
      // it is length 1 ..
-     ((array[array.len() -4 ].to_u8().unwrap() as u32) << 24)
+    let bias = ((array[array.len() -4 ].to_u8().unwrap() as u32) << 24)
      + ((array[array.len() -3].to_u8().unwrap()  as u32) << 16)
      + ((array[array.len() -2 ].to_u8().unwrap()  as u32) << 8)
-     + (array[array.len()].to_u8().unwrap()  as u32)
+     + (array[array.len() -1 ].to_u8().unwrap()  as u32);
  // return (*pbyte << 24) | (*(pbyte + 1) << 16) | (*(pbyte + 2) << 8) | (*(pbyte + 3));
+
+    println!("bias {:?} w {:?} " ,bias ,array );
+    bias
  }
 
 #[derive(Copy, Clone)]
@@ -82,14 +85,18 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f64,f64>> Neuron<W , f64 > for
     }
 }
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for DefaultWeightwBias<isize,u8,N>
+impl <W:Num + ToPrimitive +Debug , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for DefaultWeightwBias<isize,u8,N>
 {
     #[inline]
     fn eval(v: &[u8], weights: &[W]) -> u8
     {
         if  v.len() +4 != weights.len()         {
-            if  v.len() == weights.len()         {
+            println!("v{:?}",v );
+            println!("weights{:?}",weights );
+
+            if  v.len()+1 == weights.len()         {
                 panic!("weight does not have 4 byte bias");}
+
 
 
                 panic!("weight length  not the same as input vector");
@@ -107,7 +114,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for
     }
 }
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<isize,i8>> Neuron<W , i8 > for DefaultWeightwBias<isize,i8,N>
+impl <W:Num + ToPrimitive +Debug , N: ActivationFunction<isize,i8>> Neuron<W , i8 > for DefaultWeightwBias<isize,i8,N>
 {
     #[inline]
     fn eval(v: &[i8], weights: &[W]) -> i8
