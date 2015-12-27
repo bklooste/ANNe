@@ -100,6 +100,8 @@ mod network;
 mod util;
 
 pub mod blocks;
+pub mod graph;
+pub mod module;
 pub mod core;
 pub mod prelude;
 

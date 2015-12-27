@@ -58,7 +58,7 @@ where W: Num + 'static, O: Num + 'static, N: Neuron <W,O>
 impl<W ,O ,N>  Block  for FullMeshBlock<W ,O ,N>
 where W: Num + Debug +  'static , O: Num + 'static +Debug, N: Neuron <W,O>
 {
-    fn process_buffers(& mut self)
+    fn process(& mut self)
     {
         println!("starting process buffer");
         println!("{:?}", self.block.synapse_count  );
@@ -101,18 +101,18 @@ fn fullmesh_create_fullmesh_bloc ()
 {
     unsafe
     {
-        static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-        static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static  weights: & 'static  [f32] = & [0f32; 500];
+        static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+        static  WEIGHTS: & 'static  [f32] = & [0f32; 500];
 
         let mut block_data = BlockData::new(5);
         block_data.neuron_count = 5;
         block_data.synapse_count = 5;
 
-        let block  =  FullMeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(block_data
-                , weights
-                , output_buf
-                , input_buf
+        let _block  =  FullMeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(block_data
+                , WEIGHTS
+                , OUTPUT_BUF
+                , INPUT_BUF
         );
     }// unsafe
 }

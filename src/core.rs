@@ -78,15 +78,17 @@ pub trait BlockBehaviour < O : Num>
 // }
 
 //fixme rename to block
-pub trait Block
+pub trait Block 
 {
     //fn process(<Vec<O>>) -> Vec<O>;
     //(args: &[&str])
     //fn process(&[ &[O] ]) -> Vec<O>;
-    fn process_buffers(&mut self) ; // or return slice
+    fn process(&mut self) ; // or return slice
 
 
 }
+
+
 
 // for external calls we will move the paramaters in
 // pub trait PureBlock< O : Num>

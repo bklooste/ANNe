@@ -52,7 +52,7 @@ where W: Num + 'static, O: Num + 'static + Debug , N: Neuron <W,O>
 impl<W ,O ,N>  Block  for BlockwWeightHardening<W ,O ,N>
 where W: Num + Debug + 'static , O: Num + Debug +  'static, N: Neuron <W,O>
 {
-    fn process_buffers(& mut self)
+    fn process(& mut self)
     {
         let mut nc = 0;
         for weights_for_neuron in self.weights.chunks( self.block.synapse_count as usize )
@@ -91,15 +91,15 @@ fn block_w_hardening_create_bloc ()
 {
     unsafe
     {
-        static input_buf: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-        static mut output_buf: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static  weights: & 'static  [f32] = & [0f32; 500];
+        static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+        static  WEIGHTS: & 'static  [f32] = & [0f32; 500];
 
 
-        let block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5)
-                , weights
-                , output_buf
-                , input_buf
+        let _block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5)
+                , WEIGHTS
+                , OUTPUT_BUF
+                , INPUT_BUF
         );
     }// unsafe
 }

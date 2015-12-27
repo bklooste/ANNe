@@ -101,6 +101,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<isize,i8>> Neuron<W , i8 > for
 fn test_default_weight_function_dif_len_input()
 {
     let sum = DefaultNeuron::<isize, i8, Linear>::eval(I8_VECTOR1 , I8_VECTOR3 ) ;
+    assert_eq!(1, sum);
 }
 
 #[test]
