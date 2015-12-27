@@ -6,7 +6,7 @@ use anne::core::{Block};
 // , BlockData};
 
 
-// block tests 
+// block tests
 
 #[test]
 fn fullmesh_integration_w0 ()
@@ -15,7 +15,7 @@ fn fullmesh_integration_w0 ()
     {
         static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
         static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static  WEIGHTS: & 'static  [f32] = & [ 0f32  ; 5];
+        static  WEIGHTS: & 'static  [f32] = & [ 0f32  ; 25];
 
         let mut block_data = BlockData::new(5);
         block_data.neuron_count = 5;
@@ -35,7 +35,7 @@ fn fullmesh_integration_w05 ()
   {
       static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
       static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-      static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 5];
+      static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 25];
 
       let mut block_data = BlockData::new(5);
       block_data.neuron_count = 5;
@@ -49,13 +49,74 @@ fn fullmesh_integration_w05 ()
 }
 
 #[test]
+fn fullmesh_integration_w05_5x3 ()
+{
+  unsafe
+  {
+      static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+      static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32];
+      static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 15];
+
+      let mut block_data = BlockData::new(5);
+      block_data.neuron_count = 3;
+      block_data.synapse_count = 5;
+
+      let mut block = LogisticBlock::new(block_data, WEIGHTS, OUTPUT_BUF, INPUT_BUF);
+      block.process();
+
+      assert_eq!(OUTPUT_BUF, & [0.99944717f32 ;3]);
+  }// unsafe
+}
+
+#[test]
+fn fullmesh_integration_w15x05_5x3 ()
+{
+  unsafe
+  {
+      static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+      static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32];
+      static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 15];
+
+      let mut block_data = BlockData::new(5);
+      block_data.neuron_count = 3;
+      block_data.synapse_count = 5;
+
+      let mut block = LogisticBlock::new(block_data, WEIGHTS, OUTPUT_BUF, INPUT_BUF);
+      block.process();
+
+      assert_eq!(OUTPUT_BUF, & [0.99944717f32 ;3]);
+  }// unsafe
+}
+
+
+#[test]
+fn fullmesh_integration_w15_5x3 ()
+{
+  unsafe
+  {
+      static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+      static mut OUTPUT_BUF: & 'static mut [f32] = & mut [0f32, 0f32, 0f32];
+      static  WEIGHTS: & 'static  [f32] = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
+
+      let mut block_data = BlockData::new(5);
+      block_data.neuron_count = 3;
+      block_data.synapse_count = 5;
+
+      let mut block = LogisticBlock::new(block_data, WEIGHTS, OUTPUT_BUF, INPUT_BUF);
+      block.process();
+
+      assert_eq!(OUTPUT_BUF, & [1f32, 1f32, 0.9959299f32]);
+  }// unsafe
+}
+
+#[test]
 fn fullmesh_bias_integration_w0 ()
 {
    unsafe
    {
        static INPUT_BUF2: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
        static mut OUTPUT_BUF2: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-       static  WEIGHTS2: & 'static  [f32] = & [ 0f32  ; 6];
+       static  WEIGHTS2: & 'static  [f32] = & [ 0f32  ; 30];
 
        let mut block_data = BlockData::new(5);
        block_data.neuron_count = 5;
@@ -75,7 +136,7 @@ fn fullmesh_bias_integration_w05 ()
     {
         static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
         static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
-        static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 6];
+        static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 30];
 
         let mut block_data = BlockData::new(5);
         block_data.neuron_count = 5;
@@ -95,7 +156,7 @@ fn fullmesh_bias_weighti8_integration_w0_w_largebias ()
     {
          static INPUT_BUF2: &'static [u8] = &[1u8 ;5];
          static mut OUTPUT_BUF2: & 'static mut [u8] = & mut [0u8 ;5];
-         static  WEIGHTS2: & 'static  [i8] = & [ 1i8  ; 9];
+         static  WEIGHTS2: & 'static  [i8] = & [ 1i8  ; 45];
 
          let mut block_data = BlockData::new(5);
          block_data.neuron_count = 5;
@@ -115,7 +176,7 @@ fn fullmesh_bias_weighti8_integration_w0_w_0bias ()
   {
       static INPUT_BUF2: &'static [u8] = &[1u8 ;5];
       static mut OUTPUT_BUF2: & 'static mut [u8] = & mut [0u8 ;5];
-      static  WEIGHTS2: & 'static  [i8] = & [1i8 ,1i8,1i8,1i8,1i8,0i8,0i8,0i8,0i8];
+      static  WEIGHTS2: & 'static  [i8] = & [1i8 ,1i8,1i8,1i8,1i8,0i8,0i8,0i8,0i8 , 1i8 ,1i8,1i8,1i8,1i8,0i8,0i8,0i8,0i8 , 1i8 ,1i8,1i8,1i8,1i8,0i8,0i8,0i8,0i8 , 1i8 ,1i8,1i8,1i8,1i8,0i8,0i8,0i8,0i8 , 1i8 ,1i8,1i8,1i8,1i8,0i8,0i8,0i8,0i8];
 
       let mut block_data = BlockData::new(5);
       block_data.neuron_count = 5;
@@ -136,7 +197,7 @@ fn fullmesh_bias_weighti8_integration_w0_w_1bias ()
     {
         static INPUT_BUF2: &'static [u8] = &[1u8 ;5];
         static mut OUTPUT_BUF2: & 'static mut [u8] = & mut [ 1u8  ; 5];
-        static  WEIGHTS2: & 'static  [i8] = & [ 1i8 , 1i8, 1i8, 1i8, 1i8 , 0i8 , 0i8 , 0i8 , 1i8];
+        static  WEIGHTS2: & 'static  [i8] = & [1i8,1i8,1i8,1i8,1i8,0i8,0i8,0i8,1i8 , 1i8,1i8,1i8,1i8,1i8,0i8,0i8,0i8,1i8, 1i8,1i8,1i8,1i8,1i8,0i8,0i8,0i8,1i8 , 1i8,1i8,1i8,1i8,1i8,0i8,0i8,0i8,1i8 , 1i8,1i8,1i8,1i8,1i8,0i8,0i8,0i8,1i8];
 
         let mut block_data = BlockData::new(5);
         block_data.neuron_count = 5;
