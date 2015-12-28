@@ -36,13 +36,13 @@ pub enum Connection
 
 // try this if it doesnt work then we can use an enum for diffirent node types
 
-pub trait BufferManager < O : Num>
+pub trait BufferManager <O: Num>
 {
     // get weights
     // gets inputs.
 }
 
-pub trait BlockBehaviour < O : Num>
+pub trait BlockBehaviour <O: Num>
 {
 
 
@@ -78,7 +78,7 @@ pub trait BlockBehaviour < O : Num>
 // }
 
 //fixme rename to block
-pub trait Block 
+pub trait Block
 {
     //fn process(<Vec<O>>) -> Vec<O>;
     //(args: &[&str])

@@ -31,11 +31,7 @@ use blocks::neural::activation::Logistic;
             static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
             static  WEIGHTS: & 'static  [f32] = & [0f32; 500];
 
-            let mut block_data = BlockData::new(5);
-            block_data.neuron_count = 5;
-            block_data.synapse_count = 5;
-
-            let _block  =  FullMeshBlock::<f32,f32,DefaultNeuron<f32,f32, Logistic>>::new(block_data
+            let _block  =  FullMeshBlock::<f32,f32,DefaultNeuron<f32,f32, Logistic>>::new(BlockData::new(5 , 5, 5)
                     , WEIGHTS
                     , OUTPUT_BUF
                     , INPUT_BUF

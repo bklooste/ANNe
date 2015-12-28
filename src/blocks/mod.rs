@@ -19,6 +19,7 @@ pub use core::*;
 
 pub mod neural;
 pub mod fullmesh; pub mod blockwweighthardening;
+pub mod fullmesht;
 
 #[cfg(test)]
 mod block_tst;
@@ -37,7 +38,7 @@ pub struct BlockData
 
 impl BlockData
 {
-    pub fn new (newid: BlockId) -> BlockData { BlockData { id : newid , ..Default::default() } }
+    pub fn new (newid: BlockId , ncount: u32 , scount: u32) -> BlockData { BlockData { id : newid , neuron_count: ncount , synapse_count: scount , ..Default::default() } }
 }
 
 pub fn add_three(a: i32) -> i32 {
@@ -47,3 +48,4 @@ pub fn add_three(a: i32) -> i32 {
 pub type LinearByteBlock = ::blocks::fullmesh::FullMeshBlock<i8,u8,LinearByteB>;
 pub type LogisticBBlock = ::blocks::fullmesh::FullMeshBlock<f32,f32,DefaultLogisticB>;
 pub type LogisticBlock = ::blocks::fullmesh::FullMeshBlock<f32,f32,DefaultLogistic>;
+pub type LogisticBlockwLifetime<'a> = ::blocks::fullmesht::FullMeshTBlock<'a,f32,f32,DefaultLogistic>;

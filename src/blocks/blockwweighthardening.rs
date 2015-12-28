@@ -54,21 +54,34 @@ where W: Num + Debug + 'static , O: Num + Debug +  'static, N: Neuron <W,O>
 {
     fn process(& mut self)
     {
+
+        println!("starting process buffer");
+        println!("{:?}", self.block.synapse_count  );
+        println!("W {:?}", self.weights );   println!("I {:?}", self.inputs );
         let mut nc = 0;
+
+        if  (self.block.synapse_count * self.block.neuron_count) as usize != self.weights.len()  {
+            panic!("weights does not equal synapse * neurons")
+        }
+
+
+        // could use a pair itterator this seems fragile
         for weights_for_neuron in self.weights.chunks( self.block.synapse_count as usize )
         {
-            println!("W {:?}", self.weights );
-            println!("I {:?}", self.inputs );
 
-            for nc in 0..self.block.neuron_count as usize
-            {
+                println!("weights_for_neuron {:?}", weights_for_neuron );
+
+
+            // for nc in 0..self.block.neuron_count as usize
+            // {
                 let activated:O =  { N::eval( self.inputs ,   weights_for_neuron  )};
                 self.outputs[nc] = activated;
                 println!("O {:?}", self.outputs );
 
-            }
+            //}
             nc = nc + 1;
         }
+        println!("O {:?}", self.outputs );
     }
 }
 
@@ -96,7 +109,7 @@ fn block_w_hardening_create_bloc ()
         static  WEIGHTS: & 'static  [f32] = & [0f32; 500];
 
 
-        let _block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5)
+        let _block  =  BlockwWeightHardening::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5 , 5, 9)
                 , WEIGHTS
                 , OUTPUT_BUF
                 , INPUT_BUF

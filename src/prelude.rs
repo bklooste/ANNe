@@ -53,7 +53,7 @@ pub use core::{ConnectionDestination, Connection,  Block  , BlockBehaviour };
 //   #[allow(missing_docs)] type ErrorFunction : ErrorFunction;
 // }
 //
-// impl<S> TrainerParametersWithErrorFunction for S
+// impl<S> TrainerParametersWithErrorFunction for Spub type LogisticBlock = ::blocks::fullmesh::FullMeshBlock<f32,f32,DefaultLogistic>;
 //   where S : MomentumConstant + LearningRate + ErrorFunction
 // {
 //   type ErrorFunction = S;
@@ -77,9 +77,15 @@ pub use core::{ConnectionDestination, Connection,  Block  , BlockBehaviour };
 //
 // /// A trainer for a single-layer neural network.
 // ///
-// pub trait NeuralNetTrainer : Iterator {
-//   /// Trains a neural net until the stopping condition is met.
-//   ///
+// pub trait NeuralNetTrainer : Iterator {>;
+//   where S : MomentumConstant + LearningRate + ErrorFunction
+// {
+//   type ErrorFunction = S;
+// }
+//
+//
+// /// Function to calculate error during training.
+// ///
 //   #[inline(always)] fn train(&mut self) -> Option<Self::Item> { self.last() }
 // }
 //
