@@ -3,21 +3,21 @@ use graph::{Graph , NodeIndex};
 
 // we could pull the vector graph out .. eg NodeData<T> and have module hold a graph ..
 
-pub struct Module
+pub struct Module<'b>
 {
-    graph: Graph<Box<Block>>,
+    graph: Graph<Box<Block+ 'b>>,
 }
 
-impl Module
+impl<'b> Module<'b>
 {
-    pub fn new() -> Module {
-        Module { graph: Graph::<Box<Block>>::new() }
+    pub fn new() -> Module<'b> {
+        Module { graph: Graph::<Box<Block + 'b>>::new() }
     }
 
 //TODO
 //    pub fn add_block(&self, block: &Block) { self.add_box_block( Box::new( *block))  }
 
-    pub fn add_box_block(& mut self, block: Box<Block>) {  self.graph.add_node(block); }
+    pub fn add_box_block(& mut self, block: Box<Block+'b>) {  self.graph.add_node(block); }
 
     /// this will get WAY more complicated ..
     /// we need to handle loops which never finish , re run on completion , threading , timed and priority etc
