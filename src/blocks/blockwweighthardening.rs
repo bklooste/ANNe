@@ -38,13 +38,14 @@ where W: Num + 'static , O: Num + 'static , N: Neuron <W,O>
      }
 }
 
-impl<W ,O ,N>  BlockBehaviour < O > for BlockwWeightHardening<W ,O ,N>
+impl<W ,O ,N>  BlockBehaviour <  'static  , O, W > for BlockwWeightHardening<W ,O ,N>
 where W: Num + 'static, O: Num + 'static + Debug , N: Neuron <W,O>
 {
-    fn set_buffers(& mut self , inputs: &[& 'static [O]] , outputs: & 'static mut [O])
+    fn set_buffers(& mut self , weights: & 'static [W],  inputs: & 'static [& 'static [O]] , outputs: & 'static mut [O])
     {
-        self.inputs = inputs[0];
-        self.outputs = outputs;
+         self.inputs = inputs[0];
+         self.outputs = outputs;
+                 self.weights = weights;
     }
 //    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
 }

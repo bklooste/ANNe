@@ -3,21 +3,12 @@ extern crate anne;
 
 use std::ops::Range;
 use anne::blocks::{LogisticBlock ,LogisticBBlock , BlockData , LinearByteBlock,LogisticBlockwLifetime};
-use anne::core::{Block};
+use anne::core::{Block , BlockBehaviour };
+use anne::util::to_floats;
 // , BlockData};
 
 
-fn to_floats ( range : Range<i32>) -> Vec<f32>
-{
-        println!("range {:?}", range);
-        let mut val:Vec<f32> = Vec::new();
-        for i in range {
-            val.push(i as f32);
-            println!("val {:?}", val);
 
-        }
-        val
-}
 
 // block tests
 
@@ -92,7 +83,7 @@ fn fullmesht_w15_5x3_wstatic ()
     unsafe
     {
       static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-      static mut OUTPUT_BUF: & 'static mut [f32] = & mut [0f32, 0f32, 0f32];
+      static mut OUTPUT_BUF: & 'static mut [f32] = & mut [0f32; 3];
       static  WEIGHTS: & 'static  [f32] = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
 
 
@@ -214,4 +205,42 @@ fn fullmesh_bias_weighti8_integration_w0_w_1bias ()
 
         assert_eq!(OUTPUT_BUF2, & [4u8 ;5]);
     }// unsafe
+}
+
+#[test]
+fn block_load_vectors()
+{
+
+    let weights =   & [ 0.5f32  ; 25];
+    let mut outvec = vec! [0f32 ;3];
+    let mut output = & mut outvec [..];
+
+    let mut input  = vec! [1f32 ;3];
+    let mut inputs  = vec! [ &input[..]];
+    {
+        let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        block.set_buffers(weights , &inputs[..] , output );
+    }
+
+    assert_eq!(output, & [0f32; 3]);
+}
+
+
+#[test]
+fn block_load_and_proces_vectors()
+{
+
+    let weights =   & [ 0.5f32  ; 25];
+    let mut outvec = vec! [0f32 ;5];
+    let mut output = & mut outvec [..];
+
+    let mut input  = vec! [1f32 ;5];
+    let mut inputs  = vec! [ &input[..]];
+    {
+        let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        block.set_buffers(weights , &inputs[..] , output );
+        block.process();
+    }
+
+    assert_eq!(output, & [0.9241418f32; 5]);
 }

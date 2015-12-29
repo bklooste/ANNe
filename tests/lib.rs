@@ -1,6 +1,7 @@
 extern crate anne;
 
 pub mod network_specs;
+pub mod module_tests;
 
 #[test]
 fn it_works() {

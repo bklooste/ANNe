@@ -42,11 +42,12 @@ pub trait BufferManager <O: Num>
     // gets inputs.
 }
 
-pub trait BlockBehaviour <O: Num>
+pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
 {
 
+    fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
 
-    fn set_buffers(& mut self , inputs: &[& 'static [O]] , outputs: & 'static mut [O]);
+//    fn set_buffers(& mut self , inputs: &[& 'a  [O]] , outputs: & 'a mut [O]);
 //    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
 }
 

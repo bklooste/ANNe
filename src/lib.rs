@@ -97,7 +97,7 @@ extern crate rustc_serialize;
 extern crate log;
 
 mod network;
-mod util;
+pub mod util;
 
 pub mod blocks;
 pub mod graph;

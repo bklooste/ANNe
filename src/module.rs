@@ -20,9 +20,12 @@ impl Module
     pub fn add_box_block(& mut self, block: Box<Block>) {  self.graph.add_node(block); }
 
     /// this will get WAY more complicated ..
-    /// we need to handle loops which never finish , re run on completion , threading etc
+    /// we need to handle loops which never finish , re run on completion , threading , timed and priority etc
     pub fn process_blocks(& mut self)
     {
+
+        // new method process(n) and recurse
+        self.graph.get_node(0).process();
         let successors: Vec<NodeIndex> = self.graph.successors(0).collect();
 
         for i in successors { self.graph.get_node(i).process(); }
