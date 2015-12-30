@@ -62,6 +62,7 @@ where T: Sized
     }
 
     pub fn get_node(&mut self, source: NodeIndex) -> & mut T {
+        println!("get node {:?} , num nodes{:?} ", source , self.nodes.len());
         & mut self.nodes[source].node
     }
 

@@ -17,12 +17,18 @@ impl<'b> Module<'b>
 //TODO
 //    pub fn add_block(&self, block: &Block) { self.add_box_block( Box::new( *block))  }
 
-    pub fn add_box_block(& mut self, block: Box<Block+'b>) {  self.graph.add_node(block); }
+    //TODO add fail on 2 blocks with same id .. or is this ok ??
+    //TODO NodeIndex replace with nodeid IF unique
+
+
+    pub fn add_box_block(& mut self, block: Box<Block+'b>) -> NodeIndex {  self.graph.add_node(block) }
+    pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex) {  self.graph.add_edge(from, to); }
 
     /// this will get WAY more complicated ..
     /// we need to handle loops which never finish , re run on completion , threading , timed and priority etc
     pub fn process_blocks(& mut self)
     {
+
 
         // new method process(n) and recurse
         self.graph.get_node(0).process();

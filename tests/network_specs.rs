@@ -1,7 +1,6 @@
 // not sure why needed ....
 extern crate anne;
 
-use std::ops::Range;
 use anne::blocks::{LogisticBlock ,LogisticBBlock , BlockData , LinearByteBlock,LogisticBlockwLifetime};
 use anne::core::{Block , BlockBehaviour };
 use anne::util::to_floats;
@@ -215,8 +214,8 @@ fn block_load_vectors()
     let mut outvec = vec! [0f32 ;3];
     let mut output = & mut outvec [..];
 
-    let mut input  = vec! [1f32 ;3];
-    let mut inputs  = vec! [ &input[..]];
+    let input  = vec! [1f32 ;3];
+    let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
         block.set_buffers(weights , &inputs[..] , output );
@@ -234,8 +233,8 @@ fn block_load_and_proces_vectors()
     let mut outvec = vec! [0f32 ;5];
     let mut output = & mut outvec [..];
 
-    let mut input  = vec! [1f32 ;5];
-    let mut inputs  = vec! [ &input[..]];
+    let input  = vec! [1f32 ;5];
+    let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
         block.set_buffers(weights , &inputs[..] , output );
