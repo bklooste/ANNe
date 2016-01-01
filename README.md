@@ -1,4 +1,4 @@
-# ANNe • [![Join the chat at https://gitter.im/bklooste/anne](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/bklooste/anne?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/bklooste/anne.svg?branch=master)](https://travis-ci.org/bklooste/anne) [![Coverage Status](https://coveralls.io/repos/bklooste/anne/badge.svg?branch=master&service=github)](https://coveralls.io/github/bklooste/anne?branch=master) [![License](https://img.shields.io/crates/l/anne.svg)](LICENSE)
+# ANNe • [![Join the chat at https://gitter.im/bklooste/anne](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/bklooste/anne?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/bklooste/ANNe.svg?branch=master)](https://travis-ci.org/bklooste/ANNe) [![Coverage Status](https://coveralls.io/repos/bklooste/ANNe/badge.svg?branch=master&service=github)](https://coveralls.io/github/bklooste/ANNe?branch=master) [![License](https://img.shields.io/crates/l/anne.svg)](LICENSE)
 
 ## Introduction
 
