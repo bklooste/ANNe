@@ -35,7 +35,7 @@ impl<'b> Module<'b>
     pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex) {  self.graph.add_edge(from, to); }
 
     /// this will get WAY more complicated ..
-    /// we need to handle loops which never finish , re run on completion , threading , timed and priority etc
+    /// we need to handle loops which never finish , re run on completion , threading , timed and priority etc  1
     pub fn process_blocks(& 'b mut self)
     {
         self.process_rec(0);
