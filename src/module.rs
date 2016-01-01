@@ -17,8 +17,6 @@ pub struct Module<'b>
     buffers: Vec<Vec<u8>>,   ///TODO try a single buffer .
     buffers_for_node: HashMap< usize, Vec<usize>>
 
-
-    // std::slice::from_raw_parts
 }
 
 impl<'b> Module<'b>
@@ -44,17 +42,16 @@ impl<'b> Module<'b>
 
     }
 
-    pub fn process_rec(& mut self , index: NodeIndex )
+
+    pub fn process_rec(&mut self , index: NodeIndex )
     {
-        let mut successor_ids: Vec<NodeIndex> = Vec::new();
+        let successor_ids: Vec<NodeIndex> = { self.graph.successors(index).collect()};
 
         {
             let node: & BlockType = { self.graph.get_node(index)};
             self.process( node);
-            successor_ids  = { self.graph.successors(index).collect()};
-        }
 
-        //let successors: Vec<NodeIndex> = self.graph.successors(0).collect();
+        }
 
         for i in successor_ids {
             self.process_rec ( i);
