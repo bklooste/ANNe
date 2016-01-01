@@ -164,7 +164,6 @@ fn module_build_add_2blocks_diff_data_process()
     let weights =   & [ 0.5f32  ; 25];
     let weights2 =   & [ 0.2f32  ; 25];
 
-    //let mut outvec = vec! [0f32 ;5];
     let mut output = & mut  [0f32 ;5];
     let mut output2 = & mut  [0f32 ;5];
 
@@ -188,35 +187,66 @@ fn module_build_add_2blocks_diff_data_process()
     assert_eq!(output2, & [0.5744425; 5]);
 }
 
+// #[test]
+// fn module_build_add_2blocks_staged()
+// {
+//     let weights =   & [ 0.5f32  ; 25];
+//     let weights2 =   & [ 0.2f32  ; 25];
+//
+//     let mut output_buf =  vec! [0f32 ;5];
+//     let mut output = & mut  output_buf[..];
+// //    let inputs2 = &[ output];
+//     let mut output2 = & mut  [0f32 ;5];
+//
+//     let mut inputs2data  = vec!  [ & mut output_buf[..] ];
+//     let mut inputs2 = & inputs2data [..] as &[&[f32]];
+//
+//     let inputs  = &[ &[1f32 ;5][..]];
+//
+//
+//     {
+//         let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+//         block1.set_buffers(weights , inputs , output );
+//         let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+//         block2.set_buffers(weights2 , inputs2 , output2 );
+//
+//         let mut module = Module::new();
+//         let from = module.add_box_block(Box::new( block1) );
+//         let to = module.add_box_block(Box::new( block2) );
+//         module.add_link(from, to);
+//         module.process_blocks();
+//
+//     }
+//     assert_eq!(output, & [0.9241418; 5]);
+//
+// }
+//
+// ///TODO add blocks with output buf is input
+// ///TODO  add blocks with output buf is input process
+//
+// #[test]
+// fn module_build_add_node_process()
+// {
+//
+//     let weights =   & [ 0.5f32  ; 25];
+//     let mut outvec = vec! [0f32 ;5];
+//     let mut output = & mut outvec [..];
+//     let input  = vec! [2f32 ;5];
+//     let inputs  = vec! [ &input[..]];
+//
+//     {
+//         let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+//         block.set_buffers(weights , &inputs[..] , output );
+//
+//         let mut module = Module::new();
+//         module.add_box_block(Box::new( block) );
+//         module.process_blocks();
+//     }
+//
+//     assert_eq!(output, & [0.9933072f32; 5]);
+// }
 
 
-///TODO add blocks with output buf is input
-///TODO  add blocks with output buf is input process
-
-#[test]
-fn module_build_add_node_process()
-{
-
-    let weights =   & [ 0.5f32  ; 25];
-    let mut outvec = vec! [0f32 ;5];
-    let mut output = & mut outvec [..];
-    let input  = vec! [2f32 ;5];
-    let inputs  = vec! [ &input[..]];
-
-    {
-
-        //  let mut box_block =  Box::new( block);
-        //  module.add_box_block(box_block );
-        let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
-        block.set_buffers(weights , &inputs[..] , output );
-        let mut module = Module::new();
-        module.add_box_block(Box::new( block) );
-        module.process_blocks();
-    }
-
-    assert_eq!(output, & [0.9933072f32; 5]);
-
-}
 
 
 //fn module_build_add_node_w_module_allocation()
@@ -225,4 +255,5 @@ fn module_build_add_node_process()
 // add node with module doing allocation
 
 
-//add node and prcocess
+
+// xor document test

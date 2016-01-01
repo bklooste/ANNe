@@ -1,45 +1,128 @@
-use core::Block;
+use std::collections::HashMap;
+// use num::traits::Num;
+
+use core::{Block , BlockType , MutBlock , BlockId};
 use graph::{Graph , NodeIndex};
+
+// pub struct Buffer
+// {
+//
+// }
 
 // we could pull the vector graph out .. eg NodeData<T> and have module hold a graph ..
 
 pub struct Module<'b>
 {
-    graph: Graph<Box<Block+ 'b>>,
+    graph: Graph<& 'b BlockType<'b>>,
+    buffers: Vec<Vec<u8>>,   ///TODO try a single buffer .
+    buffers_for_node: HashMap< usize, Vec<usize>>
+
+
+    // std::slice::from_raw_parts
 }
 
 impl<'b> Module<'b>
 {
     pub fn new() -> Module<'b> {
-        Module { graph: Graph::<Box<Block + 'b>>::new() }
+        Module { graph: Graph::<& 'b BlockType<'b>>::new() , buffers: Vec::new() , buffers_for_node: HashMap::new() }
     }
 
-//TODO
-//    pub fn add_block(&self, block: &Block) { self.add_box_block( Box::new( *block))  }
-
-    //TODO add fail on 2 blocks with same id .. or is this ok ??
     //TODO NodeIndex replace with nodeid IF unique
+    pub fn add_box_block(& mut self, block: & 'b mut BlockType<'b>) -> NodeIndex {
+
+        self.graph.add_node(block)
+    }
 
 
-    pub fn add_box_block(& mut self, block: Box<Block+'b>) -> NodeIndex {  self.graph.add_node(block) }
     pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex) {  self.graph.add_edge(from, to); }
 
     /// this will get WAY more complicated ..
     /// we need to handle loops which never finish , re run on completion , threading , timed and priority etc
-    pub fn process_blocks(& mut self)
+    pub fn process_blocks(& 'b mut self)
     {
+        self.process_rec(0);
 
-
-        // new method process(n) and recurse
-        self.graph.get_node(0).process();
-        let successors: Vec<NodeIndex> = self.graph.successors(0).collect();
-
-        for i in successors { self.graph.get_node(i).process(); }
     }
+
+    pub fn process_rec(& mut self , index: NodeIndex )
+    {
+        let mut successor_ids: Vec<NodeIndex> = Vec::new();
+
+        {
+            let node: & BlockType = { self.graph.get_node(index)};
+            self.process( node);
+            successor_ids  = { self.graph.successors(index).collect()};
+        }
+
+        //let successors: Vec<NodeIndex> = self.graph.successors(0).collect();
+
+        for i in successor_ids {
+            self.process_rec ( i);
+        }
+
+    }
+
+    fn process(& self ,  block: & 'b BlockType)
+    {
+        match *block {
+            BlockType::Block(b) => self.process_block (b ),
+            BlockType::MutBlock(ref b) => process_mut_block( *b ),
+            BlockType::FunctionBlock(_) => {}
+        }
+    }
+
+    // fn get_buffer_ids(&self ,  block_id: BlockId) -> Vec< (usize , usize , bool)>
+    // {
+    //
+    //     self.buffers_for_node.get(block_id).map( )
+    // }
+
+
+    // fn get_buffers(& self ,  block_id: BlockId) -> Vec<& 'b [u8]>
+    // {
+    //
+    //     let bufs = self.buffers_for_node.get(& (block_id as usize) ).iter( )
+    //         .map(|x| & (self.buffers[block_id as usize] ) [..] );
+    //
+    //     bufs.collect::<Vec<_>>()
+    //     //a.iter().map(|&x| 2 * x);
+    //     //buffer_for_node: HashMap< usize, Vec< (usize , usize , bool)>>
+    // }
+
+    fn get_buffers(&self,  block_id: BlockId) -> Vec<&[u8]>
+     {
+
+         let bufs = self.buffers_for_node[&(block_id as usize)].iter( )
+             .map(|x| &self.buffers[block_id as usize][..] );
+
+         bufs.collect::<Vec<_>>()
+     }
+
+
+
+
+
+    //    Block (Box<Block + 'b> ),
+    fn process_block(& self ,  blockType: & 'b Block)
+    {
+        let buffers = self.get_buffers(blockType.get_id());
+        //let mut_buffers = get_mut_buffers(blockType.get_id());
+
+        //  process(&mut self , data: & [u8] , inputs: & [u8] , outputs: & mut [u8])
+        //*blockType.
+    }
+
 }
 
 
-// we dont really need an interface
+
+fn process_mut_block( blockType: &MutBlock)
+{
+
+}
+
+
+// we dont really need an interface , maybe for network
 pub trait IModule
 {
     //fn process(<Vec<O>>) -> Vec<O>;
@@ -55,35 +138,3 @@ pub trait IModule
 
 
 }
-
-
-
-// mod test {
-//     use super::*;
-
-    // #[test]
-    // pub fn example() {
-    //
-    //     // N0 ---E0---> N1 ---E1---> 2
-    //     // |                         ^
-    //     // E2                        |
-    //     // |                         |
-    //     // v                         |
-    //     // N3 ----------E3-----------+
-    //
-    //     let mut graph = Module::new();
-    //
-    //     let n0 = graph.add_node();
-    //     let n1 = graph.add_node();
-    //     let n2 = graph.add_node();
-    //     let n3 = graph.add_node();
-    //
-    //     graph.add_edge(n0, n1); // e0
-    //     graph.add_edge(n1, n2); // e1
-    //     graph.add_edge(n0, n3); // e2
-    //     graph.add_edge(n3, n2); // e3
-    //
-    //     let successors: Vec<NodeIndex> = graph.successors(n0).collect();
-    //     assert_eq!(&successors[..], &[n3, n1]);
-    // }
-//}

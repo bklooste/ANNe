@@ -1,3 +1,4 @@
+use std::marker::Sized;
 
 use num::traits::Num;
 
@@ -42,51 +43,93 @@ pub trait BufferManager <O: Num>
     // gets inputs.
 }
 
-pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
+// pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a> : Block
+// {
+//
+//     fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
+//
+//     fn set_mod_buffers(& mut self , weights: & 'a [u8] , inputs: & 'a mut [& 'a [u8]] , outputs: & 'a mut [u8])
+//     {
+//         // manifest a slice out of thin air!
+//         let ptr = 0x1234 as *const usize;
+//         let amt = 10;
+//         //set_buffers
+//         unsafe{
+//             use std::slice;
+//
+//
+//
+//                 let slice = slice::from_raw_parts(ptr, amt);
+//
+//             let weight: & 'a [W] = slice::from_raw_parts( weights.as_ptr(), weights.len()/ mem::size_of::<W>());
+//         }
+//     }
+
+
+//     use std::slice;
+//
+// // manifest a slice out of thin air!
+// let ptr = 0x1234 as *const usize;
+// let amt = 10;
+// unsafe {
+//     let slice = slice::from_raw_parts(ptr, amt);
+// }
+
+    // fn get_weights_size()-> usize
+    // {
+    //     mem::size_of::<W>()
+    //     //sizeof(W);
+    // }
+    //
+    // fn get_input_size()-> usize
+    // {
+    //     mem::size_of::<O>()
+    // }
+
+    // this would seem a lot better with module managing it,
+    //fn process(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
+//}
+
+//fixme rename to block
+
+pub trait IBlock
 {
+    // fn as_blocktype(&self) -> BlockType ;
+    fn get_id(&self) -> BlockId;
+}
 
-    fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
+// simple func.
+// pub trait PlainBlock :IBlock
+// {
+//     fn process<'a>(&mut self , inputs: & 'a [u8] , outputs: & 'a mut [u8]      ) ; // or return slice
+// }
 
-//    fn set_buffers(& mut self , inputs: &[& 'a  [O]] , outputs: & 'a mut [O]);
-//    fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
+
+// not sure if inputs should be mutable , the buffer may be mutable but not for this function
+pub trait Block :IBlock
+{
+    fn process(&mut self , data: & [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
+}
+
+
+pub trait MutBlock :IBlock
+{
+    fn process(&mut self , mut_data: & mut  [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
+}
+
+
+pub trait FunctionBlock :IBlock
+{
+    fn process(&mut self , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
 }
 
 
 
 
-
-
-//
-//
-// pub trait FloatNeuronBlockBehaviour<N : Neuron<f32,f32>> : NeuronBlockBehaviour <f32, f32 , N>
-// {
-//
-// }
-//
-// pub trait ByteNeuronBlockBehaviour<N: Neuron<i8,u8 >> : NeuronBlockBehaviour <i8, u8 , N >
-// {
-//
-// }
-//
-// impl<N : Neuron<f32,f32>> FloatNeuronBlockBehaviour<N>  for NeuronBlockBehaviour<f32, f32  , N> {}
-//
-// // // get input for neuron is not needed for full mesh so this is a specialization
-// pub trait NeuronBlockBehaviour<W: Num> : BlockBehaviour
-// {
-// //    fn get_neuron_behaviour (&self) -> Neuron<W , Output = Self::Output>;
-// //    type Output: Num;
-//     fn get_input_for_neuron (&self  , neuron_num : u32 ) -> &[Self::Output];
-// }
-
-//fixme rename to block
-pub trait Block
-{
-    //fn process(<Vec<O>>) -> Vec<O>;
-    //(args: &[&str])
-    //fn process(&[ &[O] ]) -> Vec<O>;
-    fn process(&mut self) ; // or return slice
-
-
+pub enum BlockType<'a>  {
+    MutBlock(& 'a mut MutBlock),
+    Block (& 'a Block),
+    FunctionBlock (& 'a FunctionBlock )
 }
 
 
