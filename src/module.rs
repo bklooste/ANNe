@@ -1,7 +1,8 @@
 use std::collections::HashMap;
+use std::cell::RefCell;
 // use num::traits::Num;
 
-use core::{Block , BlockType , MutBlock , BlockId};
+use core::{Block , BlockType , MutBlock }; 
 use graph::{Graph , NodeIndex};
 
 // pub struct Buffer
@@ -14,7 +15,7 @@ use graph::{Graph , NodeIndex};
 pub struct Module<'b>
 {
     graph: Graph<& 'b BlockType<'b>>,
-    buffers: Vec<Vec<u8>>,   ///TODO try a single buffer .
+    buffers: Vec<RefCell<Vec<u8>>>,   ///TODO try a single buffer .
     buffers_for_node: HashMap< usize, Vec<usize>>
 
 }
@@ -59,7 +60,7 @@ impl<'b> Module<'b>
 
     }
 
-    fn process(& self ,  block: & 'b BlockType)
+    fn process(& mut self ,  block: & 'b BlockType)
     {
         match *block {
             BlockType::Block(b) => self.process_block (b ),
@@ -86,34 +87,44 @@ impl<'b> Module<'b>
     //     //buffer_for_node: HashMap< usize, Vec< (usize , usize , bool)>>
     // }
 
-    fn get_buffers(&self,  block_id: BlockId) -> Vec<&[u8]>
-     {
-
-         let bufs = self.buffers_for_node[&(block_id as usize)].iter( )
-             .map(|x| &self.buffers[block_id as usize][..] );
-
-         bufs.collect::<Vec<_>>()
-     }
+    // fn get_buffers(& 'b mut self,  block_id: BlockId) -> Vec<& mut [u8]>
+    //  {
+    //
+    //     //  let bufs = self.buffers_for_node[&(block_id as usize)].iter( )
+    //     //      .map(|&x| & mut self.buffers[x as usize][..] );
+    //      //
+    //     //  bufs.collect::<Vec<_>>()
+    //  }
 
 
 
 
 
     //    Block (Box<Block + 'b> ),
-    fn process_block(& self ,  blockType: & 'b Block)
+    fn process_block(& mut self ,  block: & 'b Block)
     {
-        let buffers = self.get_buffers(blockType.get_id());
+        let blockid = block.get_id() as usize;
+        let buffers = self.buffers_for_node.get(&blockid).unwrap();
+
+
+        let static_data = self.buffers[ buffers[0]].borrow();
+        let input  = self.buffers[ buffers[1]].borrow();
+        let mut output = self.buffers[buffers[2]].borrow_mut();
+
+
+        block.process( &static_data[..] ,&input[..] , & mut output[..]);
+
+
+        // .iter( )
+        //     .map(|&x| & mut self.buffers[x as usize][..] ).collect::<Vec<_>>();
+        //let buffers = self.get_buffers(block.get_id());
         //let mut_buffers = get_mut_buffers(blockType.get_id());
-
-        //  process(&mut self , data: & [u8] , inputs: & [u8] , outputs: & mut [u8])
-        //*blockType.
     }
-
-}
-
+} //impl
 
 
-fn process_mut_block( blockType: &MutBlock)
+
+fn process_mut_block( _block_type: &MutBlock)
 {
 
 }

@@ -3,7 +3,7 @@ use anne::module::{Module};
 extern crate anne;
 
 //use std::ops::Range;
-use anne::blocks::{BlockData, LogisticBlockwLifetime};
+use anne::blocks::{BlockData, LogisticMutBlock , LogisticBlock};
 // use anne::blocks::neural::neuron::DefaultLogistic;
 use anne::core::{ BlockBehaviour };
 // , BlockData};
@@ -32,7 +32,7 @@ fn module_build_add_node()
         static mut OUTPUT_BUF: & 'static mut [f32] = & mut [0f32; 3];
         static  WEIGHTS: & 'static  [f32] = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
 
-        let block = LogisticBlockwLifetime::new(BlockData::new(2 , 5, 5), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
+        let block = LogisticMutBlock::new(BlockData::new(2 , 5, 5), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
         let box_block =  Box::new( block);
         module.add_box_block(box_block );
 
@@ -49,7 +49,7 @@ fn module_build_add_block()
     let input  = vec! [1f32 ;5];
     let inputs  = vec! [ &input[..]];
     {
-        let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block.set_buffers(weights , &inputs[..] , output );
         let mut module = Module::new();
         module.add_box_block(Box::new( block) );
@@ -68,9 +68,9 @@ fn module_build_add_2blocks()
     let input  = vec! [1f32 ;5];
     let inputs  = vec! [ &input[..]];
     {
-        let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block1.set_buffers(weights , &inputs[..] , output );
-        let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , &inputs[..] , output2 );
         let mut module = Module::new();
         module.add_box_block(Box::new( block1) );
@@ -92,9 +92,9 @@ fn module_build_add_2blocks_same_id()
     let input  = vec! [1f32 ;5];
     let inputs  = vec! [ &input[..]];
     {
-        let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block1.set_buffers(weights , &inputs[..] , output );
-        let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , &inputs[..] , output2 );
         let mut module = Module::new();
         module.add_box_block(Box::new( block1) );
@@ -116,9 +116,9 @@ fn module_build_add_2blocks_process()
     let input  = vec! [1f32 ;5];
     let inputs  = vec! [ &input[..]];
     {
-        let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block1.set_buffers(weights , &inputs[..] , output );
-        let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , &inputs[..] , output2 );
         let mut module = Module::new();
         module.add_box_block(Box::new( block1) );
@@ -143,9 +143,9 @@ fn module_build_add_2blocks_diff_data_process_no_link()
     let inputs2 = &[ &[0.3f32 ;5][..]];
 
     {
-        let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block1.set_buffers(weights , inputs , output );
-        let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights2 , inputs2 , output2 );
 
         let mut module = Module::new();
@@ -171,9 +171,9 @@ fn module_build_add_2blocks_diff_data_process()
     let inputs2 = &[ &[0.3f32 ;5][..]];
 
     {
-        let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block1.set_buffers(weights , inputs , output );
-        let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights2 , inputs2 , output2 );
 
         let mut module = Module::new();
@@ -205,9 +205,9 @@ fn module_build_add_2blocks_diff_data_process()
 //
 //
 //     {
-//         let mut block1 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+//         let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
 //         block1.set_buffers(weights , inputs , output );
-//         let mut block2 = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+//         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
 //         block2.set_buffers(weights2 , inputs2 , output2 );
 //
 //         let mut module = Module::new();
@@ -235,7 +235,7 @@ fn module_build_add_2blocks_diff_data_process()
 //     let inputs  = vec! [ &input[..]];
 //
 //     {
-//         let mut block = LogisticBlockwLifetime::new_late(BlockData::new(2 , 5, 5));
+//         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
 //         block.set_buffers(weights , &inputs[..] , output );
 //
 //         let mut module = Module::new();

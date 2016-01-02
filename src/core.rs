@@ -1,5 +1,3 @@
-use std::marker::Sized;
-
 use num::traits::Num;
 
 pub type BlockId = u32;
@@ -43,28 +41,37 @@ pub trait BufferManager <O: Num>
     // gets inputs.
 }
 
-// pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a> : Block
-// {
-//
-//     fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
-//
-//     fn set_mod_buffers(& mut self , weights: & 'a [u8] , inputs: & 'a mut [& 'a [u8]] , outputs: & 'a mut [u8])
-//     {
-//         // manifest a slice out of thin air!
-//         let ptr = 0x1234 as *const usize;
-//         let amt = 10;
-//         //set_buffers
-//         unsafe{
-//             use std::slice;
-//
-//
-//
-//                 let slice = slice::from_raw_parts(ptr, amt);
-//
-//             let weight: & 'a [W] = slice::from_raw_parts( weights.as_ptr(), weights.len()/ mem::size_of::<W>());
-//         }
-//     }
 
+    //fn process(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
+
+pub trait NeuronBlock < O: Num  ,  W: Num> : Block
+{
+    fn process_input(& self , weights: & [W] , inputs: & [O] , outputs: & mut [O]);
+}
+
+
+pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
+{
+
+    fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
+
+    // fn set_mod_buffers(& mut self , weights: & 'a [u8] , inputs: & 'a mut [& 'a [u8]] , outputs: & 'a mut [u8])
+    // {
+    //     // manifest a slice out of thin air!
+    //     let ptr = 0x1234 as *const usize;
+    //     let amt = 10;
+    //     //set_buffers
+    //     unsafe{
+    //         use std::slice;
+    //
+    //
+    //
+    //             let slice = slice::from_raw_parts(ptr, amt);
+    //
+    //         let weight: & 'a [W] = slice::from_raw_parts( weights.as_ptr(), weights.len()/ mem::size_of::<W>());
+    //     }
+    // }
+}
 
 //     use std::slice;
 //
@@ -98,18 +105,14 @@ pub trait IBlock
     fn get_id(&self) -> BlockId;
 }
 
-// simple func.
-// pub trait PlainBlock :IBlock
-// {
-//     fn process<'a>(&mut self , inputs: & 'a [u8] , outputs: & 'a mut [u8]      ) ; // or return slice
-// }
-
 
 // not sure if inputs should be mutable , the buffer may be mutable but not for this function
 pub trait Block :IBlock
 {
-    fn process(&mut self , data: & [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
+    fn process(&self , data: & [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
 }
+
+
 
 
 pub trait MutBlock :IBlock
@@ -120,7 +123,7 @@ pub trait MutBlock :IBlock
 
 pub trait FunctionBlock :IBlock
 {
-    fn process(&mut self , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
+    fn process(&self , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
 }
 
 
