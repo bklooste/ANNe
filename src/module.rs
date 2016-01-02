@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 // use num::traits::Num;
 
-use core::{Block , BlockType , MutBlock }; 
+use core::{IBlock, Block , BlockType , MutBlock };
 use graph::{Graph , NodeIndex};
 
 // pub struct Buffer
@@ -27,7 +27,7 @@ impl<'b> Module<'b>
     }
 
     //TODO NodeIndex replace with nodeid IF unique
-    pub fn add_box_block(& mut self, block: & 'b mut BlockType<'b>) -> NodeIndex {
+    pub fn add_block(& mut self, block: & 'b mut BlockType<'b>) -> NodeIndex {
 
         self.graph.add_node(block)
     }
@@ -45,29 +45,29 @@ impl<'b> Module<'b>
 
 
     pub fn process_rec(&mut self , index: NodeIndex )
-    {
-        let successor_ids: Vec<NodeIndex> = { self.graph.successors(index).collect()};
+       {
+           let successor_ids: Vec<NodeIndex> = { self.graph.successors(index).collect()};
 
-        {
-            let node: & BlockType = { self.graph.get_node(index)};
-            self.process( node);
+           {
+               let node: & BlockType = { self.graph.get_node(index)};
+               self.process( node);
 
-        }
+           }
 
-        for i in successor_ids {
-            self.process_rec ( i);
-        }
+           for i in successor_ids {
+               self.process_rec ( i);
+           }
 
-    }
+       }
 
-    fn process(& mut self ,  block: & 'b BlockType)
-    {
-        match *block {
-            BlockType::Block(b) => self.process_block (b ),
-            BlockType::MutBlock(ref b) => process_mut_block( *b ),
-            BlockType::FunctionBlock(_) => {}
-        }
-    }
+       fn process(& mut self ,  block: & 'b BlockType)
+       {
+           match *block {
+               BlockType::Block(b) => self.process_block (b ),
+               BlockType::MutBlock(ref b) => process_mut_block( *b ),
+               BlockType::FunctionBlock(_) => {}
+           }
+       }
 
     // fn get_buffer_ids(&self ,  block_id: BlockId) -> Vec< (usize , usize , bool)>
     // {

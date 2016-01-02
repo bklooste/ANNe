@@ -101,7 +101,7 @@ pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
 
 pub trait IBlock
 {
-    // fn as_blocktype(&self) -> BlockType ;
+    fn as_blocktype(&self) -> BlockType ;
     fn get_id(&self) -> BlockId;
 }
 
@@ -128,7 +128,7 @@ pub trait FunctionBlock :IBlock
 
 
 
-
+//#[derive(Debug, Copy, Clone)]
 pub enum BlockType<'a>  {
     MutBlock(& 'a mut MutBlock),
     Block (& 'a Block),

@@ -5,7 +5,7 @@ extern crate anne;
 //use std::ops::Range;
 use anne::blocks::{BlockData, LogisticMutBlock , LogisticBlock};
 // use anne::blocks::neural::neuron::DefaultLogistic;
-use anne::core::{ BlockBehaviour };
+use anne::core::{ BlockBehaviour ,IBlock ,BlockType };
 // , BlockData};
 
 
@@ -21,7 +21,9 @@ fn module_new()
 #[test]
 fn module_build_add_node()
 {
-    let mut module = Module::new();
+
+
+
     // let input =  ::anne::util::to_floats(1..6);
     // println!("input {:?}", input );
     // let mut output = vec! [0f32 ;3];
@@ -33,12 +35,24 @@ fn module_build_add_node()
         static  WEIGHTS: & 'static  [f32] = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
 
         let block = LogisticMutBlock::new(BlockData::new(2 , 5, 5), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
-        let box_block =  Box::new( block);
-        module.add_box_block(box_block );
+
+        let mut module = Module::new();
+
+        let block_type: & 'static BlockType =  &BlockType::Block(&block)  ;
+        module.add_block( block_type );
 
         assert_eq!(OUTPUT_BUF,& mut [0f32; 3]);
     }
 }
+
+
+// let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
+// block2.set_buffers(weights2 , inputs2 , output2 );
+//
+// let mut module = Module::new();
+// module.add_block( &(block1.as_blocktype()) );
+// module.add_block( &(block2.as_blocktype()) );
+// module.process_blocks();
 
 #[test]
 fn module_build_add_block()
@@ -48,11 +62,12 @@ fn module_build_add_block()
     let mut output = & mut outvec [..];
     let input  = vec! [1f32 ;5];
     let inputs  = vec! [ &input[..]];
+    let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
     {
-        let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
+
         block.set_buffers(weights , &inputs[..] , output );
         let mut module = Module::new();
-        module.add_box_block(Box::new( block) );
+        module.add_block( &(block.as_blocktype()) );
     }
     assert_eq!(output,& [0f32; 5]);
 }
@@ -73,8 +88,8 @@ fn module_build_add_2blocks()
         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , &inputs[..] , output2 );
         let mut module = Module::new();
-        module.add_box_block(Box::new( block1) );
-        module.add_box_block(Box::new( block2) );
+        module.add_block( &(block1.as_blocktype()) );
+        module.add_block( &(block2.as_blocktype()) );
 
     }
     assert_eq!(output,& [0f32; 5]);
@@ -97,8 +112,8 @@ fn module_build_add_2blocks_same_id()
         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , &inputs[..] , output2 );
         let mut module = Module::new();
-        module.add_box_block(Box::new( block1) );
-        module.add_box_block(Box::new( block2) );
+        module.add_block( &(block1.as_blocktype()) );
+        module.add_block( &(block2.as_blocktype()) );
 
     }
     assert_eq!(output,& [0f32; 5]);
@@ -121,8 +136,8 @@ fn module_build_add_2blocks_process()
         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , &inputs[..] , output2 );
         let mut module = Module::new();
-        module.add_box_block(Box::new( block1) );
-        module.add_box_block(Box::new( block2) );
+        module.add_block( &(block1.as_blocktype()) );
+        module.add_block( &(block2.as_blocktype()) );
         module.process_blocks();
 
     }
@@ -149,8 +164,8 @@ fn module_build_add_2blocks_diff_data_process_no_link()
         block2.set_buffers(weights2 , inputs2 , output2 );
 
         let mut module = Module::new();
-        module.add_box_block(Box::new( block1) );
-        module.add_box_block(Box::new( block2) );
+        module.add_block( &(block1.as_blocktype()) );
+        module.add_block( &(block2.as_blocktype()) );
         module.process_blocks();
 
     }
@@ -177,8 +192,8 @@ fn module_build_add_2blocks_diff_data_process()
         block2.set_buffers(weights2 , inputs2 , output2 );
 
         let mut module = Module::new();
-        let from = module.add_box_block(Box::new( block1) );
-        let to = module.add_box_block(Box::new( block2) );
+        let from = module.add_block( &(block1.as_blocktype()) );
+        let to = module.add_block( &(block2.as_blocktype()) );
         module.add_link(from, to);
         module.process_blocks();
 
@@ -211,8 +226,8 @@ fn module_build_add_2blocks_diff_data_process()
 //         block2.set_buffers(weights2 , inputs2 , output2 );
 //
 //         let mut module = Module::new();
-//         let from = module.add_box_block(Box::new( block1) );
-//         let to = module.add_box_block(Box::new( block2) );
+//         let from = module.add_block( &(block1.as_blocktype()) );
+//         let to = module.add_block( &(block2.as_blocktype()) );
 //         module.add_link(from, to);
 //         module.process_blocks();
 //
@@ -239,7 +254,7 @@ fn module_build_add_2blocks_diff_data_process()
 //         block.set_buffers(weights , &inputs[..] , output );
 //
 //         let mut module = Module::new();
-//         module.add_box_block(Box::new( block) );
+//         module.add_block(Box::new( block) );
 //         module.process_blocks();
 //     }
 //
