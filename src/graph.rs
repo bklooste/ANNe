@@ -61,10 +61,17 @@ where T: Sized
         node_data.first_outgoing_edge = Some(edge_index);
     }
 
-    pub fn get_node(&mut self, source: NodeIndex) -> & mut T {
+    pub fn get_node(&self, source: NodeIndex) -> &T {
         println!("get node {:?} , num nodes{:?} ", source , self.nodes.len());
-        & mut self.nodes[source].node
+        & self.nodes[source].node
     }
+
+
+        pub fn get_node_mut(&mut self, source: NodeIndex) -> & mut T {
+            println!("get node {:?} , num nodes{:?} ", source , self.nodes.len());
+            & mut self.nodes[source].node
+        }
+
 
     pub fn successors(&self, source: NodeIndex) -> Successors<T> {
         let first_outgoing_edge = self.nodes[source].first_outgoing_edge;

@@ -1,5 +1,10 @@
 use num::traits::Num;
 
+use std::mem;
+use std::slice;
+use std::fmt::Debug;
+
+pub type BlockIndex = u32;
 pub type BlockId = u32;
 pub type BlockPort = u32;
 pub type NeuronNum = u32;
@@ -35,24 +40,17 @@ pub enum Connection
 
 // try this if it doesnt work then we can use an enum for diffirent node types
 
-pub trait BufferManager <O: Num>
-{
-    // get weights
-    // gets inputs.
-}
+// replaces base num
+pub trait Numb {}
 
 
-    //fn process(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
 
-pub trait NeuronBlock < O: Num  ,  W: Num> : Block
-{
-    fn process_input(& self , weights: & [W] , inputs: & [O] , outputs: & mut [O]);
-}
+
+
 
 
 pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
 {
-
     fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
 
     // fn set_mod_buffers(& mut self , weights: & 'a [u8] , inputs: & 'a mut [& 'a [u8]] , outputs: & 'a mut [u8])
@@ -71,6 +69,80 @@ pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
     //         let weight: & 'a [W] = slice::from_raw_parts( weights.as_ptr(), weights.len()/ mem::size_of::<W>());
     //     }
     // }
+}
+
+
+//fixme rename to block
+
+pub trait IBlock
+{
+//    fn as_blocktype(&self) -> Box<BlockType> ;
+    fn get_id(&self) -> BlockId;
+    fn process(&self , data: & mut [u8] , inputs: & mut[u8] , outputs: & mut [u8]) ;  // or an array ????
+}
+
+ //buffers: [& mut [u8] ;3])
+
+pub trait IntoBox<A: ?Sized>
+ {
+    /// Convert self into the appropriate boxed form.
+    fn into_box(self) -> Box<A>;
+}
+
+
+
+
+pub trait NeuronBlock <  W: Num , O: Num  >
+{
+    fn getid(&self) -> BlockId ; // clumsy does not belong but need iblock
+    fn process_input(& self , weights: & [W] , inputs: & [O] , outputs: & mut [O]);
+}
+
+
+impl <W:Num , O:Num+Debug>  IBlock for NeuronBlock<W,O>
+{
+
+// not needed ?
+    fn get_id(&self) -> BlockId { self.getid() }
+
+    fn process(&self , data: & mut [u8] , inputs: & mut [u8] , outputs: & mut [u8])
+    {
+        unsafe
+        {
+            let weight_size = mem::size_of::<W>();
+            let weights: & [W] = slice::from_raw_parts( data.as_ptr() as *const W, data.len()/ weight_size);
+            let inputs: & [O] = slice::from_raw_parts( inputs.as_ptr() as *const O, inputs.len()/ mem::size_of::<O>());
+            let outputs: & mut [O] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut O, outputs.len()/ mem::size_of::<O>());
+
+            // if  (self.block.synapse_count * self.block.neuron_count) as usize != weights.len()  {
+            //     panic!("weights does not equal synapse * neurons")
+            // }
+
+            self.process_input( weights , inputs , outputs);
+
+            //
+            // // could use a pair itterator this seems fragile
+            // for weights_for_neuron in weights.chunks( self.block.synapse_count as usize )
+            // {
+            //
+            //         println!("weights_for_neuron {:?}", weights_for_neuron );
+            //
+            //
+            //     // for nc in 0..self.block.neuron_count as usize
+            //     // {
+            //         let activated:O =  { N::eval( inputs ,   weights_for_neuron  )};
+            //         outputs[nc] = activated;
+            //         println!("O {:?}", outputs );
+            //
+            //     //}
+            //     nc = nc + 1;
+            // }
+            println!("O {:?}", outputs );
+        }
+    }
+
+
+
 }
 
 //     use std::slice;
@@ -97,43 +169,32 @@ pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
     //fn process(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
 //}
 
-//fixme rename to block
-
-pub trait IBlock
-{
-    fn as_blocktype(&self) -> BlockType ;
-    fn get_id(&self) -> BlockId;
-}
 
 
-// not sure if inputs should be mutable , the buffer may be mutable but not for this function
-pub trait Block :IBlock
-{
-    fn process(&self , data: & [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
-}
+// // not sure if inputs should be mutable , the buffer may be mutable but not for this function
 
-
-
-
-pub trait MutBlock :IBlock
-{
-    fn process(&mut self , mut_data: & mut  [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
-}
-
-
-pub trait FunctionBlock :IBlock
-{
-    fn process(&self , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
-}
-
-
-
-//#[derive(Debug, Copy, Clone)]
-pub enum BlockType<'a>  {
-    MutBlock(& 'a mut MutBlock),
-    Block (& 'a Block),
-    FunctionBlock (& 'a FunctionBlock )
-}
+//
+//
+//
+// pub trait MutBlock :IBlock
+// {
+//     fn process(&mut self , mut_data: & mut  [u8] , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
+// }
+//
+//
+// pub trait FunctionBlock :IBlock
+// {
+//     fn process(&self , inputs: & [u8] , outputs: & mut [u8]) ; // or return slice
+// }
+//
+//
+//
+// //#[derive(Debug, Copy, Clone)]
+// pub enum BlockType<'a>  {
+//     MutBlock(Box<MutBlock + 'a>),
+//     Block (Box<Block  + 'a>),
+//     FunctionBlock (Box<FunctionBlock  + 'a> )
+// }
 
 
 

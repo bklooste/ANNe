@@ -1,5 +1,5 @@
 
-pub use core::{ConnectionDestination, Connection,  Block  };
+pub use core::{ConnectionDestination, Connection  };
 
 
 // standard impl for all neuron blocks
