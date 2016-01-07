@@ -4,7 +4,7 @@ extern crate anne;
 
 
 use anne::blocks::{LogisticBlock ,LogisticMutBlock , BlockData , LinearByteMutBlock , LinearByteBlock};
-use anne::core::{Block , BlockBehaviour };
+use anne::core::{IBlock , MutableBlock };
 use anne::util::to_floats;
 // , BlockData};
 
@@ -217,10 +217,10 @@ fn block_load_vectors()
     let mut output = & mut outvec [..];
 
     let input  = vec! [1f32 ;3];
-    let inputs  = vec! [ &input[..]];
+    //let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-        block.set_buffers(weights , &inputs[..] , output );
+        block.set_buffers(weights , &input[..] , output );
     }
 
     assert_eq!(output, & [0f32; 3]);
@@ -236,10 +236,10 @@ fn block_load_and_proces_vectors()
     let mut output = & mut outvec [..];
 
     let input  = vec! [1f32 ;5];
-    let inputs  = vec! [ &input[..]];
+//    let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-        block.set_buffers(weights , &inputs[..] , output );
+        block.set_buffers(weights , &input[..] , output );
         block.process_buffers();
     }
 

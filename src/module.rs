@@ -52,7 +52,7 @@ impl Module
 //     unsafe { *self.inner.insert(value.into_box()).downcast_unchecked() }
 // }
 
-    pub fn add_box_block(& mut self, box_block: Box<IBlock>) -> NodeIndex {
+    pub fn add_block(& mut self, box_block: Box<IBlock>) -> NodeIndex {
 
 
         self.blocks.push(RefCell::new(box_block));

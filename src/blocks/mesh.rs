@@ -1,6 +1,5 @@
 
 use std::marker::PhantomData;
-use std::{slice , mem};
 use std::fmt::Debug;
 
 use num::traits::Num;
@@ -95,6 +94,7 @@ where W: Num  , O: Num   , N: Neuron <W,O>
 
 
 
+
 impl<W  ,O ,N>  NeuronBlock<W , O>  for MeshBlock< W ,O ,N>
 where W: Num + Debug  , O: Num + Debug  , N: Neuron <W,O>
 {
@@ -139,12 +139,50 @@ fn fullmesh_create_fullmesh_bloc ()
         let mut output: & mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
           let weights: &  [f32] = & [0f32; 500];
 
-        let _block  =  MeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5 , 5, 5)
-                , weights
-                , output
-                , input
-        );
+        let _block  =  MeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(5 , 5, 5);
+
+        // load buffers
 }
+
+
+#[test]
+fn fullmesh_create_fullmesh_bloc_2 ()
+{
+
+         let input: & [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        let mut output: & mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+          let weights: &  [f32] = & [0f32; 500];
+
+        let _block  =  MeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(5 , 5, 5);
+        //         , weights
+        //         , output
+        //         , input
+        // );
+
+//anne::blocks::fullmesh::FullMeshBlock<'_, f32, f32, anne::blocks::neural::defaultweight::DefaultNeuron<f32, f32, anne::blocks::neural::activation::Logistic>>
+        let neuronblock : &NeuronBlock<f32,f32>  = &_block;
+    //    let iblock: Box<IBlock> = Box::new(neuronblock);
+}
+
+#[test]
+fn fullmesh_create_fullmesh_bloc_3 ()
+{
+
+         let input: & [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        let mut output: & mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+          let weights: &  [f32] = & [0f32; 500];
+
+        let _block  =  MeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(5 , 5, 5);
+        //         , weights
+        //         , output
+        //         , input
+        // );
+
+//anne::blocks::fullmesh::FullMeshBlock<'_, f32, f32, anne::blocks::neural::defaultweight::DefaultNeuron<f32, f32, anne::blocks::neural::activation::Logistic>>
+        let iblock : & IBlock  = &_block;
+        //let iblock: Box<IBlock> = Box::new(& *neuronblock);
+}
+
 
 
 //

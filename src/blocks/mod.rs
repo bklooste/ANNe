@@ -37,7 +37,7 @@ pub fn add_three(a: i32) -> i32 {
     a + 3
 }
 
-pub type LinearByteMutBlock<'a> = ::blocks::fullmesh::FullMeshBlock<'a,i8,u8 ,LinearByteB>;
-pub type LogisticMutBlock<'a> = ::blocks::fullmesh::FullMeshBlock<'a, f32,f32,DefaultLogistic>;
+pub type LinearByteMutBlock = ::blocks::fullmesh::FullMeshBlock<i8,u8 ,LinearByteB>;
+pub type LogisticMutBlock = ::blocks::fullmesh::FullMeshBlock< f32,f32,DefaultLogistic>;
 pub type LinearByteBlock = ::blocks::mesh::MeshBlock<i8,u8 ,LinearByteB>;
 pub type LogisticBlock = ::blocks::mesh::MeshBlock<f32,f32,DefaultLogistic>;

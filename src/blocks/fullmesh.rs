@@ -1,6 +1,6 @@
 
 use std::marker::PhantomData;
-use std::{slice , mem};
+//use std::{slice , mem};
 use std::fmt::Debug;
 use std::cell::RefCell;
 use std::borrow::BorrowMut;
@@ -19,58 +19,65 @@ use super::BlockData;
 
 // dont enhance it build new ones this is a basic impl.
 //#[derive(Default)]
-pub struct FullMeshBlock<'a, W, O, N>
-where W: Num + 'a  , O: Num + 'a  , N: Neuron <W,O >
+pub struct FullMeshBlock< W, O, N>
+where W: Num, O: Num, N: Neuron <W,O>
 {
-    weights: & 'a [W],
-    inputs: & 'a [O],
-    outputs: RefCell<& 'a mut  [O]>,
+    weights: Vec<W>,
+    inputs: Vec<O>,
+    outputs: RefCell<Vec<O>>,
 
     block: BlockData,
     neural_behaviour: PhantomData<N>,
 }
 
 
-impl<'a,W,O,N>  FullMeshBlock<'a,W,O,N>
-where W: Num +'a +Debug , O: Num +'a +Debug  , N: Neuron <W,O>
+impl<W,O,N>  FullMeshBlock<W,O,N>
+where W: Num  +Debug , O: Num  +Debug  , N: Neuron <W,O>
 {
-    pub fn new_late(block_data: BlockData )  -> FullMeshBlock< 'a, W , O , N>
+    pub fn new_late(block_data: BlockData )  -> FullMeshBlock<  W , O , N>
     {
         if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
-        FullMeshBlock { block : block_data , weights:  &[],  outputs: RefCell::new(& mut []) ,inputs: &[]  , neural_behaviour:  ::std::marker::PhantomData   }
+        FullMeshBlock { block : block_data , weights:  Vec::new(),  outputs: RefCell::new(Vec::new()) ,inputs: Vec::new() , neural_behaviour:  ::std::marker::PhantomData   }
     }
 
-     pub fn new(block_data: BlockData , all_weights: & 'a [W] , output_buf: & 'a mut [O], input_buf: & 'a  [O])  -> FullMeshBlock< 'a, W , O , N>
-     {
-         if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
-         FullMeshBlock { block : block_data , weights: all_weights ,  outputs: RefCell::new(output_buf) ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
-     }
+    pub fn new(block_data: BlockData , all_weights: Vec<W> , output_buf: Vec<O>, input_buf: Vec<O>)  -> FullMeshBlock<  W , O , N>
+    {
+        if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
+        FullMeshBlock { block : block_data , weights: all_weights ,  outputs: RefCell::new(output_buf) ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
+    }
 
-     pub fn process_buffers(& self )
-     {
-         //let out:&mut [O] = ;  // should only need 1 but deref not working
-         self.process_input(self.weights , self.inputs , (self.outputs.borrow_mut()).borrow_mut());
-     }
+    pub fn process_buffers(& mut self )
+    {
+        //let out:&mut [O] = ;  // should only need 1 but deref not working
+        self.process_input(&self.weights[..] , &self.inputs[..] , & mut self.outputs.borrow_mut()[..]);
+    }
+
 
 
 }
 
 
 
-impl<'a,W ,O ,N>  BlockBehaviour <'a, O ,W> for FullMeshBlock<'a,W ,O ,N>
-where W: Num + Debug + 'a , O: Num + Debug+  'a , N: Neuron <W,O>
+impl< W ,O ,N>  MutableBlock <O ,W> for FullMeshBlock<W ,O ,N>
+where W: Num + Debug, O: Num + Debug + Copy, N: Neuron <W,O>
 {
-    fn set_buffers(& mut self , weights: & 'a [W],  inputs: & 'a [& [O]] , outputs: & 'a mut [O])
+    fn set_buffers(& mut self , weights: Vec<W>,  inputs: Vec<O> , outputs: Vec<O>)
     {
-        self.inputs = inputs[0];
+        self.inputs = inputs;
         self.outputs = RefCell::new(outputs);
         self.weights = weights;
 
     }
+
+    fn get_output(&self ) -> Vec<O>
+    {
+
+        self.outputs.borrow().to_vec()
+    }
 }
 
-impl< 'b, W  ,O ,N>  NeuronBlock<W, O>  for FullMeshBlock< 'b,W ,O ,N>
-where W: Num + Debug+'b  , O: Num + Debug +'b, N: Neuron <W,O>
+impl< W  ,O ,N>  NeuronBlock<W, O>  for FullMeshBlock< W ,O ,N>
+where W: Num + Debug  , O: Num + Debug , N: Neuron <W,O>
 {
 
     fn getid(&self) -> BlockId {  self.block.id}
@@ -93,7 +100,7 @@ where W: Num + Debug+'b  , O: Num + Debug +'b, N: Neuron <W,O>
 }
 
 
-// impl<'a, W  ,O ,N>  IBlock  for FullMeshBlock<'a, W ,O ,N>
+// impl< W  ,O ,N>  IBlock  for FullMeshBlock< W ,O ,N>
 // where W: 'a + Num + Debug  , O: 'a + Num  +Debug, N: Neuron <W,O>
 // {
 //     //    fn as_blocktype (&self) -> BlockType {   BlockType::Block(  self)  }
@@ -165,6 +172,27 @@ fn fullmesh_create_fullmesh_bloc ()
                 , input
         );
 }
+
+
+#[test]
+fn fullmesh_create_fullmesh_bloc_3 ()
+{
+
+         let input: & [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+        let mut output: & mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
+          let weights: &  [f32] = & [0f32; 500];
+
+        let _block  =  FullMeshBlock::<f32,f32,DefaultNeuron<f32,f32,Logistic>>::new(BlockData::new(5 , 5, 5)
+                , weights
+                , output
+                , input
+        );
+
+//anne::blocks::fullmesh::FullMeshBlock<'_, f32, f32, anne::blocks::neural::defaultweight::DefaultNeuron<f32, f32, anne::blocks::neural::activation::Logistic>>
+        let iblock : & IBlock  = &_block;
+        //let iblock: Box<IBlock> = Box::new(& *neuronblock);
+}
+
 
 
 //

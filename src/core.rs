@@ -49,9 +49,10 @@ pub trait Numb {}
 
 
 
-pub trait BlockBehaviour <'a, O: Num + 'a ,  W: Num + 'a>
+pub trait MutableBlock <O: Num ,W: Num >
 {
-    fn set_buffers(& mut self , weights: & 'a [W] , inputs: & 'a [& 'a [O]] , outputs: & 'a mut [O]);
+    fn set_buffers(& mut self , weights: Vec<W> , inputs: Vec<O> , outputs: Vec<O>);
+    fn get_output(& self) -> Vec<O>;
 
     // fn set_mod_buffers(& mut self , weights: & 'a [u8] , inputs: & 'a mut [& 'a [u8]] , outputs: & 'a mut [u8])
     // {
@@ -99,7 +100,14 @@ pub trait NeuronBlock <  W: Num , O: Num  >
 }
 
 
-impl <W:Num , O:Num+Debug>  IBlock for NeuronBlock<W,O>
+// impl <T , W:Num  , O:Num >  IBlock for T
+// where T:NeuronBlock<W,O> //<W,O>
+// {
+//     fn getid(&self) -> i8 { self.get_id() }
+// }
+
+impl <T >  IBlock for T
+where T:NeuronBlock<f32,f32>
 {
 
 // not needed ?
@@ -109,10 +117,10 @@ impl <W:Num , O:Num+Debug>  IBlock for NeuronBlock<W,O>
     {
         unsafe
         {
-            let weight_size = mem::size_of::<W>();
-            let weights: & [W] = slice::from_raw_parts( data.as_ptr() as *const W, data.len()/ weight_size);
-            let inputs: & [O] = slice::from_raw_parts( inputs.as_ptr() as *const O, inputs.len()/ mem::size_of::<O>());
-            let outputs: & mut [O] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut O, outputs.len()/ mem::size_of::<O>());
+            let weight_size = mem::size_of::<f32>();
+            let weights: & [f32] = slice::from_raw_parts( data.as_ptr() as *const f32, data.len()/ weight_size);
+            let inputs: & [f32] = slice::from_raw_parts( inputs.as_ptr() as *const f32, inputs.len()/ mem::size_of::<f32>());
+            let outputs: & mut [f32] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut f32, outputs.len()/ mem::size_of::<f32>());
 
             // if  (self.block.synapse_count * self.block.neuron_count) as usize != weights.len()  {
             //     panic!("weights does not equal synapse * neurons")
