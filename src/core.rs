@@ -49,8 +49,11 @@ pub trait Numb {}
 
 
 
-pub trait MutableBlock <O: Num ,W: Num >
+pub trait MutableBlock <O: Num  ,W: Num >
 {
+
+    // later we can pass in a buffer via pointer.
+    fn add_data<'a>(& mut self , weights: & 'a [W] , inputs: & 'a [O]);
     fn set_buffers(& mut self , weights: Vec<W> , inputs: Vec<O> , outputs: Vec<O>);
     fn get_output(& self) -> Vec<O>;
 

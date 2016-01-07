@@ -88,7 +88,7 @@ fn fullmesh_create_fullmesh_bloc1_set_bufs_late ()
         //         , output
         //         , input
         // );
-        _block.set_buffers(&weights[..] , input ,  output );
+        _block.add_data(&weights[..] , input  );
 }
 
 
@@ -108,7 +108,7 @@ let mut output: & mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
     let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
     {
         {
-        block.set_buffers(&weights[..] , input ,  output );
+        block.add_data(&weights[..] , input );
         }
         //block.set_buffers(&weights , &input ,  & mut outvec [..] );
         {
@@ -119,54 +119,61 @@ let mut output: & mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
     }
     //assert_eq!(output,& [0f32; 5]);
 }
-//
-// #[test]
-// fn module_build_add_2blocks()
-// {
-//     let weights =   & [ 0.5f32  ; 25];
-//     //let mut outvec = vec! [0f32 ;5];
-//     let mut output = & mut  [0f32 ;5];
-//     let mut output2 = & mut  [0f32 ;5];
-//
-//     let input  = vec! [1f32 ;5];
-//     //let inputs  = vec! [ &input[..]];
-//     {
-//         let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block1.set_buffers(weights , &input , output );
-//         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block2.set_buffers(weights , &input , output2 );
-//         let mut module = Module::new();
-//         module.add_block(Box::new(block1) );
-//         module.add_block(Box::new(block2) );
-//
-//
-//     }
-//     assert_eq!(output,& [0f32; 5]);
-// }
-//
-// //allowed for now.. do we reuse ?
-// #[test]
-// fn module_build_add_2blocks_same_id()
-// {
-//     let weights =   & [ 0.5f32  ; 25];
-//     //let mut outvec = vec! [0f32 ;5];
-//     let mut output = & mut  [0f32 ;5];
-//     let mut output2 = & mut  [0f32 ;5];
-//
-//     let input  = vec! [1f32 ;5];
-//     //let inputs  = vec! [ &input[..]];
-//     {
-//         let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block1.set_buffers(weights , &input[..] , output );
-//         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block2.set_buffers(weights , &input[..] , output2 );
-//         let mut module = Module::new();
-//         module.add_block(Box::new(block1) );
-//         module.add_block(Box::new(block2) );
-//
-//     }
-//     assert_eq!(output,& [0f32; 5]);
-// }
+
+#[test]
+fn module_build_add_2blocks()
+{
+    let weights =   vec![ 0.5f32  ; 25];
+    //let mut outvec = vec! [0f32 ;5];
+    let mut output = vec!  [0f32 ;5];
+    let mut output2 = vec!  [0f32 ;5];
+
+    let input  = vec! [1f32 ;5];
+    //let inputs  = vec! [ &input[..]];
+    {
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
+        block1.set_buffers(weights.to_vec() , input.to_vec() , output );
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
+        block2.set_buffers(weights , input , output2 );
+        {
+            let mut module = Module::new();
+            module.add_block(Box::new(block1) );
+            module.add_block(Box::new(block2) );
+        }
+        //assert_eq!( block2.get_output()  ,& [0f32; 5]);
+
+
+    }
+
+}
+
+
+//these types of tests are not
+//allowed for now.. do we reuse ?
+#[test]
+fn module_build_add_2blocks_same_id()
+{
+    let weights =   vec! [ 0.5f32  ; 25];
+    //let mut outvec = vec! [0f32 ;5];
+    let mut output = vec!  [0f32 ;5];
+    let mut output2 = vec!  [0f32 ;5];
+
+    let input  = vec! [1f32 ;5];
+    //let inputs  = vec! [ &input[..]];
+    {
+        let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
+        block1.set_buffers(weights.to_vec() , input.to_vec() , output );
+        let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
+        block2.set_buffers(weights , input , output2 );
+        let mut module = Module::new();
+        module.add_block(Box::new(block1) );
+        module.add_block(Box::new(block2) );
+
+        //assert_eq!( block2.get_output()  ,& [0f32; 5]);
+
+    }
+    //assert_eq!(output,& [0f32; 5]);
+}
 //
 //
 // #[test]

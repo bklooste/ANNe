@@ -216,11 +216,11 @@ fn block_load_vectors()
     let mut outvec = vec! [0f32 ;3];
     let mut output = & mut outvec [..];
 
-    let input  = vec! [1f32 ;3];
+    let input  = & [1f32 ;3];
     //let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-        block.set_buffers(weights , &input[..] , output );
+        block.add_data(weights, input );
     }
 
     assert_eq!(output, & [0f32; 3]);
@@ -239,7 +239,7 @@ fn block_load_and_proces_vectors()
 //    let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-        block.set_buffers(weights , &input[..] , output );
+        block.add_data(weights , &input[..] );
         block.process_buffers();
     }
 
