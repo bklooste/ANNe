@@ -1,17 +1,9 @@
 // not sure why needed ....
 extern crate anne;
 
-
-
-use anne::blocks::{LogisticBlock ,LogisticMutBlock , BlockData , LinearByteMutBlock , LinearByteBlock};
+use anne::blocks::{LogisticBlock ,LogisticMutBlock ,LogisticMutBiasBlock, BlockData , LinearByteMutBlock , LinearByteBlock};
 use anne::core::{IBlock , MutableBlock };
 use anne::util::to_floats;
-// , BlockData};
-
-
-
-
-// block tests
 
 #[test]
 fn fullmesh_integration_w0 ()
@@ -140,7 +132,7 @@ fn fullmesh_bias_integration_w0 ()
        static mut OUTPUT_BUF2: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
        static  WEIGHTS2: & 'static  [f32] = & [ 0f32  ; 30];
 
-       let mut block = LogisticMutBlock::new(BlockData::new(5 , 5, 6), WEIGHTS2, OUTPUT_BUF2, INPUT_BUF2);
+       let mut block = LogisticMutBiasBlock::new(BlockData::new(5 , 5, 6), WEIGHTS2, OUTPUT_BUF2, INPUT_BUF2);
        block.process_buffers();
 
        assert_eq!(block.get_output(), & [0.5f32 ;5]);
@@ -156,7 +148,7 @@ fn fullmesh_bias_integration_w05 ()
         static mut OUTPUT_BUF: & 'static mut [f32] = & mut [1f32, 2f32, 3f32, 4f32, 5f32];
         static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 30];
 
-        let mut block = LogisticMutBlock::new(BlockData::new(5 , 5, 6), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
+        let mut block = LogisticMutBiasBlock::new(BlockData::new(5 , 5, 6), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
         block.process_buffers();
 
         assert_eq!(block.get_output(), & [0.999089f32 ;5]);
@@ -191,7 +183,7 @@ fn fullmesh_bias_weighti8_integration_w0_w_0bias ()
       let mut block = LinearByteMutBlock::new(BlockData::new(5 , 5, 9), WEIGHTS2, OUTPUT_BUF2, INPUT_BUF2);
       block.process_buffers();
 
-      assert_eq!(OUTPUT_BUF2, & [5u8 ;5]);
+      assert_eq!(block.get_output(), & [5u8 ;5]);
   }// unsafe
 }
 
@@ -208,26 +200,24 @@ fn fullmesh_bias_weighti8_integration_w0_w_1bias ()
         let mut block = LinearByteMutBlock::new(BlockData::new(5 , 5, 9), WEIGHTS2, OUTPUT_BUF2, INPUT_BUF2);
         block.process_buffers();
 
-        assert_eq!(OUTPUT_BUF2, & [4u8 ;5]);
+        assert_eq!(block.get_output(), & [4u8 ;5]);
     }// unsafe
 }
 
 #[test]
 fn block_load_vectors()
 {
-
     let weights =   & [ 0.5f32  ; 25];
-    let mut outvec = vec! [0f32 ;3];
-    let mut output = & mut outvec [..];
-
     let input  = & [1f32 ;3];
-    //let inputs  = vec! [ &input[..]];
     {
         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block.add_data(weights, input );
+
+        // output is garbage without process
+        //assert_eq!(block.get_output(), & [0f32; 5]);
     }
 
-    assert_eq!(output, & [0f32; 3]);
+
 }
 
 
@@ -236,8 +226,7 @@ fn block_load_and_proces_vectors()
 {
 
     let weights =   & [ 0.5f32  ; 25];
-    let mut outvec = vec! [0f32 ;5];
-    let mut output = & mut outvec [..];
+
 
     let input  = vec! [1f32 ;5];
 //    let inputs  = vec! [ &input[..]];
@@ -245,7 +234,9 @@ fn block_load_and_proces_vectors()
         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block.add_data(weights , &input[..] );
         block.process_buffers();
+
+        assert_eq!(block.get_output() , & [0.9241418f32; 5]);
     }
 
-    assert_eq!(output, & [0.9241418f32; 5]);
+
 }

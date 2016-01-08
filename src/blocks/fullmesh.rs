@@ -32,23 +32,30 @@ where W: Num, O: Num, N: Neuron <W,O>
 
 
 impl<W,O,N>  FullMeshBlock<W,O,N>
-where W: Num  +Debug +Copy, O: Num  +Debug +Copy , N: Neuron <W,O>
+where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
 {
     pub fn new_late(block_data: BlockData )  -> FullMeshBlock<  W , O , N>
     {
+        let mut output = Vec::with_capacity(block_data.neuron_count as usize);
+        unsafe { output.set_len(block_data.neuron_count as usize); }
+
         if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
-        FullMeshBlock { block : block_data , weights:  Vec::new(),  outputs: RefCell::new(Vec::new()) ,inputs: Vec::new() , neural_behaviour:  ::std::marker::PhantomData   }
+        FullMeshBlock { block : block_data , weights:  Vec::new(),  outputs: RefCell::new(  output) ,inputs: Vec::new() , neural_behaviour:  ::std::marker::PhantomData   }
     }
 
     pub fn new_vec(block_data: BlockData , all_weights: Vec<W> , output_buf: Vec<O>, input_buf: Vec<O>)  -> FullMeshBlock<  W , O , N>
     {
         if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
+        if block_data.neuron_count as usize != output_buf.len()  {  panic!("output must be the same size as neuron count"); };
+
         FullMeshBlock { block : block_data , weights: all_weights ,  outputs: RefCell::new(output_buf) ,inputs: input_buf  , neural_behaviour:  ::std::marker::PhantomData   }
     }
 
     pub fn new<'a>(block_data: BlockData , all_weights: & 'a [W] , output_buf: & 'a [O], input_buf: & 'a [O])  -> FullMeshBlock<  W , O , N>
     {
         if block_data.neuron_count == 0 || block_data.synapse_count == 0 {  panic!("neuron or synapse_count cannot be 0"); };
+        if block_data.neuron_count as usize != output_buf.len()  {  panic!("output must be the same size as neuron count"); };
+
         FullMeshBlock { block : block_data , weights: all_weights.to_vec()  ,  outputs: RefCell::new(output_buf.to_vec() ) ,inputs: input_buf.to_vec()  , neural_behaviour:  ::std::marker::PhantomData   }
     }
 
