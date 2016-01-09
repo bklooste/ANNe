@@ -1,9 +1,9 @@
 
 use std::marker::PhantomData;
-//use std::{slice , mem};
 use std::fmt::Debug;
-use std::cell::RefCell;
+use std::cell::{RefCell};
 use std::borrow::BorrowMut;
+
 
 use num::traits::Num;
 
@@ -62,15 +62,36 @@ where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
 
     pub fn process_buffers(& mut self )
     {
-        //let out:&mut [O] = ;  // should only need 1 but deref not working
-        self.process_input(&self.weights[..] , &self.inputs[..] , & mut self.outputs.borrow_mut()[..]);
+        //process_block(self);
+        let mut output = self.outputs.borrow_mut();
+        let mut nc = 0;
+        // could use a pair itterator this seems fragile
+        for weights_for_neuron in self.weights.chunks( self.block.synapse_count as usize )
+        {
+
+            println!("weights_for_neuron {:?}", weights_for_neuron );
+
+            let activated:O =  { N::eval( & self.inputs[..] ,   weights_for_neuron  )};
+            output[nc] = activated;
+            println!("O {:?}", self.outputs );
+            nc = nc + 1;
+        }
     }
 
 
+} //impl
+
+
+pub fn process_block<W,O,N> (block: & mut FullMeshBlock<W,O,N> )
+where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
+{
+    block.process_buffers();
+    //block.outputs
+    //let out:&mut [O] = ;  // should only need 1 but deref not working
+   //self.process_input(&self.weights[..] , &self.inputs[..] , & mut self.outputs.borrow_mut()[..]);
+
 
 }
-
-
 
 impl< W ,O ,N>  MutableBlock <O ,W> for FullMeshBlock<W ,O ,N>
 where W: Num + Debug + Copy , O: Num + Debug + Copy, N: Neuron <W,O>
@@ -80,7 +101,6 @@ where W: Num + Debug + Copy , O: Num + Debug + Copy, N: Neuron <W,O>
         self.inputs = inputs;
         self.outputs = RefCell::new(outputs);
         self.weights = weights;
-
     }
 
     fn add_data<'a>(& mut self , weights: & 'a [W] , inputs: & 'a [O])
@@ -97,28 +117,73 @@ where W: Num + Debug + Copy , O: Num + Debug + Copy, N: Neuron <W,O>
     }
 }
 
-impl< W  ,O ,N>  NeuronBlock<W, O>  for FullMeshBlock< W ,O ,N>
-where W: Num + Debug  , O: Num + Debug , N: Neuron <W,O>
+
+
+
+impl< W ,O ,N>  IBlock for FullMeshBlock<W ,O ,N>
+where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
 {
 
-    fn getid(&self) -> BlockId {  self.block.id}
+// not needed ?
+    fn get_id(&self) -> BlockId { self.block.id }
 
-    fn process_input(& self , weights: & [W] , inputs: & [O] , outputs: & mut [O])
+fn process_mut_and_copy_output(& mut self , outputs: & mut [u8])
+{
+    process_block(self);
+}
+
+    fn process(&self , data: & mut [u8] , inputs: &[& [u8]] , outputs: & mut [u8])
     {
-        let mut nc = 0;
-        // could use a pair itterator this seems fragile
-        for weights_for_neuron in weights.chunks( self.block.synapse_count as usize )
-        {
-
-            println!("weights_for_neuron {:?}", weights_for_neuron );
-
-            let activated:O =  { N::eval( inputs ,   weights_for_neuron  )};
-            outputs[nc] = activated;
-            println!("O {:?}", outputs );
-            nc = nc + 1;
-        }
+        panic!("not supported for mutable blocks");
     }
 }
+
+
+
+
+        // unsafe
+        // {
+        //     let weight_size = mem::size_of::<f32>();
+        //     let weights: & [f32] = slice::from_raw_parts( data.as_ptr() as *const f32, data.len()/ weight_size);
+        //     let inputs: & [f32] = slice::from_raw_parts( inputs[0].as_ptr() as *const f32, inputs.len()/ mem::size_of::<f32>());
+        //     let outputs: & mut [f32] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut f32, outputs.len()/ mem::size_of::<f32>());
+        //
+        //     // if  (self.block.synapse_count * self.block.neuron_count) as usize != weights.len()  {
+        //     //     panic!("weights does not equal synapse * neurons")
+        //     // }
+        //
+        //     self.process_input( weights , inputs , outputs);
+        //
+        //     println!("O {:?}", outputs );
+        // }
+
+
+
+
+
+//we dont impliment neuronblock as default iblock  doesnt work
+// impl< W  ,O ,N>  NeuronBlock<W, O>  for FullMeshBlock< W ,O ,N>
+// where W: Num + Debug  , O: Num + Debug , N: Neuron <W,O>
+// {
+//
+//     fn getid(&self) -> BlockId {  self.block.id}
+//
+//     fn process_input(& self , weights: & [W] , inputs: & [O] , outputs: & mut [O])
+//     {
+//         let mut nc = 0;
+//         // could use a pair itterator this seems fragile
+//         for weights_for_neuron in weights.chunks( self.block.synapse_count as usize )
+//         {
+//
+//             println!("weights_for_neuron {:?}", weights_for_neuron );
+//
+//             let activated:O =  { N::eval( inputs ,   weights_for_neuron  )};
+//             outputs[nc] = activated;
+//             println!("O {:?}", outputs );
+//             nc = nc + 1;
+//         }
+//     }
+// }
 
 
 // impl< W  ,O ,N>  IBlock  for FullMeshBlock< W ,O ,N>

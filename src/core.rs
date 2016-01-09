@@ -2,7 +2,7 @@ use num::traits::Num;
 
 use std::mem;
 use std::slice;
-use std::fmt::Debug;
+
 
 pub type BlockIndex = u32;
 pub type BlockId = u32;
@@ -82,7 +82,8 @@ pub trait IBlock
 {
 //    fn as_blocktype(&self) -> Box<BlockType> ;
     fn get_id(&self) -> BlockId;
-    fn process(&self , data: & mut [u8] , inputs: & mut[u8] , outputs: & mut [u8]) ;  // or an array ????
+    fn process(&self , data: & mut [u8] , inputs: &[ & [u8]] , outputs: & mut [u8]) ;  // or an array ????
+    fn process_mut_and_copy_output(& mut self , outputs: & mut [u8]) ;
 }
 
  //buffers: [& mut [u8] ;3])
@@ -109,6 +110,8 @@ pub trait NeuronBlock <  W: Num , O: Num  >
 //     fn getid(&self) -> i8 { self.get_id() }
 // }
 
+
+
 impl <T >  IBlock for T
 where T:NeuronBlock<f32,f32>
 {
@@ -116,43 +119,34 @@ where T:NeuronBlock<f32,f32>
 // not needed ?
     fn get_id(&self) -> BlockId { self.getid() }
 
-    fn process(&self , data: & mut [u8] , inputs: & mut [u8] , outputs: & mut [u8])
+    fn process(&self , data: & mut [u8] , inputs: &[& [u8]] , outputs: & mut [u8])
     {
         unsafe
         {
             let weight_size = mem::size_of::<f32>();
             let weights: & [f32] = slice::from_raw_parts( data.as_ptr() as *const f32, data.len()/ weight_size);
-            let inputs: & [f32] = slice::from_raw_parts( inputs.as_ptr() as *const f32, inputs.len()/ mem::size_of::<f32>());
+            let input_o = inputs [0];
+            let input: & [f32] = slice::from_raw_parts( input_o.as_ptr() as *const f32, input_o.len()/ mem::size_of::<f32>());
+                                println!(" inputs , inputs[0] , input n{:?} : i{:?} : o{:?}",inputs , input_o, input );
+
             let outputs: & mut [f32] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut f32, outputs.len()/ mem::size_of::<f32>());
 
             // if  (self.block.synapse_count * self.block.neuron_count) as usize != weights.len()  {
             //     panic!("weights does not equal synapse * neurons")
             // }
 
-            self.process_input( weights , inputs , outputs);
+                        println!(" process , triplet w{:?} : i{:?} : o{:?}",weights , input , outputs );
 
-            //
-            // // could use a pair itterator this seems fragile
-            // for weights_for_neuron in weights.chunks( self.block.synapse_count as usize )
-            // {
-            //
-            //         println!("weights_for_neuron {:?}", weights_for_neuron );
-            //
-            //
-            //     // for nc in 0..self.block.neuron_count as usize
-            //     // {
-            //         let activated:O =  { N::eval( inputs ,   weights_for_neuron  )};
-            //         outputs[nc] = activated;
-            //         println!("O {:?}", outputs );
-            //
-            //     //}
-            //     nc = nc + 1;
-            // }
+            self.process_input( weights , input , outputs);
+
             println!("O {:?}", outputs );
         }
     }
 
-
+    fn process_mut_and_copy_output(& mut self , outputs: & mut [u8])
+    {
+            panic!("no buffers setup or NeuronBlocks cant be  mutable ");
+    }
 
 }
 

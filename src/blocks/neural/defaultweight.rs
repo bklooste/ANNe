@@ -18,6 +18,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for
     fn eval(v: &[f32], weights: &[W]) -> f32
     {
         if  v.len() != weights.len()         {
+            println!("v {:?} : weights {:?}", v.len() , weights.len() );
             panic!("weight length not the same as input vector");
         }
 
