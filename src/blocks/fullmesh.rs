@@ -1,4 +1,4 @@
-
+use std::{mem, slice};
 use std::marker::PhantomData;
 use std::fmt::Debug;
 use std::cell::{RefCell};
@@ -7,6 +7,7 @@ use std::borrow::BorrowMut;
 
 use num::traits::Num;
 
+//use core::BlockBehaviour;
 use core::*;
 use super::neural::neuron::*;
 #[allow(unused_imports)]
@@ -112,7 +113,6 @@ where W: Num + Debug + Copy , O: Num + Debug + Copy, N: Neuron <W,O>
 
     fn get_output(&self ) -> Vec<O>
     {
-
         self.outputs.borrow().to_vec()
     }
 }
@@ -124,13 +124,23 @@ impl< W ,O ,N>  IBlock for FullMeshBlock<W ,O ,N>
 where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
 {
 
+    fn behaviour(&self) -> BlockBehaviour  { BlockBehaviour::Mutable{ copy_out:false} }
+
 // not needed ?
     fn get_id(&self) -> BlockId { self.block.id }
 
-fn process_mut_and_copy_output(& mut self , outputs: & mut [u8])
-{
-    process_block(self);
-}
+    fn process_self_copy_output(& mut self ) -> Vec<u8> // or vec ?
+    {
+        process_block(self);
+
+        let output = self.get_output();
+            let new_size = output.len() * mem::size_of::<O>();
+        unsafe
+        {
+            Vec::from_raw_parts( output.as_ptr() as *mut u8, new_size , new_size)
+
+        }
+    }
 
     fn process(&self , data: & mut [u8] , inputs: &[& [u8]] , outputs: & mut [u8])
     {

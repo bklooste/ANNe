@@ -77,13 +77,22 @@ pub trait MutableBlock <O: Num  ,W: Num >
 
 
 //fixme rename to block
+#[derive(Debug)]
+pub enum BlockBehaviour
+{
+    Unknown,
+    Immutable ,
+    Mutable { copy_out: bool}
+}
 
+// we can probably design this blcok behaviour and process better
 pub trait IBlock
 {
 //    fn as_blocktype(&self) -> Box<BlockType> ;
+    fn behaviour(&self) -> BlockBehaviour;
     fn get_id(&self) -> BlockId;
     fn process(&self , data: & mut [u8] , inputs: &[ & [u8]] , outputs: & mut [u8]) ;  // or an array ????
-    fn process_mut_and_copy_output(& mut self , outputs: & mut [u8]) ;
+    fn process_self_copy_output(& mut self) -> Vec<u8> ;
 }
 
  //buffers: [& mut [u8] ;3])
@@ -115,6 +124,7 @@ pub trait NeuronBlock <  W: Num , O: Num  >
 impl <T >  IBlock for T
 where T:NeuronBlock<f32,f32>
 {
+    fn behaviour(&self) -> BlockBehaviour  { BlockBehaviour::Immutable }
 
 // not needed ?
     fn get_id(&self) -> BlockId { self.getid() }
@@ -127,15 +137,9 @@ where T:NeuronBlock<f32,f32>
             let weights: & [f32] = slice::from_raw_parts( data.as_ptr() as *const f32, data.len()/ weight_size);
             let input_o = inputs [0];
             let input: & [f32] = slice::from_raw_parts( input_o.as_ptr() as *const f32, input_o.len()/ mem::size_of::<f32>());
-                                println!(" inputs , inputs[0] , input n{:?} : i{:?} : o{:?}",inputs , input_o, input );
-
             let outputs: & mut [f32] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut f32, outputs.len()/ mem::size_of::<f32>());
 
-            // if  (self.block.synapse_count * self.block.neuron_count) as usize != weights.len()  {
-            //     panic!("weights does not equal synapse * neurons")
-            // }
-
-                        println!(" process , triplet w{:?} : i{:?} : o{:?}",weights , input , outputs );
+            //println!(" process , triplet w{:?} : i{:?} : o{:?}",weights , input , outputs );
 
             self.process_input( weights , input , outputs);
 
@@ -143,7 +147,8 @@ where T:NeuronBlock<f32,f32>
         }
     }
 
-    fn process_mut_and_copy_output(& mut self , outputs: & mut [u8])
+
+    fn process_self_copy_output(& mut self) ->  Vec<u8>
     {
             panic!("no buffers setup or NeuronBlocks cant be  mutable ");
     }

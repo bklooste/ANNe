@@ -1,18 +1,16 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
+use std::{mem, slice};
+//use std::slice;
 // use num::traits::Num;
 
-use core::{IBlock , BlockIndex};
+use core::{IBlock , BlockBehaviour , BlockIndex};
 use graph::{Graph , NodeIndex};
+use buffer_manager::BufferManager;
 
-const  STATIC_DATA_INDEX: usize = 0;
-const  OUTPUT_DATA_INDEX: usize = 1;
-const  INPUT_DATA_INDEX: usize = 2;
-const  INPUT2_DATA_INDEX: usize = 3;
-const  INPUT3_DATA_INDEX: usize = 4;
+//externals should use node index.
 
-const  MODULE_INPUT: usize = 0;
-const  MODULE_OUTPUT: usize = 1;
+
 
 // pub struct Buffer
 // {
@@ -31,11 +29,14 @@ pub struct Module
 {
     //data mutable on creation ..eg add block , edges
     graph: Graph<BlockIndex>,
-    buffers_for_node: HashMap< BlockIndex, Vec<usize>>, // vector is staticdata , return/output , inputs..
+    //buffers_for_node: HashMap< BlockIndex, Vec<usize>>, // vector is staticdata , return/output , inputs..
 
     // data mutable durring run  (note ...Vec should not change ) , with these changes self should be immutable
     blocks:  Vec<RefCell<Box<IBlock>>>, // we may be able to remove refcell here ...
-    buffers: Vec<RefCell<Vec<u8>>>,
+
+    //eventually we can do something like variable/ flow anylysis on this.
+    //buffers: Vec<RefCell<Vec<u8>>>,
+    buffer_mgr: BufferManager,
 
     stats: ModuleStats
 
@@ -47,7 +48,8 @@ impl Module
         let mut  buffers =  Vec::new();
         buffers.push( RefCell::new( Vec::<u8>::new())); //module input
         buffers.push( RefCell::new( Vec::<u8>::new())); //module output
-        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() , buffers: buffers , buffers_for_node: HashMap::new() , stats : ModuleStats{ ..Default::default()} };
+        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new()
+            , buffer_mgr: BufferManager::new() , stats : ModuleStats{ ..Default::default()} };
 
         // block input 1
         module
@@ -65,7 +67,8 @@ impl Module
         buffers.push( RefCell::new(  output )); //module output
         buffers.push( RefCell::new(  input)); //module input
 
-        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() , buffers: buffers , buffers_for_node: HashMap::new() , stats : ModuleStats{ ..Default::default()} };
+        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() ,
+             buffer_mgr: BufferManager::new() , stats : ModuleStats{ ..Default::default()} };
 
         // block input 1
         module
@@ -97,24 +100,61 @@ impl Module
         self.graph.add_node((self.blocks.len() - 1) as u32)
     }
 
+
+    //fixme should index be exposed
+    pub fn add_block_w_data<T:Sized+Copy>(& mut self, box_block: Box<IBlock> , data: Vec<T>) -> NodeIndex
+    {
+        let new_size = data.len() * mem::size_of::<T>();
+
+        // fn from_raw_parts(ptr: *mut T, length: usize, capacity: usize) -> Vec<T>
+        unsafe
+        {
+        let weights: Vec<u8> = Vec::from_raw_parts( data.as_ptr() as *mut u8, new_size , new_size);
+        self. add_block_w_static_data( box_block , weights)
+        }
+    }
+
     pub fn add_block_w_static_data(& mut self, box_block: Box<IBlock> , static_data: Vec<u8>) -> NodeIndex
     {
-        let blkid = self.add_block(box_block);
+        let nodeid = self.add_block(box_block);
+        let block_index = self.graph.get_node(nodeid);
 
 //        println!("static_data {:?} : {:?}", self.buffers.len() , buffer_ids  );
 //TODO fixme add buffer function
-        self.buffers.push(RefCell::new(static_data));
-        self.buffers_for_node.insert(blkid as u32,  vec!(self.buffers.len() -1)  );
 
-        blkid
+    //block_index
+        self.buffer_mgr.set_data_for_block(*block_index ,static_data);
+
+
+        nodeid
+    }
+
+    fn link_buffers(& mut self, from: BlockIndex , to: BlockIndex)
+    {
+        self.buffer_mgr.link_output_to_input(from , to );
     }
 
     pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex)
     {
-        self.graph.add_edge(from, to);
+        let mut blockfrom_index  = 0;
+        let mut blockto_index  = 0;
 
-        // self.buffers.push(RefCell::new(static_data));
-        // self.buffers_for_node.insert(blkid as u32,  vec!(self.buffers.len())  );
+        {
+            blockfrom_index = *self.graph.get_node(from);
+            blockto_index = *self.graph.get_node(to);
+        }
+
+        // check if valid
+        self.graph.add_edge( blockfrom_index as usize, blockto_index as usize );
+
+    }
+
+    //todo borrow output as slice
+
+    // pretty crap
+    pub fn get_output<T:Sized+Copy>(&self ) -> Vec<T>
+    {
+        self.buffer_mgr.get_mod_output_buffer_as_type::<T>()
     }
 
     pub fn process_blocks(&mut self)
@@ -136,71 +176,82 @@ impl Module
         for i in successor_ids { self.process_rec(i);}
     }
 
-    fn process_block<'a>(&self ,block_index: BlockIndex)
+    fn get_block_behaviour(&self ,block_index: BlockIndex) -> BlockBehaviour
+    {
+        let block = self.blocks[block_index as usize].borrow();
+        block.behaviour()
+    }
+
+    fn process_block<'a>(& self ,block_index: BlockIndex)
     {
 
-        let buffer_option = self.buffers_for_node.get(&block_index );
-        if buffer_option == None
+        match self.get_block_behaviour(block_index)
         {
-            let mut mut_block_ref = self.blocks[block_index as usize].borrow_mut();
-            // if no buffers just process assume its an independent block  ...
-            return mut_block_ref.process_mut_and_copy_output(  & mut []) ;  // ,&mut [] ,&[] , &mut []);
-        }
-        let buffer_ids = buffer_option.unwrap();
+            BlockBehaviour::Immutable => {
+                let block_ref = self.blocks[block_index as usize].borrow();
 
+                // let tupple  = self.buffer_mgr.get_common_buffers_for_block(block_index);
+                // process(  &*block_ref ,  tupple.0 , & [tupple.1 as &[u8]][..],  tupple.2)
+                // let stat_data = self.buffer_mgr.get_data_for_block(block_index);
+                // let output  = self.buffer_mgr.get_output_for_block(block_index);
+                //
+                // let inputs  = self.buffer_mgr.get_inputs_block(block_index);
 
-        let block_ref = self.blocks[block_index as usize].borrow();
+                let block_buffer_data = self.buffer_mgr.get_buffer_block_data(block_index);
 
-        println!("static_data {:?} : {:?}", self.buffers.len() , buffer_ids  );
+                let mut stat_data = self.buffer_mgr.get_buffer(block_buffer_data.data_buffer_id).borrow_mut();
+                println!("stat_data {:?} : {:?}", stat_data.len() , stat_data  );
+                let mut output  = self.buffer_mgr.get_buffer(block_buffer_data.output_buffer_id).borrow_mut();
 
-
-        if buffer_ids.len() == 0  { panic!("There is no buffers for this block ") };
-
-
-
-        let mut static_data = self.buffers[ buffer_ids[ STATIC_DATA_INDEX ]].borrow_mut();
-        if buffer_ids.len() < 3 {
-            let mut module_output = self.buffers[MODULE_OUTPUT].borrow_mut();
-            let module_input = self.buffers[MODULE_INPUT].borrow();
-            println!(" less than 3 {:?} : {:?}", module_input , module_output  );
-            return process(  &*block_ref , & mut static_data[..], &[&module_input[..]][..] , & mut module_output[..])
-        }
-
-        let mut output = self.buffers[buffer_ids[OUTPUT_DATA_INDEX]].borrow_mut();
-
-        let input1 = self.buffers[ buffer_ids[INPUT_DATA_INDEX]].borrow();
-        if buffer_ids.len() == 3 {
-                return process(  &*block_ref , & mut static_data[..], &[&input1[..]][..] , & mut output[..])
+                let inputs  =self.buffer_mgr.get_buffer(*block_buffer_data.inputs_buffer_ids.first().unwrap()).borrow();
+                process(  &*block_ref ,  & mut stat_data[..], &[ & inputs[..]][..],  & mut output[..])
+            } ,
+            BlockBehaviour::Mutable {copy_out} => {
+                let mut mut_block_ref = self.blocks[block_index as usize].borrow_mut();
+                let out = mut_block_ref.process_self_copy_output( );
+                // todo  copy
+            },
+            _ => println!("something else"),
         }
 
-        let input2 = self.buffers[ buffer_ids[INPUT2_DATA_INDEX]].borrow();
-        if buffer_ids.len() == 4 {
-            return process(  &*block_ref , & mut static_data[..], &[&input1[..] , &input2[..]][..] , & mut output[..])
-        }
 
-        let input3 = self.buffers[ buffer_ids[INPUT3_DATA_INDEX]].borrow();
-        if buffer_ids.len() == 5 {
-            return process(  &* block_ref ,&mut static_data[..] ,&[&input1[..],&input2[..],&input3[..]  ][..] , & mut output[..])
-        }
 
-//         //let mut inputs = Vec::new();
-//         match buffer_ids.len() {
-//             0 => panic!("There is no buffers for this block "),  // may be allowed later
-//             1 => inputs.push  ( & (* self.buffers[ buffer_ids[INPUT_DATA_INDEX]].borrow()) [..] ) ,
-//             // 2 => &[&self.buffers[ buffer_ids[INPUT_DATA_INDEX]].borrow()[..]
-//             //         ,&self.buffers[ buffer_ids[3]].borrow()[..]
-//             //      ][..],
-//             // 3 => &[&self.buffers[ buffer_ids[INPUT_DATA_INDEX]].borrow()[..]
-//             //         ,&self.buffers[ buffer_ids[3]].borrow()[..]
-//             //         ,&self.buffers[ buffer_ids[4]].borrow()[..]
-//             //      ][..],
-//     _ => panic!("Only 3 inputs per block supported"),
-// };
-//     //   ^ Don't
+
+
+    }
+
+        //if buffer_ids.len() == 0  { panic!("There is no buffers for this block ") };
+
+
+
+        // let mut static_data = self.buffers[ buffer_ids[ STATIC_DATA_INDEX ]].borrow_mut();
+        // if buffer_ids.len() < 3 {
+        //     let mut module_output = self.buffers[MODULE_OUTPUT].borrow_mut();
+        //     let module_input = self.buffers[MODULE_INPUT].borrow();
+        //     println!(" less than 3 {:?} : {:?}", module_input , module_output  );
+        //     return process(  &*block_ref , & mut static_data[..], &[&module_input[..]][..] , & mut module_output[..])
+        // }
+        //
+        // let mut output = self.buffers[buffer_ids[OUTPUT_DATA_INDEX]].borrow_mut();
+        //
+        // let input1 = self.buffers[ buffer_ids[INPUT_DATA_INDEX]].borrow();
+        // if buffer_ids.len() == 3 {
+        //         return process(  &*block_ref , & mut static_data[..], &[&input1[..]][..] , & mut output[..])
+        // }
+        //
+        // let input2 = self.buffers[ buffer_ids[INPUT2_DATA_INDEX]].borrow();
+        // if buffer_ids.len() == 4 {
+        //     return process(  &*block_ref , & mut static_data[..], &[&input1[..] , &input2[..]][..] , & mut output[..])
+        // }
+        //
+        // let input3 = self.buffers[ buffer_ids[INPUT3_DATA_INDEX]].borrow();
+        // if buffer_ids.len() == 5 {
+        //     return process(  &* block_ref ,&mut static_data[..] ,&[&input1[..],&input2[..],&input3[..]  ][..] , & mut output[..])
+        // }
 
         //process(  &block , & mut static_data[..], &inputs[..] , & mut output[..]);
-        panic!("Only 3 inputs per block supported")
-    }
+    //     panic!("Only 3 inputs per block supported")
+    // }
 } //impl
 
 

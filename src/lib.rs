@@ -99,6 +99,7 @@ extern crate log;
 mod network;
 pub mod util;
 
+pub mod buffer_manager;
 pub mod blocks;
 pub mod graph;
 pub mod module;

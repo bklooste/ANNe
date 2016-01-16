@@ -198,6 +198,23 @@ fn module_build_add_2_imm_blocks()
 }
 
 #[test]
+fn module_build_add_block_w_data()
+{
+    let weights =   vec![ 0.5f32  ; 25];
+    let input  = vec! [1f32 ;5];
+    let mut output = vec!  [0f32 ;5];
+    {
+        let mut block1 = LogisticBlock::new(2 , 5, 5);
+        let mut module = Module::new_from_inputs(20);
+        module.add_block_w_data(Box::new(block1)  , weights );
+        assert_eq!(    module.get_stats().blocks_processed, 0);
+        module.process_blocks();
+        assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
+    //    assert_eq!(block1.get_output(), & [0.9241418; 5]);
+    }
+}
+
+#[test]
 fn module_build_add_2_imm_blocks_process()
 {
     let weights_bytes =   vec![ 5  ; 100];
@@ -207,16 +224,12 @@ fn module_build_add_2_imm_blocks_process()
     {
         let mut block1 = LogisticBlock::new(2 , 5, 5);
         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-        print!("blocks created");
         block2.set_buffers(weights , input , output  );
-        print!("buffs set");
         let mut module = Module::new_from_inputs(20);
-        print!("module created");
         module.add_block_w_static_data(Box::new(block1)  , weights_bytes );
         module.add_block(Box::new(block2) );
-            print!("blocks added");
+                assert_eq!(    module.get_stats().blocks_processed, 0);
         module.process_blocks();
-        print!("processed");
         assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
     //    assert_eq!(block1.get_output(), & [0.9241418; 5]);
     }
