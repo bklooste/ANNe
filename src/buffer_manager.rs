@@ -25,8 +25,10 @@ pub struct BufferManager
 
     buffers_for_block: HashMap< BlockIndex, BuffersForBlock>,
     buffers: Vec<RefCell<Vec<u8>>>,
-    module_in_buffers: Vec<BufferIndex>,
-    module_out_buffers: Vec<BufferIndex>,
+    // we manage modules buffers here for now
+    pub module_in_buffers: Vec<BufferIndex>,
+    pub module_out_buffers: Vec<BufferIndex>,
+
 }
 
 impl BufferManager
@@ -36,12 +38,64 @@ impl BufferManager
         let mut  bm = BufferManager{  ..Default::default()}  ;
 
         //this needs to be better
-        bm.module_in_buffers.push( 0);
-        bm.module_out_buffers.push( 1);
+    //    bm.module_in_buffers.push( 0);
+        bm.module_out_buffers.push( 0);
         bm.buffers.push(RefCell::new( Vec::new() ));
-        bm.buffers.push(RefCell::new(  Vec::new() ));
+        //bm.buffers.push(RefCell::new(  Vec::new() ));
 
         bm
+    }
+
+    //Module code
+    pub fn add_module_output<T>(&mut self, output: Vec<T>)
+    {
+        let data_size = output.len() *  mem::size_of::<T>();
+        unsafe
+        {
+            let conv_output: Vec<u8> = Vec::from_raw_parts( output.as_ptr() as *mut u8, data_size , data_size);
+            self.add_mod_output(conv_output);
+        }
+    }
+
+    pub fn add_mod_output(&mut self, output: Vec<u8>)
+    {
+        self.buffers.push(RefCell::new( output ));
+        self.module_out_buffers.push( self.buffers.len() as u32 - 1 );
+    }
+
+    pub fn add_module_input<T>(&mut self, input: Vec<T>)
+    {
+        let data_size = input.len() *  mem::size_of::<T>();
+        unsafe
+        {
+            let conv_input: Vec<u8> = Vec::from_raw_parts( input.as_ptr() as *mut u8, data_size , data_size);
+            self.add_mod_input(conv_input);
+        }
+    }
+
+    pub fn add_mod_input(&mut self, input: Vec<u8>)
+    {
+        self.buffers.push(RefCell::new( input ));
+        self.module_in_buffers.push( self.buffers.len() as u32 - 1 );
+    }
+
+    //should be indexed
+    pub fn get_module_output <T:Sized+Copy>(&self  ) -> Vec<T>
+    {
+        self.get_buffer_copy_as_type::<T>(0 )
+    }
+
+    pub fn link_buffer_to_module_input(&mut self, block: BlockIndex , buffer_id: BufferIndex )
+    {
+        let mut blk_info  = self.get_mut_buffer_block_data(block);
+        blk_info.inputs_buffer_ids.push( buffer_id);
+    }
+
+    pub fn set_buffer_to_module_output(&mut self, block: BlockIndex , buffer_id: BufferIndex )
+    {
+        let mut blk_info  = self.get_mut_buffer_block_data(block);
+        if ( blk_info.output_buffer_id != 0) { panic!("block already set ") }
+        blk_info.output_buffer_id =  buffer_id;
     }
 
     // pub fn get_data_for_block (&self , block_index: BlockIndex ) -> & mut [u8]
@@ -100,14 +154,14 @@ impl BufferManager
         self.get_mut_buffer_block_data(block_index).data_buffer_id = self.buffers.len() as BufferIndex - 1 ;
     }
 
-    pub fn set_inputs_block (&mut self , block_index: BlockIndex , buffer: Vec<u8> )
+    pub fn set_inputs_for_block (&mut self , block_index: BlockIndex , buffer: Vec<u8> )
     {
-        let  mut next_buf: BufferIndex = 0;
+        let  mut _next_buf: BufferIndex = 0;
         {
-            next_buf = self.buffers.len() as BufferIndex - 1 ;
+            _next_buf = self.buffers.len() as BufferIndex - 1 ;
         }
         self.buffers.push(RefCell::new(buffer));
-        self.get_mut_buffer_block_data(block_index).inputs_buffer_ids.push(  next_buf) ;
+        self.get_mut_buffer_block_data(block_index).inputs_buffer_ids.push(  _next_buf) ;
     }
 
     pub fn set_output_for_block (&mut self , block_index: BlockIndex , buffer: Vec<u8>)
@@ -118,12 +172,13 @@ impl BufferManager
 
     fn get_mut_buffer_block_data(&mut self, block_index: BlockIndex ) -> & mut BuffersForBlock
     {
-        match self.buffers_for_block.get_mut(&block_index )
-        {
-            Some(x) => x ,
-            None =>  panic!("no buffers for node") ,
+        let contains = self.buffers_for_block.contains_key(&block_index);
+        if !contains {
+            self.buffers_for_block.insert(block_index, BuffersForBlock{  ..Default::default()});
         }
+        self.buffers_for_block.get_mut(&block_index).unwrap()
     }
+
 
     fn copy_buffer_block_data(&self, block_index: BlockIndex ) -> BuffersForBlock
     {
@@ -154,11 +209,7 @@ impl BufferManager
     //     &buffer_option.unwrap()
     // }
 
-    pub fn get_mod_output_buffer_as_type <T:Sized+Copy>(&self  ) -> Vec<T>
-    {
-        self.get_buffer_copy_as_type::<T>(0 )
 
-    }
 
 
     pub fn get_buffer_copy_as_type<T:Sized+Copy>(&self , index: BufferIndex ) -> Vec<T>
@@ -183,6 +234,8 @@ impl BufferManager
     {
         &self.buffers[buffer_index as usize]
     }
+
+
 
     pub fn link_output_to_input(&mut self, from: BlockIndex , to: BlockIndex )
     {

@@ -37,8 +37,9 @@ pub struct Module
     //eventually we can do something like variable/ flow anylysis on this.
     //buffers: Vec<RefCell<Vec<u8>>>,
     buffer_mgr: BufferManager,
+    stats: ModuleStats,
 
-    stats: ModuleStats
+
 
 }
 
@@ -55,20 +56,18 @@ impl Module
         module
     }
 
-    pub fn new_from_inputs(bytes_size : usize) -> Module {
-        let mut  buffers =  Vec::new();
+    pub fn new_from_inputs<T>(input: Vec<T>) -> Module {
 
-        let output = vec![0; bytes_size];
+        //  let output = vec![0; bytes_size];
         //unsafe { output.set_len(bytes_size as usize); }
-        let input = vec![0; bytes_size];
         //  Vec::with_capacity(bytes_size as usize);
         // unsafe { input.set_len(bytes_size as usize); }
 
-        buffers.push( RefCell::new(  output )); //module output
-        buffers.push( RefCell::new(  input)); //module input
 
-        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() ,
+        let mut  module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() ,
              buffer_mgr: BufferManager::new() , stats : ModuleStats{ ..Default::default()} };
+
+        module.buffer_mgr.add_module_input::<T>(input);
 
         // block input 1
         module
@@ -129,10 +128,46 @@ impl Module
         nodeid
     }
 
-    fn link_buffers(& mut self, from: BlockIndex , to: BlockIndex)
+
+    // pub fn receive_module_input(& mut self, block: NodeIndex)
+    // {
+    //     self.buffer_mgr.link_output_to_input(block );
+    // }
+
+    // input and output is via copy
+    pub fn add_buffers(&mut self, input_sizes: &[usize] , output_sizes: &[usize] )
     {
-        self.buffer_mgr.link_output_to_input(from , to );
+        for &size  in input_sizes {
+            let zero_vec = vec![0; size];
+            self.buffer_mgr.add_mod_input( zero_vec)
+        }
+
+        for &size  in output_sizes {
+            let zero_vec = vec![0; size];
+            self.buffer_mgr.add_mod_output( zero_vec)
+        }
     }
+
+    pub fn add_connections(&mut self,module_in: &[(usize, NodeIndex) ], module_out: &[(usize, NodeIndex)] , links: &[ (NodeIndex , NodeIndex) ]  )
+    {
+        for &(input_index, block_index) in module_in {
+            let buffer_index = self.buffer_mgr.module_in_buffers[input_index];
+            let block_id = { self.get_index(block_index)};
+            self.buffer_mgr.link_buffer_to_module_input(block_id ,buffer_index);
+        }
+
+        for &(output_index, block_index) in module_out {
+            let buffer_index = self.buffer_mgr.module_out_buffers[output_index];
+            let block_id = { self.get_index(block_index)};
+            self.buffer_mgr.set_buffer_to_module_output(block_id ,buffer_index);
+        }
+
+        for &(node_from, node_to) in links { self.add_link(node_from, node_to);  }
+
+    }
+
+    fn get_index(&self , index: NodeIndex) -> BlockIndex {*self.graph.get_node(index) }
+
 
     pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex)
     {
@@ -147,6 +182,8 @@ impl Module
         // check if valid
         self.graph.add_edge( blockfrom_index as usize, blockto_index as usize );
 
+        self.buffer_mgr.link_output_to_input(blockfrom_index , blockto_index );
+
     }
 
     //todo borrow output as slice
@@ -154,7 +191,7 @@ impl Module
     // pretty crap
     pub fn get_output<T:Sized+Copy>(&self ) -> Vec<T>
     {
-        self.buffer_mgr.get_mod_output_buffer_as_type::<T>()
+        self.buffer_mgr.get_buffer_copy_as_type::<T>(0)
     }
 
     pub fn process_blocks(&mut self)
@@ -203,6 +240,7 @@ impl Module
                 println!("stat_data {:?} : {:?}", stat_data.len() , stat_data  );
                 let mut output  = self.buffer_mgr.get_buffer(block_buffer_data.output_buffer_id).borrow_mut();
 
+                if block_buffer_data.inputs_buffer_ids.len() == 0 { panic!("no input for buffer")} ;
                 let inputs  =self.buffer_mgr.get_buffer(*block_buffer_data.inputs_buffer_ids.first().unwrap()).borrow();
                 process(  &*block_ref ,  & mut stat_data[..], &[ & inputs[..]][..],  & mut output[..])
             } ,

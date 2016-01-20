@@ -189,6 +189,7 @@ fn module_build_add_2_imm_blocks()
         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
         block2.set_buffers(weights , input , output  );
         let mut module = Module::new();
+        println!("created module1");
         module.add_block(Box::new(block1) );
         module.add_block(Box::new(block2) );
         assert_eq!(    module.get_stats().block_count, 2);
@@ -214,8 +215,42 @@ fn module_build_add_block_w_data()
     }
 }
 
+
 #[test]
 fn module_build_add_2_imm_blocks_process()
+{
+//    let weights_bytes =   vec![ 5  ; 100];
+    let weights1 =   vec![ 0.5f32  ; 25];
+    let weights2 =   vec![ 0.5f32  ; 25];
+
+    let input  = vec! [1f32 ;5];
+    let mut output = vec!  [0f32 ;5];
+    {
+        let mut block1 = LogisticBlock::new(2 , 5, 5);
+        let mut block2 = LogisticBlock::new(2 , 5, 5);
+        let mut module = Module::new_from_inputs(input);
+        let blk1 = module.add_block_w_static_data(Box::new(block1)  , weights1 );
+        let blk2 = module.add_block_w_static_data(Box::new(block1)  , weights2 );
+
+        module.add_link( blk1 , blk2);
+        module.receive_module_input(blk1);
+        module.use_module_output(blk2);
+
+
+        assert_eq!(    module.get_stats().blocks_processed, 0);
+
+        //fails buffers not setup
+        module.process_blocks();
+        assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
+
+        module.get_output()
+        assert_eq!(module.get_output(), & [0.9241418; 5]);
+    }
+}
+
+// this should fail
+#[test]
+fn module_build_add_1_imm_1_mut_blocks_process()
 {
     let weights_bytes =   vec![ 5  ; 100];
     let weights =   vec![ 0.5f32  ; 25];
@@ -228,7 +263,9 @@ fn module_build_add_2_imm_blocks_process()
         let mut module = Module::new_from_inputs(20);
         module.add_block_w_static_data(Box::new(block1)  , weights_bytes );
         module.add_block(Box::new(block2) );
-                assert_eq!(    module.get_stats().blocks_processed, 0);
+        assert_eq!(    module.get_stats().blocks_processed, 0);
+
+        //fails buffers not setup
         module.process_blocks();
         assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
     //    assert_eq!(block1.get_output(), & [0.9241418; 5]);
