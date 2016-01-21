@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::{mem, slice };
+use std::{mem, fmt };
 use core::{BlockIndex};
 
 pub type BufferIndex = u32;
 
-#[derive(Default , Clone)]
+#[derive(Default , Clone , Debug)]
 pub struct BuffersForBlock
 {
     // manages_own_data: bool,
@@ -19,7 +19,7 @@ pub struct BuffersForBlock
     //let input2 = self.buffers[ buffer_ids[INPUT2_DATA_INDEX]].borrow();
 
 // all heap data
-#[derive(Default , Clone)]
+#[derive(Default , Clone )]
 pub struct BufferManager
 {
 
@@ -265,4 +265,19 @@ impl BufferManager
             //let input1 = self.buffers[ buffer_ids[INPUT_DATA_INDEX]].borrow();
 
 
+}
+
+
+// buffers_for_block: HashMap< BlockIndex, BuffersForBlock>,
+// buffers: Vec<RefCell<Vec<u8>>>,
+// pub module_in_buffers: Vec<BufferIndex>,
+// pub module_out_buffers: Vec<BufferIndex>,
+
+impl fmt::Debug for BufferManager {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "BufferManager:module_in_buffers {:?}", self.module_in_buffers);
+        writeln!(f, "BufferManager:module_out_buffers {:?}", self.module_out_buffers);
+        writeln!(f, "BufferManager:buffers {:?}", self.buffers);
+        writeln!(f, "BufferManager:buffers_for_block {:?}", self.buffers_for_block)
+    }
 }

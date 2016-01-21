@@ -118,7 +118,7 @@ impl Module
         let nodeid = self.add_block(box_block);
         let block_index = self.graph.get_node(nodeid);
 
-//        println!("static_data {:?} : {:?}", self.buffers.len() , buffer_ids  );
+        println!("got block {:?}", block_index);
 //TODO fixme add buffer function
 
     //block_index
@@ -148,9 +148,20 @@ impl Module
         }
     }
 
+    pub fn add_simple_connections(&mut self,block_module_in: NodeIndex, block_module_out: NodeIndex , links: &[ (NodeIndex , NodeIndex) ]  )
+    {
+                    println!("buffer_manager: {:?} in : {:?} out: {:?} links: {:?}",self.buffer_mgr , block_module_in , block_module_out , links);
+        //let buffer_in_index = { *self.buffer_mgr.module_in_buffers.first().unwrap() as usize};
+        //let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() as usize};
+
+        self.add_connections( &[ ( 0   , block_module_in ) ]   , &[ (0   , block_module_out ) ]      , links )
+    }
+
+    // usize is buffer index
     pub fn add_connections(&mut self,module_in: &[(usize, NodeIndex) ], module_out: &[(usize, NodeIndex)] , links: &[ (NodeIndex , NodeIndex) ]  )
     {
         for &(input_index, block_index) in module_in {
+            println!("add_connections index: {:?} Length: {:?}",input_index , self.buffer_mgr.module_in_buffers.len() );
             let buffer_index = self.buffer_mgr.module_in_buffers[input_index];
             let block_id = { self.get_index(block_index)};
             self.buffer_mgr.link_buffer_to_module_input(block_id ,buffer_index);
@@ -191,7 +202,8 @@ impl Module
     // pretty crap
     pub fn get_output<T:Sized+Copy>(&self ) -> Vec<T>
     {
-        self.buffer_mgr.get_buffer_copy_as_type::<T>(0)
+        let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() };
+        self.buffer_mgr.get_buffer_copy_as_type::<T>(buffer_out_index)
     }
 
     pub fn process_blocks(&mut self)
@@ -225,7 +237,10 @@ impl Module
         match self.get_block_behaviour(block_index)
         {
             BlockBehaviour::Immutable => {
+                println!("block index {:?}  blocks {:?}", block_index ,self.blocks.len() );
                 let block_ref = self.blocks[block_index as usize].borrow();
+
+                println!("have block");
 
                 // let tupple  = self.buffer_mgr.get_common_buffers_for_block(block_index);
                 // process(  &*block_ref ,  tupple.0 , & [tupple.1 as &[u8]][..],  tupple.2)
@@ -235,6 +250,7 @@ impl Module
                 // let inputs  = self.buffer_mgr.get_inputs_block(block_index);
 
                 let block_buffer_data = self.buffer_mgr.get_buffer_block_data(block_index);
+                println!("have block buffer data");
 
                 let mut stat_data = self.buffer_mgr.get_buffer(block_buffer_data.data_buffer_id).borrow_mut();
                 println!("stat_data {:?} : {:?}", stat_data.len() , stat_data  );
