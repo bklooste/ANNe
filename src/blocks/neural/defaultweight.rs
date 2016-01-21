@@ -12,7 +12,7 @@ use blocks::neural::testdata::*;
 // basic non performant weights good for debugging and comparisons
 #[derive(Copy, Clone)]
 pub struct DefaultNeuron<I, O, T>
-where O: Num  +Debug +Copy, O: Num  +Debug +Copy , T:ActivationFunction<I,O>
+where O: Num  +Debug +Copy, I: Num  +Debug +Copy , T:ActivationFunction<I,O>
 {
     _m: PhantomData<(T,I,O)>
 }
