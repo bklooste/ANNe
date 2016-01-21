@@ -238,7 +238,7 @@ fn module_build_add_block_w_data_process()
         assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
         let mod_output: Vec<f32>  = module.get_output();
         //
-        assert_eq!(mod_output, & [0.9241418; 5]);
+        assert_eq!(mod_output, & [0.9341418; 5]);
     }
 
         println!("unwind ");
