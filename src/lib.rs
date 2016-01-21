@@ -1,3 +1,68 @@
+//! The `aNNe` crate
+//!
+//! # Examples
+//!
+//! ```
+//! assert_eq!(4, anne::add_two(2));
+//! ```
+
+// #![feature(plugin)]
+// #![feature(augmented_assignments)]
+// #![plugin(clippy)]
+// #![allow(dead_code)]
+// #![allow(unused_variables)]
+// #![deny(missing_docs,
+//         missing_debug_implementations, missing_copy_implementations,
+//         trivial_casts, trivial_numeric_casts,
+//         unsafe_code,
+//         unused_import_braces, unused_qualifications)]
+//
+
+extern crate num;
+extern crate rand;
+extern crate rustc_serialize;
+
+#[macro_use]
+extern crate log;
+
+mod network;
+pub mod util;
+
+pub mod buffer_manager;
+pub mod blocks;
+pub mod graph;
+pub mod module;
+pub mod core;
+pub mod prelude;
+
+
+/// This function adds two to its argument.
+///
+/// # Examples
+///
+/// ```
+/// use anne::add_two;
+///
+/// assert_eq!(14, add_two(12));
+/// ```
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(4, add_two(2));
+    }
+}
+
+
 // //! Leaf is a open, fast and a well-designed, modular Framework for distributed
 // //! Deep Learning on {C, G}PUs.
 // //!
@@ -66,56 +131,3 @@
 // //! [issue-loss]: https://github.com/autumnai/leaf/issues/18
 // //! [issue-activate]: https://github.com/autumnai/leaf/issues/19
 // //! [issue-common]: https://github.com/autumnai/leaf/issues/20
-// #![feature(plugin)]
-// #![feature(augmented_assignments)]
-// #![plugin(clippy)]
-// #![allow(dead_code)]
-// #![allow(unused_variables)]
-// #![deny(missing_docs,
-//         missing_debug_implementations, missing_copy_implementations,
-//         trivial_casts, trivial_numeric_casts,
-//         unsafe_code,
-//         unused_import_braces, unused_qualifications)]
-//
-// #[macro_use]
-//
-// extern crate log;
-// extern crate rblas;
-// extern crate phloem;
-// pub mod shared_memory;
-// mod math;
-// pub mod layer;
-// pub mod layers;
-// pub mod solver;
-// pub mod solvers;
-
-extern crate num;
-extern crate rand;
-extern crate rustc_serialize;
-
-#[macro_use]
-extern crate log;
-
-mod network;
-pub mod util;
-
-pub mod buffer_manager;
-pub mod blocks;
-pub mod graph;
-pub mod module;
-pub mod core;
-pub mod prelude;
-
-pub fn add_two(a: i32) -> i32 {
-    a + 2
-}
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-//     fn it_works() {
-//         assert_eq!(4, add_two(2));
-//     }
-// }
