@@ -16,6 +16,8 @@ pub struct BuffersForBlock
 }
 
 
+
+
     //let input2 = self.buffers[ buffer_ids[INPUT2_DATA_INDEX]].borrow();
 
 // all heap data
@@ -24,7 +26,7 @@ pub struct BufferManager
 {
 
     buffers_for_block: HashMap< BlockIndex, BuffersForBlock>,
-    buffers: Vec<RefCell<Vec<u8>>>,
+    buffers: Vec<RefCell<Vec<u8>>>,   // should be Box<[u8]>!!
     // we manage modules buffers here for now
     pub module_in_buffers: Vec<BufferIndex>,
     pub module_out_buffers: Vec<BufferIndex>,
@@ -35,12 +37,12 @@ impl BufferManager
 {
     pub fn new() -> BufferManager
     {
-        let mut  bm = BufferManager{  ..Default::default()}  ;
+        let bm = BufferManager{  ..Default::default()}  ;
 
         //this needs to be better
     //    bm.module_in_buffers.push( 0);
-        bm.module_out_buffers.push( 0);
-        bm.buffers.push(RefCell::new( Vec::new() ));
+        // bm.module_out_buffers.push( 0);
+        // bm.buffers.push(RefCell::new( Vec::new() ));
         //bm.buffers.push(RefCell::new(  Vec::new() ));
 
         bm
@@ -49,10 +51,14 @@ impl BufferManager
     //Module code
     pub fn add_module_output<T>(&mut self, output: Vec<T>)
     {
-        let data_size = output.len() *  mem::size_of::<T>();
+        let tsize = mem::size_of::<T>();
+        let data_size = output.len() *  tsize;
+        let cap = output.capacity() * tsize;
+        let p = output.as_ptr() as *mut u8;
         unsafe
         {
-            let conv_output: Vec<u8> = Vec::from_raw_parts( output.as_ptr() as *mut u8, data_size , data_size);
+            mem::forget(output);
+            let conv_output: Vec<u8> = Vec::from_raw_parts( p , data_size , cap);
             self.add_mod_output(conv_output);
         }
     }
@@ -65,10 +71,16 @@ impl BufferManager
 
     pub fn add_module_input<T>(&mut self, input: Vec<T>)
     {
-        let data_size = input.len() *  mem::size_of::<T>();
+        //if input.len()!= input.capacity() { input.shrink_to_fit()  }
+
+        let tsize = mem::size_of::<T>();
+        let data_size = input.len() *  tsize;
+        let cap = input.capacity() * tsize;
+        let p = input.as_ptr() as *mut u8;
         unsafe
         {
-            let conv_input: Vec<u8> = Vec::from_raw_parts( input.as_ptr() as *mut u8, data_size , data_size);
+            mem::forget(input);
+            let conv_input: Vec<u8> = Vec::from_raw_parts( p , data_size , cap);
             self.add_mod_input(conv_input);
         }
     }
@@ -93,8 +105,8 @@ impl BufferManager
 
     pub fn set_buffer_to_module_output(&mut self, block: BlockIndex , buffer_id: BufferIndex )
     {
-        let mut blk_info  = self.get_mut_buffer_block_data(block);
-        if ( blk_info.output_buffer_id != 0) { panic!("block already set ") }
+        let blk_info  = self.get_mut_buffer_block_data(block);
+        if  blk_info.output_buffer_id != 0 { panic!("block already set ") }
         blk_info.output_buffer_id =  buffer_id;
     }
 
@@ -215,13 +227,25 @@ impl BufferManager
     pub fn get_buffer_copy_as_type<T:Sized+Copy>(&self , index: BufferIndex ) -> Vec<T>
     {
 
-        let byte_vec = self.buffers[index as usize].borrow().to_vec();
-        let data_size = byte_vec.len() /  mem::size_of::<T>();
+        let output  = self.buffers[index as usize].borrow().to_vec(); //copy
+        // let data_size = byte_vec.len() /  mem::size_of::<T>();
+        // unsafe
+        // {
+        //     let output: Vec<T> = Vec::from_raw_parts( byte_vec.as_ptr() as *mut T, data_size , data_size);
+        //     output
+        // }
+
+        let tsize = mem::size_of::<T>();
+        let data_size = output.len() /  tsize;
+        let cap = output.capacity() / tsize;
+        let p = output.as_ptr() as *mut T;
         unsafe
         {
-            let output: Vec<T> = Vec::from_raw_parts( byte_vec.as_ptr() as *mut T, data_size , data_size);
-            output
+            mem::forget(output);
+            let conv_output: Vec<T> = Vec::from_raw_parts( p , data_size , cap);
+            conv_output
         }
+
     }
 
 

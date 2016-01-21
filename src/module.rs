@@ -56,7 +56,7 @@ impl Module
         module
     }
 
-    pub fn new_from_inputs<T>(input: Vec<T>) -> Module {
+    pub fn new_from_input<T>(input: Vec<T> , output_size: usize) -> Module {
 
         //  let output = vec![0; bytes_size];
         //unsafe { output.set_len(bytes_size as usize); }
@@ -68,9 +68,30 @@ impl Module
              buffer_mgr: BufferManager::new() , stats : ModuleStats{ ..Default::default()} };
 
         module.buffer_mgr.add_module_input::<T>(input);
+        //
+        let zero_vec = vec![0; output_size];
+        module.buffer_mgr.add_mod_output( zero_vec);
 
+
+        debug!("DEBUG: foo2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!2");
         // block input 1
+        println!("after create buffer_manager: {:?} ",module.buffer_mgr);
+
         module
+    }
+
+    // input and output is via copy
+    pub fn add_buffers(&mut self, input_sizes: &[usize] , output_sizes: &[usize] )
+    {
+        for &size  in input_sizes {
+            let zero_vec = vec![0; size];
+            self.buffer_mgr.add_mod_input( zero_vec)
+        }
+
+        for &size  in output_sizes {
+            let zero_vec = vec![0; size];
+            self.buffer_mgr.add_mod_output( zero_vec)
+        }
     }
 
     pub fn get_stats(&self) -> &ModuleStats  {
@@ -103,54 +124,36 @@ impl Module
     //fixme should index be exposed
     pub fn add_block_w_data<T:Sized+Copy>(& mut self, box_block: Box<IBlock> , data: Vec<T>) -> NodeIndex
     {
-        let new_size = data.len() * mem::size_of::<T>();
+        let tsize = mem::size_of::<T>();
+        let data_size = data.len() *  tsize;
+        let cap = data.capacity() * tsize;
+        let p = data.as_ptr() as *mut u8;
 
-        // fn from_raw_parts(ptr: *mut T, length: usize, capacity: usize) -> Vec<T>
         unsafe
         {
-        let weights: Vec<u8> = Vec::from_raw_parts( data.as_ptr() as *mut u8, new_size , new_size);
-        self. add_block_w_static_data( box_block , weights)
+            mem::forget(data);
+            let weights: Vec<u8> = Vec::from_raw_parts( p , data_size , cap);
+            self. add_block_w_static_data( box_block , weights)
+
         }
     }
 
     pub fn add_block_w_static_data(& mut self, box_block: Box<IBlock> , static_data: Vec<u8>) -> NodeIndex
     {
+
+
         let nodeid = self.add_block(box_block);
         let block_index = self.graph.get_node(nodeid);
 
         println!("got block {:?}", block_index);
-//TODO fixme add buffer function
 
-    //block_index
         self.buffer_mgr.set_data_for_block(*block_index ,static_data);
-
-
         nodeid
-    }
-
-
-    // pub fn receive_module_input(& mut self, block: NodeIndex)
-    // {
-    //     self.buffer_mgr.link_output_to_input(block );
-    // }
-
-    // input and output is via copy
-    pub fn add_buffers(&mut self, input_sizes: &[usize] , output_sizes: &[usize] )
-    {
-        for &size  in input_sizes {
-            let zero_vec = vec![0; size];
-            self.buffer_mgr.add_mod_input( zero_vec)
-        }
-
-        for &size  in output_sizes {
-            let zero_vec = vec![0; size];
-            self.buffer_mgr.add_mod_output( zero_vec)
-        }
     }
 
     pub fn add_simple_connections(&mut self,block_module_in: NodeIndex, block_module_out: NodeIndex , links: &[ (NodeIndex , NodeIndex) ]  )
     {
-                    println!("buffer_manager: {:?} in : {:?} out: {:?} links: {:?}",self.buffer_mgr , block_module_in , block_module_out , links);
+        println!("add_simple_connections buffer_manager: {:?} in : {:?} out: {:?} links: {:?}",self.buffer_mgr , block_module_in , block_module_out , links);
         //let buffer_in_index = { *self.buffer_mgr.module_in_buffers.first().unwrap() as usize};
         //let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() as usize};
 
@@ -182,6 +185,7 @@ impl Module
 
     pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex)
     {
+
         let mut blockfrom_index  = 0;
         let mut blockto_index  = 0;
 
@@ -215,7 +219,7 @@ impl Module
     {
 
         {
-            debug!("DEBUG: foo");
+            debug!("DEBUG: foo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
             let block_index  =  self.graph.get_node(index);
             self.process_block(*block_index);
             self.stats.blocks_processed = self.stats.blocks_processed + 1;
@@ -252,12 +256,21 @@ impl Module
                 let block_buffer_data = self.buffer_mgr.get_buffer_block_data(block_index);
                 println!("have block buffer data");
 
+                // should be allowed later
+                if block_buffer_data.inputs_buffer_ids.len() == 0  { panic! ("no input  buffer") }
+                if block_buffer_data.output_buffer_id == 0  { panic! ("no output   buffer") }
+
                 let mut stat_data = self.buffer_mgr.get_buffer(block_buffer_data.data_buffer_id).borrow_mut();
                 println!("stat_data {:?} : {:?}", stat_data.len() , stat_data  );
                 let mut output  = self.buffer_mgr.get_buffer(block_buffer_data.output_buffer_id).borrow_mut();
+                if output.len() == 0 {
+                    println!("empty output  {:?} :buffer id  {:?}", output , block_buffer_data.output_buffer_id  );
+                }
 
                 if block_buffer_data.inputs_buffer_ids.len() == 0 { panic!("no input for buffer")} ;
                 let inputs  =self.buffer_mgr.get_buffer(*block_buffer_data.inputs_buffer_ids.first().unwrap()).borrow();
+
+
                 process(  &*block_ref ,  & mut stat_data[..], &[ & inputs[..]][..],  & mut output[..])
             } ,
             BlockBehaviour::Mutable {copy_out} => {

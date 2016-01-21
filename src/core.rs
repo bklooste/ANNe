@@ -131,6 +131,7 @@ where T:NeuronBlock<f32,f32>
 
     fn process(&self , data: & mut [u8] , inputs: &[& [u8]] , outputs: & mut [u8])
     {
+         if outputs.len() == 0 { println!("warning 0 length output " );}
         unsafe
         {
             let weight_size = mem::size_of::<f32>();
@@ -139,11 +140,9 @@ where T:NeuronBlock<f32,f32>
             let input: & [f32] = slice::from_raw_parts( input_o.as_ptr() as *const f32, input_o.len()/ mem::size_of::<f32>());
             let outputs: & mut [f32] = slice::from_raw_parts_mut( outputs.as_ptr() as *mut f32, outputs.len()/ mem::size_of::<f32>());
 
-            //println!(" process , triplet w{:?} : i{:?} : o{:?}",weights , input , outputs );
-
+            println!("process , triplet w{:?} : i{:?} : o{:?}",weights , input , outputs );
             self.process_input( weights , input , outputs);
-
-            println!("O {:?}", outputs );
+            println!("process new O {:?}", outputs );
         }
     }
 

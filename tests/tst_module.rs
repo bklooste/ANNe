@@ -21,31 +21,20 @@ fn module_new()
 
 // externally management data rather module looks dodgy
 // need to use static .. we will then get module to create
-#[test]
-fn module_build_add_node()
-{
-
-
-
-    // let input =  ::anne::util::to_floats(1..6);
-    // println!("input {:?}", input );
-    // let mut output = vec! [0f32 ;3];
-    //   static  WEIGHTS: & 'static  [f32] = & [ 0.5f32  ; 25];
-    unsafe
-    {
-        static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
-        static mut OUTPUT_BUF: & 'static mut [f32] = & mut [0f32; 5];
-        static  WEIGHTS: & 'static  [f32] = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
-
-        let block = LogisticMutBlock::new(BlockData::new(2 , 5, 5), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
-        let mut module = Module::new();
-        module.add_block(Box::new(block) );
-
-        //fixme test
-        //assert_eq!(block.get_output(), & [0f32; 5]);
-
-    }
-}
+// #[test]
+// fn module_build_add_node()
+// {
+//     unsafe
+//     {
+//         static INPUT_BUF: &'static [f32] = &[1f32, 2f32, 3f32, 4f32, 5f32];
+//         static mut OUTPUT_BUF: & 'static mut [f32] = & mut [0f32; 5];
+//         static  WEIGHTS: & 'static  [f32] = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
+//
+//         let block = LogisticMutBlock::new(BlockData::new(2 , 5, 5), WEIGHTS, OUTPUT_BUF, INPUT_BUF);
+//         let mut module = Module::new();
+//         module.add_block(Box::new(block) );
+//     }
+// }
 
 
 // let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
@@ -198,22 +187,62 @@ fn module_build_add_2_imm_blocks()
     }
 }
 
-// #[test]
-// fn module_build_add_block_w_data()
-// {
-//     let weights =   vec![ 0.5f32  ; 25];
-//     let input  = vec! [1f32 ;5];
-//     let mut output = vec!  [0f32 ;5];
-//     {
-//         let mut block1 = LogisticBlock::new(2 , 5, 5);
-//         let mut module = Module::new_from_inputs(input);
-//         module.add_block_w_data(Box::new(block1)  , weights );
-//         assert_eq!(    module.get_stats().blocks_processed, 0);
-//         module.process_blocks();
-//         assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
-//     //    assert_eq!(block1.get_output(), & [0.9241418; 5]);
-//     }
-// }
+#[test]
+fn module_build_from_input()
+{
+    let input  = vec! [1f32 ;5];
+    let mut module = Module::new_from_input(input , 20);
+}
+
+#[test]
+fn module_build_from_input_add_block()
+{
+    let input  = vec! [1f32 ;5];
+    let mut module = Module::new_from_input(input , 20);
+
+     let mut block1 = LogisticBlock::new(2 , 5, 5);
+
+}
+
+#[test]
+fn module_build_from_input_add_block2()
+{
+    let input  = vec! [1f32 ;5];
+     let weights =   vec![ 0.5f32  ; 25];
+
+
+     let mut block1 = LogisticBlock::new(2 , 5, 5);
+     let mut module = Module::new_from_input(input , 20);
+
+     let blk_index = module.add_block_w_data(Box::new(block1)  , weights );
+
+}
+
+#[test]
+fn module_build_add_block_w_data_process()
+{
+    let weights =   vec![ 0.5f32  ; 25];
+    let input  = vec! [1f32 ;5];
+    //let mut output = vec!  [0f32 ;5];
+    {
+        let mut block1 = LogisticBlock::new(2 , 5, 5);
+        let mut module = Module::new_from_input(input , 20);
+        let blk_index = module.add_block_w_data(Box::new(block1)  , weights );
+        module.add_simple_connections( blk_index, blk_index , &[] );
+
+        assert_eq!(    module.get_stats().blocks_processed, 0);
+        module.process_blocks();
+
+
+        println!("block processed");
+        assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
+        let mod_output: Vec<f32>  = module.get_output();
+        //
+        assert_eq!(mod_output, & [0.9241418; 5]);
+    }
+
+        println!("unwind ");
+}
 
 // #[test]
 // fn module_build_add_1imm_blocks_hook_to_module_process()

@@ -135,9 +135,10 @@ where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
 
         let output = self.get_output();
             let new_size = output.len() * mem::size_of::<O>();
+        let p = output.as_ptr() as *mut u8;
         unsafe
         {
-            Vec::from_raw_parts( output.as_ptr() as *mut u8, new_size , new_size)
+            Vec::from_raw_parts(p , new_size , new_size)
 
         }
     }
