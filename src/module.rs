@@ -1,6 +1,5 @@
-use std::collections::HashMap;
 use std::cell::RefCell;
-use std::{mem, slice};
+use std::{mem};
 //use std::slice;
 // use num::traits::Num;
 
@@ -185,30 +184,31 @@ impl Module
 
     pub fn add_link(& mut self, from: NodeIndex , to: NodeIndex)
     {
-
-        let mut blockfrom_index  = 0;
-        let mut blockto_index  = 0;
-
+        let mut _blockfrom_index  = 0;
+        let mut _blockto_index  = 0;
         {
-            blockfrom_index = *self.graph.get_node(from);
-            blockto_index = *self.graph.get_node(to);
+            _blockfrom_index = *self.graph.get_node(from);
+            _blockto_index = *self.graph.get_node(to);
         }
-
         // check if valid
-        self.graph.add_edge( blockfrom_index as usize, blockto_index as usize );
-
-        self.buffer_mgr.link_output_to_input(blockfrom_index , blockto_index );
-
+        self.graph.add_edge( _blockfrom_index as usize, _blockto_index as usize );
+        self.buffer_mgr.link_output_to_input(_blockfrom_index , _blockto_index );
     }
 
     //todo borrow output as slice
 
     // pretty crap
-    pub fn get_output<T:Sized+Copy>(&self ) -> Vec<T>
+    pub fn copy_output<T:Sized+Copy>(&self ) -> Vec<T>
     {
         let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() };
         self.buffer_mgr.get_buffer_copy_as_type::<T>(buffer_out_index)
     }
+
+    // pub fn get_output<T:Sized+Copy>(&self ) -> Box<[T]>
+    // {
+    //     let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() };
+    //     self.buffer_mgr.get_buffer_as_slice::<T>(buffer_out_index)
+    // }
 
     pub fn process_blocks(&mut self)
     {
@@ -244,25 +244,15 @@ impl Module
                 println!("block index {:?}  blocks {:?}", block_index ,self.blocks.len() );
                 let block_ref = self.blocks[block_index as usize].borrow();
 
-                println!("have block");
-
-                // let tupple  = self.buffer_mgr.get_common_buffers_for_block(block_index);
-                // process(  &*block_ref ,  tupple.0 , & [tupple.1 as &[u8]][..],  tupple.2)
-                // let stat_data = self.buffer_mgr.get_data_for_block(block_index);
-                // let output  = self.buffer_mgr.get_output_for_block(block_index);
-                //
-                // let inputs  = self.buffer_mgr.get_inputs_block(block_index);
-
                 let block_buffer_data = self.buffer_mgr.get_buffer_block_data(block_index);
-                println!("have block buffer data");
 
                 // should be allowed later
                 if block_buffer_data.inputs_buffer_ids.len() == 0  { panic! ("no input  buffer") }
                 if block_buffer_data.output_buffer_id == 0  { panic! ("no output   buffer") }
 
                 let mut stat_data = self.buffer_mgr.get_buffer(block_buffer_data.data_buffer_id).borrow_mut();
-                println!("stat_data {:?} : {:?}", stat_data.len() , stat_data  );
                 let mut output  = self.buffer_mgr.get_buffer(block_buffer_data.output_buffer_id).borrow_mut();
+
                 if output.len() == 0 {
                     println!("empty output  {:?} :buffer id  {:?}", output , block_buffer_data.output_buffer_id  );
                 }
@@ -271,12 +261,14 @@ impl Module
                 let inputs  =self.buffer_mgr.get_buffer(*block_buffer_data.inputs_buffer_ids.first().unwrap()).borrow();
 
 
-                process(  &*block_ref ,  & mut stat_data[..], &[ & inputs[..]][..],  & mut output[..])
+                process(  &*block_ref ,  & mut stat_data[..], &[ & inputs[..]][..],  & mut output[..]);
             } ,
             BlockBehaviour::Mutable {copy_out} => {
                 let mut mut_block_ref = self.blocks[block_index as usize].borrow_mut();
-                let out = mut_block_ref.process_self_copy_output( );
-                // todo  copy
+                mut_block_ref.process_self_copy_output( );
+                if copy_out {
+                    println!("todo copy out");
+                }                // todo  copy
             },
             _ => println!("something else"),
         }

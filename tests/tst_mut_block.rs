@@ -1,8 +1,8 @@
 // not sure why needed ....
 extern crate anne;
 
-use anne::blocks::{LogisticBlock ,LogisticMutBlock ,LogisticMutBiasBlock, BlockData , LinearByteMutBlock , LinearByteBlock};
-use anne::core::{IBlock , MutableBlock };
+use anne::blocks::{LogisticMutBlock ,LogisticMutBiasBlock, BlockData , LinearByteMutBlock };
+use anne::core::{MutableBlock };
 use anne::util::to_floats;
 
 #[test]
@@ -96,7 +96,7 @@ fn fullmesht_w15_5x3()
 
       let input = & to_floats(1..6);
       println!("input {:?}", input );
-      let mut output = & mut [0f32 ;3];
+      let output = & mut [0f32 ;3];
       let weights = & [ 1f32, 2f32, 3f32, 4f32, 5f32, 11f32, 12f32, 13f32, 14f32, 15f32, 0.1f32, 0.2f32, 0.3f32, 0.4f32, 0.5f32 ];
       {
           let mut block = LogisticMutBlock::new(BlockData::new(5 , 3, 5), weights, output, input);

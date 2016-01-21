@@ -226,15 +226,7 @@ impl BufferManager
 
     pub fn get_buffer_copy_as_type<T:Sized+Copy>(&self , index: BufferIndex ) -> Vec<T>
     {
-
         let output  = self.buffers[index as usize].borrow().to_vec(); //copy
-        // let data_size = byte_vec.len() /  mem::size_of::<T>();
-        // unsafe
-        // {
-        //     let output: Vec<T> = Vec::from_raw_parts( byte_vec.as_ptr() as *mut T, data_size , data_size);
-        //     output
-        // }
-
         let tsize = mem::size_of::<T>();
         let data_size = output.len() /  tsize;
         let cap = output.capacity() / tsize;
@@ -245,8 +237,23 @@ impl BufferManager
             let conv_output: Vec<T> = Vec::from_raw_parts( p , data_size , cap);
             conv_output
         }
-
     }
+
+    // pub fn get_buffer_as_slice<T:Sized+Copy>(&self , index: BufferIndex ) -> &[T]
+    // {
+    //     let output  = self.buffers[index as usize].borrow().into_boxed_slice(); //copy
+    //     let data_size = output.len() /  mem::size_of::<T>();
+    //     let cap = output.capacity() / tsize;
+    //     let p = output.as_ptr() as *mut T;
+    //     unsafe
+    //     {
+    //         mem::forget(output);
+    //         let conv_output: Vec<T> = slice::from_raw_parts( p , data_size , cap);
+    //         conv_output
+    //     }
+    // }
+
+
 
 
     // fn get_mut_buffer(&self, buffer_index: BufferIndex ) -> & mut Vec<u8>
@@ -299,9 +306,10 @@ impl BufferManager
 
 impl fmt::Debug for BufferManager {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "BufferManager:module_in_buffers {:?}", self.module_in_buffers);
-        writeln!(f, "BufferManager:module_out_buffers {:?}", self.module_out_buffers);
-        writeln!(f, "BufferManager:buffers {:?}", self.buffers);
-        writeln!(f, "BufferManager:buffers_for_block {:?}", self.buffers_for_block)
+        writeln!(f, "BufferManager:in {:?} out {:?} buffers {:?} bfb {:?}"
+            , self.module_in_buffers
+            , self.module_out_buffers
+            , self.buffers
+            , self.buffers_for_block)
     }
 }
