@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 use num::traits::Num;
 use num::traits::ToPrimitive;
+use std::fmt::Debug;
 
 use blocks::neural::activation::*;
 use blocks::neural::neuron::*;
@@ -10,7 +11,11 @@ use blocks::neural::testdata::*;
 
 // basic non performant weights good for debugging and comparisons
 #[derive(Copy, Clone)]
-pub struct DefaultNeuron<I, O, T> where T:ActivationFunction<I,O> {    _m: PhantomData<T>  , _i: PhantomData<I> , _o: PhantomData<O> }
+pub struct DefaultNeuron<I, O, T>
+where O: Num  +Debug +Copy, O: Num  +Debug +Copy , T:ActivationFunction<I,O>
+{
+    _m: PhantomData<(T,I,O)>
+}
 
 impl <W:Num + ToPrimitive , N: ActivationFunction<f32,f32>> Neuron<W , f32 > for DefaultNeuron<f32,f32,N>
 {

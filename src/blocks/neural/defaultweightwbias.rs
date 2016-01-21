@@ -23,7 +23,9 @@ use blocks::neural::testdata::*;
  }
 
 #[derive(Copy, Clone)]
-pub struct DefaultWeightwBias<I, O, T> where T:ActivationFunction<I,O> {    _m: PhantomData<T>  , _i: PhantomData<I> , _o: PhantomData<O> }
+pub struct DefaultWeightwBias<I, O, T>
+where O: Num  +Debug +Copy, O: Num  +Debug +Copy , T:ActivationFunction<I,O>
+{    _m: PhantomData<T>  , _i: PhantomData<I> , _o: PhantomData<O> }
 
 
 // fixme DefaultWeightwBias should return isize for integer types.
