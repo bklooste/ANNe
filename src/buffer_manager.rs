@@ -37,12 +37,12 @@ impl BufferManager
 {
     pub fn new() -> BufferManager
     {
-        let bm = BufferManager{  ..Default::default()}  ;
+        let mut bm = BufferManager{  ..Default::default()}  ;
 
         //this needs to be better
     //    bm.module_in_buffers.push( 0);
         // bm.module_out_buffers.push( 0);
-        // bm.buffers.push(RefCell::new( Vec::new() ));
+         bm.buffers.push(RefCell::new( Vec::new() )); // dummy
         //bm.buffers.push(RefCell::new(  Vec::new() ));
 
         bm
@@ -99,8 +99,11 @@ impl BufferManager
 
     pub fn link_buffer_to_module_input(&mut self, block: BlockIndex , buffer_id: BufferIndex )
     {
+
         let mut blk_info  = self.get_mut_buffer_block_data(block);
+        //println!("input to out put blk_info {:?} , blockid {:?}   , pushing {:?} ", blk_info ,block ,  buffer_id  );
         blk_info.inputs_buffer_ids.push( buffer_id);
+        //        println!("input to out after push  blk_info {:?} ", blk_info  );
     }
 
     pub fn set_buffer_to_module_output(&mut self, block: BlockIndex , buffer_id: BufferIndex )
@@ -273,10 +276,16 @@ impl BufferManager
         let in_bfb =  self.copy_buffer_block_data(from);
         let mut  out_bfb = self.get_mut_buffer_block_data(to);
 
+    //    println!(" module inputs  {:?} outputs {:?} ", &self.module_in_buffers , &self.module_out_buffers);
+        println!("link_output_to_input: f  {:?} outputs {:?} -> in_bfb {:?} out_bfb {:?}  ", from,  to  , in_bfb  , out_bfb);
+
         // if 0
         //if ( in_bfb.output_buffer_id )
+        if  in_bfb.output_buffer_id == 0 { panic!("no out put set for block index {:?}" , from) }
 
         out_bfb.inputs_buffer_ids.push( in_bfb.output_buffer_id);
+        println!("link_output_to_input post: out_bfb {:?}  ", out_bfb);
+
 
     // let buffer_option = self.buffers_for_node.get(&blockfrom_index );
     // if buffer_option == None
@@ -306,10 +315,10 @@ impl BufferManager
 
 impl fmt::Debug for BufferManager {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "BufferManager:in {:?} out {:?} buffers {:?} bfb {:?}"
+        writeln!(f, "BufferManager:in {:?} out {:?} blocks {:?}"
             , self.module_in_buffers
             , self.module_out_buffers
-            , self.buffers
+        //    , self.buffers
             , self.buffers_for_block)
     }
 }

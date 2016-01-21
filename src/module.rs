@@ -7,14 +7,6 @@ use core::{IBlock , BlockBehaviour , BlockIndex};
 use graph::{Graph , NodeIndex};
 use buffer_manager::BufferManager;
 
-//externals should use node index.
-
-
-
-// pub struct Buffer
-// {
-//
-// }
 
 // we could pull the vector graph out .. eg NodeData<T> and have module hold a graph ..
 #[derive(Default)]
@@ -29,17 +21,12 @@ pub struct Module
     //data mutable on creation ..eg add block , edges
     graph: Graph<BlockIndex>,
     //buffers_for_node: HashMap< BlockIndex, Vec<usize>>, // vector is staticdata , return/output , inputs..
-
     // data mutable durring run  (note ...Vec should not change ) , with these changes self should be immutable
     blocks:  Vec<RefCell<Box<IBlock>>>, // we may be able to remove refcell here ...
-
     //eventually we can do something like variable/ flow anylysis on this.
     //buffers: Vec<RefCell<Vec<u8>>>,
     buffer_mgr: BufferManager,
     stats: ModuleStats,
-
-
-
 }
 
 impl Module
@@ -120,39 +107,42 @@ impl Module
     }
 
 
+    pub fn add_block_w_data_and_output<T:Sized+Copy>(& mut self, box_block: Box<IBlock> , data: Vec<T> , output_size:usize) -> NodeIndex
+    {
+        let index:NodeIndex = self.add_block_w_data::<T>(box_block, data);
+
+        let zero_vec = vec![0; output_size];
+        let block_index = self.graph.get_node(index);
+        self.buffer_mgr.set_output_for_block( *block_index, zero_vec );
+        index
+    }
+
     //fixme should index be exposed
-    pub fn add_block_w_data<T:Sized+Copy>(& mut self, box_block: Box<IBlock> , data: Vec<T>) -> NodeIndex
+    pub fn add_block_w_data<T:Sized+Copy>(& mut self, box_block: Box<IBlock> , data: Vec<T> ) -> NodeIndex
     {
         let tsize = mem::size_of::<T>();
         let data_size = data.len() *  tsize;
         let cap = data.capacity() * tsize;
         let p = data.as_ptr() as *mut u8;
-
         unsafe
         {
             mem::forget(data);
             let weights: Vec<u8> = Vec::from_raw_parts( p , data_size , cap);
-            self. add_block_w_static_data( box_block , weights)
-
+            self.add_block_w_static_data( box_block , weights)
         }
     }
 
-    pub fn add_block_w_static_data(& mut self, box_block: Box<IBlock> , static_data: Vec<u8>) -> NodeIndex
+    pub fn add_block_w_static_data(& mut self, box_block: Box<IBlock> , static_data: Vec<u8> ) -> NodeIndex
     {
-
-
         let nodeid = self.add_block(box_block);
         let block_index = self.graph.get_node(nodeid);
-
-        println!("got block {:?}", block_index);
-
-        self.buffer_mgr.set_data_for_block(*block_index ,static_data);
+        self.buffer_mgr.set_data_for_block(*block_index ,static_data) ;
         nodeid
     }
 
     pub fn add_simple_connections(&mut self,block_module_in: NodeIndex, block_module_out: NodeIndex , links: &[ (NodeIndex , NodeIndex) ]  )
     {
-        println!("add_simple_connections buffer_manager: {:?} in : {:?} out: {:?} links: {:?}",self.buffer_mgr , block_module_in , block_module_out , links);
+
         //let buffer_in_index = { *self.buffer_mgr.module_in_buffers.first().unwrap() as usize};
         //let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() as usize};
 
@@ -163,7 +153,6 @@ impl Module
     pub fn add_connections(&mut self,module_in: &[(usize, NodeIndex) ], module_out: &[(usize, NodeIndex)] , links: &[ (NodeIndex , NodeIndex) ]  )
     {
         for &(input_index, block_index) in module_in {
-            println!("add_connections index: {:?} Length: {:?}",input_index , self.buffer_mgr.module_in_buffers.len() );
             let buffer_index = self.buffer_mgr.module_in_buffers[input_index];
             let block_id = { self.get_index(block_index)};
             self.buffer_mgr.link_buffer_to_module_input(block_id ,buffer_index);
@@ -175,7 +164,10 @@ impl Module
             self.buffer_mgr.set_buffer_to_module_output(block_id ,buffer_index);
         }
 
-        for &(node_from, node_to) in links { self.add_link(node_from, node_to);  }
+
+        for &(node_from, node_to) in links {               self.add_link(node_from, node_to);     }
+
+            //    println!("post  link: {:?} ",self.buffer_mgr );
 
     }
 
@@ -193,6 +185,8 @@ impl Module
         // check if valid
         self.graph.add_edge( _blockfrom_index as usize, _blockto_index as usize );
         self.buffer_mgr.link_output_to_input(_blockfrom_index , _blockto_index );
+
+
     }
 
     //todo borrow output as slice
@@ -241,14 +235,13 @@ impl Module
         match self.get_block_behaviour(block_index)
         {
             BlockBehaviour::Immutable => {
-                println!("block index {:?}  blocks {:?}", block_index ,self.blocks.len() );
                 let block_ref = self.blocks[block_index as usize].borrow();
 
                 let block_buffer_data = self.buffer_mgr.get_buffer_block_data(block_index);
 
                 // should be allowed later
-                if block_buffer_data.inputs_buffer_ids.len() == 0  { panic! ("no input  buffer") }
-                if block_buffer_data.output_buffer_id == 0  { panic! ("no output   buffer") }
+                if block_buffer_data.inputs_buffer_ids.len() == 0  { println!("buffer_manager: {:?} ",self.buffer_mgr );  panic! ("no input  buffer") }
+                if block_buffer_data.output_buffer_id == 0  {        println!("buffer_manager: {:?} ",self.buffer_mgr ); panic! ("no output   buffer") }
 
                 let mut stat_data = self.buffer_mgr.get_buffer(block_buffer_data.data_buffer_id).borrow_mut();
                 let mut output  = self.buffer_mgr.get_buffer(block_buffer_data.output_buffer_id).borrow_mut();

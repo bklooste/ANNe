@@ -62,13 +62,11 @@ where T: Sized
     }
 
     pub fn get_node(&self, source: NodeIndex) -> &T {
-        println!("get node {:?} , num nodes{:?} ", source , self.nodes.len());
         & self.nodes[source].node
     }
 
 
         pub fn get_node_mut(&mut self, source: NodeIndex) -> & mut T {
-            println!("get node {:?} , num nodes{:?} ", source , self.nodes.len());
             & mut self.nodes[source].node
         }
 
