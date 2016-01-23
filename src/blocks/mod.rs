@@ -10,6 +10,8 @@ pub use core::*;
 pub mod neural;
 pub mod fullmesh;
 pub mod mesh;
+pub mod function;
+
 
 
 
