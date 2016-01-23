@@ -24,7 +24,7 @@ pub struct BlockData
     pub connections: Vec<Connection>,
     pub next_run_sequence: Vec<BlockId>,
     pub neuron_count: u32,
-    /// includes bias
+    /// includes bias per neuron
     pub synapse_count: u32
 }
 
@@ -41,5 +41,8 @@ pub fn add_three(a: i32) -> i32 {
 pub type LinearByteMutBlock = ::blocks::fullmesh::FullMeshBlock<i8,u8 ,LinearByteB>;
 pub type LogisticMutBlock = ::blocks::fullmesh::FullMeshBlock< f32,f32,DefaultLogistic>;
 pub type LogisticMutBiasBlock = ::blocks::fullmesh::FullMeshBlock< f32,f32,DefaultLogisticB>;
-pub type LinearByteBlock = ::blocks::mesh::MeshBlock<i8,u8 ,LinearByteB>;
+pub type LinearByteBlock = ::blocks::mesh::MeshBlock<i8,u8 ,LinearByte>;
+pub type LinearByteBiasBlock = ::blocks::mesh::MeshBlock<i8,u8 ,LinearByteB>;
 pub type LogisticBlock = ::blocks::mesh::MeshBlock<f32,f32,DefaultLogistic>;
+pub type LogisticBiasBlock = ::blocks::mesh::MeshBlock<f32,f32,DefaultLogisticB>;
+pub type ThreshholdByteBiasBlock = ::blocks::mesh::MeshBlock<i8,u8 ,ThresholdByteB>;

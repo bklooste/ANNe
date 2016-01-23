@@ -6,6 +6,22 @@
 //! assert_eq!(4, anne::add_two(2));
 //! ```
 
+//! ```
+//! use anne::module::{Module};
+//! use anne::blocks::{BlockData, LogisticMutBlock , LogisticBlock , LogisticBiasBlock};
+//! use anne::blocks::neural::neuron::*;
+//! use anne::core::{ MutableBlock };
+
+//! let mut module = Module::new_from_input(vec! [1f32 ;2] ,4);
+//! let blk1 = module.add_block_w_data_and_output(Box::new(LogisticBlock::new(1, 2, 2)), vec![ 1f32, 1f32, 2f32, 2f32] , 8);
+//! let blk2 = module.add_block_w_data(Box::new(LogisticBlock::new(2 , 1, 2))  , vec![-1000f32, 850f32] ); 
+//! module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
+//! module.process_blocks();
+//! assert_eq!(    module.get_stats().blocks_processed, 2);
+//! let mod_output: Vec<f32>  =  module.copy_output();
+//! assert!(mod_output[0] < 0.01f32 && mod_output[0] > -0.01f32  )
+//! ```
+
 // #![feature(plugin)]
 // #![feature(augmented_assignments)]
 // #![plugin(clippy)]

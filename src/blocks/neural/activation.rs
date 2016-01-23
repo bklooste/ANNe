@@ -69,6 +69,27 @@ impl ActivationFunction<f64,f64> for TanhNeuralNet {
   //derivative #[inline(always)] fn derivative(x: f64) -> f64 { 1f64 - x.tanh().powi(2) }
 }
 
+//FANN_THRESHOLD  Threshold activate function.
+// convention is bias is the activation level but this means 0 = 1..
+// and for no bias 0 total = activate
+// we only activate on positive .
+//x<= 0 -> y = 0, x > 0 -> y = 1
+#[derive(Copy, Clone, RustcEncodable, RustcDecodable)]
+pub struct Threshold;
+
+impl ActivationFunction<f32,f32> for Threshold {
+  #[inline(always)] fn activate(x: f32) -> f32 { if  x <= 0f32 { return 0f32}  1f32 }
+}
+
+impl ActivationFunction<f64,f64> for Threshold {
+  #[inline(always)] fn activate(x: f64) -> f64 { if  x <= 0f64 { return 0f64}  1f64 }
+  //derivative #[inline(always)] fn derivative(x: f64) -> f64 { 1f64 - x.tanh().powi(2) }
+}
+
+
+impl ActivationFunction<isize, u8> for Threshold {
+    #[inline(always)] fn activate(x: isize) -> u8  { if  x <= 0 { return 0}  1  }}
+
 
 // fn test<T: Num , U: Num ,A: ActivationFunction<T, U> > ( x: T)-> U
 // {

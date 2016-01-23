@@ -1,7 +1,5 @@
 use std::cell::RefCell;
-use std::{mem};
-//use std::slice;
-// use num::traits::Num;
+use std::{mem , slice};
 
 use core::{IBlock , BlockBehaviour , BlockIndex};
 use graph::{Graph , NodeIndex};
@@ -163,11 +161,11 @@ impl Module
             let block_id = { self.get_index(block_index)};
             self.buffer_mgr.set_buffer_to_module_output(block_id ,buffer_index);
         }
-
+        //println!("pre   link: {:?} ",self.buffer_mgr );
 
         for &(node_from, node_to) in links {               self.add_link(node_from, node_to);     }
 
-            //    println!("post  link: {:?} ",self.buffer_mgr );
+        // println!("post  link: {:?} ",self.buffer_mgr );
 
     }
 
@@ -197,6 +195,23 @@ impl Module
         let buffer_out_index = { *self.buffer_mgr.module_out_buffers.first().unwrap() };
         self.buffer_mgr.get_buffer_copy_as_type::<T>(buffer_out_index)
     }
+
+    pub fn set_input<T:Sized+Copy>(&self ,input :&[T])
+    {
+        let buffer_out_index = { *self.buffer_mgr.module_in_buffers.first().unwrap() };
+
+        unsafe
+        {
+            let slice_as_bytes =  slice::from_raw_parts_mut( input.as_ptr() as *mut u8, input.len()* mem::size_of::<T>());
+            let mut buf = self.buffer_mgr.get_buffer(buffer_out_index).borrow_mut();
+            let mut counter = 0;
+            for i in slice_as_bytes {
+                buf[counter] = *i;
+                counter = counter + 1;
+            }
+        }
+    }
+
 
     // pub fn get_output<T:Sized+Copy>(&self ) -> Box<[T]>
     // {

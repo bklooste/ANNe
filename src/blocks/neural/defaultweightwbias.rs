@@ -9,13 +9,13 @@ use blocks::neural::activation::*;
 #[allow(unused_imports)]
 use blocks::neural::testdata::*;
 
- fn get_bias_from_end<W: ToPrimitive + Debug>( array : &[W]  ) -> u32
+ fn get_bias_from_end<W: ToPrimitive + Debug>( array : &[W]  ) -> i32
  {
      // it is length 1 ..
-    let bias = ((array[array.len() -4 ].to_u8().unwrap() as u32) << 24)
-     + ((array[array.len() -3].to_u8().unwrap()  as u32) << 16)
-     + ((array[array.len() -2 ].to_u8().unwrap()  as u32) << 8)
-     + (array[array.len() -1 ].to_u8().unwrap()  as u32);
+    let bias = ((array[array.len() -4 ].to_i8().unwrap() as i32) << 24)
+     + ((array[array.len() -3].to_i8().unwrap()  as i32) << 16)
+     + ((array[array.len() -2 ].to_i8().unwrap()  as i32) << 8)
+     + (array[array.len() -1 ].to_i8().unwrap()  as i32);
  // return (*pbyte << 24) | (*(pbyte + 1) << 16) | (*(pbyte + 2) << 8) | (*(pbyte + 3));
 
     println!("bias {:?} w {:?} " ,bias ,array );
@@ -105,14 +105,24 @@ impl <W:Num + ToPrimitive +Debug , N: ActivationFunction<isize,u8>> Neuron<W , u
         }
 
         let bias = get_bias_from_end::<W>(weights);
+                println!("bias {:?}", bias );
         let mut sum = 0isize;
         for (vn , weight) in v.iter().zip(weights.iter()) {
-                sum = sum + (vn * weight.to_u8().unwrap()) as isize;
+                //sum = sum + (*vn as isize * weight.to_isize().unwrap()) ;
+                let add = weight.to_isize().unwrap();
+
+                let mult = *vn as isize * add;
+                sum = sum + (mult) as isize;
+                println!("add  {:?} mult {:?} sum {:?}", add , mult , sum );
+
         }
         // if ( sum <= bias )
         //     return 0;
         sum = sum - bias as isize;
-        N::activate(sum)
+        let res = N::activate(sum);
+        println!("result {:?} sum {:?} bias {:?}", res , sum , bias );
+
+        res
     }
 }
 
@@ -129,62 +139,38 @@ impl <W:Num + ToPrimitive +Debug , N: ActivationFunction<isize,i8>> Neuron<W , i
         }
 
         let bias = get_bias_from_end(weights);
+
         let mut sum = 0isize;
         for (vn , weight) in v.iter().zip(weights.iter()) {
-             let add = weight.to_i8().unwrap() as isize;
+             let add = weight.to_isize().unwrap();
+
              let mult = *vn as isize * add;
              sum = sum + (mult) as isize;
+             println!("add  {:?} mult {:?} sum {:?}", add , mult , sum );
         }
         sum = sum - bias as isize;
-
+                println!("sum {:?} bias {:?}", sum , bias );
         N::activate(sum)
         }
 }
-//
-// impl <W:Num+ ToPrimitive> Neuron<W , i32 > for DefaultWeightwBias
-// {
-//     #[inline]
-//     fn eval(v: &[i32], weights: &[W]) -> i32
-//     {
-//         if  v.len() != weights.len()         {
-//             panic!("weight length not the same as input vector");
-//         }
-//
-//         let mut sum = 0isize;
-//         for (vn , weight) in v.iter().zip(weights.iter()) {
-//                 sum = sum + (vn * weight.to_i32().unwrap()) as isize ;
-//         }
-//         sum.to_i32().unwrap()
-//     }
-// }
 
+///TODO
+#[test]
+fn test_large_bias()
+{
+    assert_eq!(0, 0);
+}
 
-    //    vec.push( (F32_VECTOR8 , F32_VECTOR8_1, 26f32)  );
-
-    // #[test]
-    // #[should_panic(expected = "weight length")]
-    // fn test_default_weight_function_dif_len_input()
-    // {
-    //     let sum = DefaultNeuron::eval(I8_VECTOR1 , I8_VECTOR3 ) ;
-    // }
-    //
-    // #[test]
-    // fn test_default_weight_function_i8() {
-    //     //let weightFunction : &Neuron<f32 ,f32 > = &DefaultNeuron;
-    //
-    //     info!("running default_weight_tests");
-    //
-    //
-    //     let sum = DefaultNeuron::eval(I8_VECTOR1 , I8_VECTOR1 ) ;
-    //     assert_eq!(1, sum);
-    //         let sum = DefaultNeuron::eval(&[1 ,2, 3 ] , &[1,2,3] ) ;
-    //         assert_eq!(14, sum);
-    //         let sum = DefaultNeuron::eval(&[1f32 ; 3 ] , &[1f32 ; 3 ] ) ;
-    //         assert_eq!(3f32, sum);
-    // }
+///TODO
+#[test]
+fn test_large_negative_bias()
+{
+    assert_eq!(0, 0);
+}
 
 #[test]
-fn test_default_weight_function_w_bias_f32_many() {
+fn test_default_weight_function_w_bias_f32_many()
+{
     info!("running default_weight_tests");
 
     for (v1, v2,result) in getf32datawbias()

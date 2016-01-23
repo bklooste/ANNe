@@ -55,7 +55,7 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<f64,f64>> Neuron<W , f64 > for
 }
 
 
-impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for DefaultNeuron<isize,u8,N>
+impl <W:Num + ToPrimitive +Debug , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for DefaultNeuron<isize,u8,N>
 {
     #[inline]
     fn eval(v: &[u8], weights: &[W]) -> u8
@@ -66,7 +66,8 @@ impl <W:Num + ToPrimitive , N: ActivationFunction<isize,u8>> Neuron<W , u8 > for
 
         let mut sum = 0isize;
         for (vn , weight) in v.iter().zip(weights.iter()) {
-            let add = weight.to_u8().unwrap() as isize;
+            println!("vn {:?} , weight {:?}",vn , weight );
+            let add = weight.to_isize().unwrap() ;
             let mult = *vn as isize * add;
             sum = sum + (mult) as isize;
         }

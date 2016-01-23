@@ -1,9 +1,12 @@
-use anne::module::{Module};
+
 // not sure why needed ....
 extern crate anne;
 
+
+
+use anne::module::{Module};
 //use std::ops::Range;
-use anne::blocks::{BlockData, LogisticMutBlock , LogisticBlock};
+use anne::blocks::{BlockData, LogisticMutBlock , LogisticBlock , LogisticBiasBlock , LinearByteBlock , ThreshholdByteBiasBlock};
 
 //fixme remove
 pub use anne::blocks::neural::neuron::*;
@@ -199,18 +202,17 @@ fn module_build_add_block_w_module_process()
 {
     let weights =   vec![ 0.5f32  ; 25];
     let input  = vec! [1f32 ;5];
-    {
-        let block1 = LogisticBlock::new(2 , 5, 5);
-        let mut module = Module::new_from_input(input , 20);
-        let blk_index = module.add_block_w_data(Box::new(block1)  , weights );
-        module.add_simple_connections( blk_index, blk_index , &[] );
 
-        assert_eq!(    module.get_stats().blocks_processed, 0);
-        module.process_blocks();
-        assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
-        let mod_output: Vec<f32>  = module.copy_output();
-        assert_eq!(mod_output, & [0.9241418; 5]);
-    }
+    let block1 = LogisticBlock::new(2 , 5, 5);
+    let mut module = Module::new_from_input(input , 20);
+    let blk_index = module.add_block_w_data(Box::new(block1)  , weights );
+    module.add_simple_connections( blk_index, blk_index , &[] );
+
+    assert_eq!(    module.get_stats().blocks_processed, 0);
+    module.process_blocks();
+    assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
+    let mod_output: Vec<f32>  = module.copy_output();
+    assert_eq!(mod_output, & [0.9241418; 5]);
 }
 
 #[test]
@@ -250,38 +252,124 @@ fn module_build_add_4imm_module_process()
     assert_eq!(mod_output, & [0.90609163; 5]);  // single process would be 0.9241418
 }
 
-// #[test]
-// fn module_build_add_2_imm_blocks_process()
-// {
-// //    let weights_bytes =   vec![ 5  ; 100];
-//     let weights1 =   vec![ 0.5f32  ; 25];
-//     let weights2 =   vec![ 0.5f32  ; 25];
-//
-//     let input  = vec! [1f32 ;5];
-//     let mut output = vec!  [0f32 ;5];
-//     {
-//         let mut block1 = LogisticBlock::new(2 , 5, 5);
-//         let mut block2 = LogisticBlock::new(2 , 5, 5);
-//         let mut module = Module::new_from_inputs(input);
-//         let blk1 = module.add_block_w_data(Box::new(block1)  , weights1 );
-//         let blk2 = module.add_block_w_data(Box::new(block2)  , weights2 );
-//
-//         module.add_simple_connections( blk1, blk2 , &[ (blk1, blk2)] );
-//         // module.add_link( blk1 , blk2);
-//         // module.receive_module_input(blk1);
-//         // module.use_module_output(blk2);
-//
-//
-//         assert_eq!(    module.get_stats().blocks_processed, 0);
-//
-//         //fails buffers not setup
-//         module.process_blocks();
-//         assert_eq!(    module.get_stats().blocks_processed, 1); // there is no link so only 1 processed
-//
-//         let mod_output: Vec<f32>  = module.get_output();
-//         assert_eq!(mod_output, & [0.9241418; 5]);
-//     }
-// }
+
+#[test]
+fn module_build_bias_irregular()
+{
+    let mut module = Module::new_from_input(vec! [1f32 ;2] ,8);
+
+    // probably need to imrpove this synapse_ count inmcludes bias =3 , weights = weight1 ,weight2 , bias ,  8 is 4 bytes output ie 2 floats
+    let blk1 = module.add_block_w_data(Box::new(LogisticBiasBlock::new(1, 2, 3)), vec![ 1f32 , 1f32 , 0f32 , 1f32, 1f32, -1f32]);
+    module.add_simple_connections( blk1, blk1, &[ ] );
+
+    assert_eq!(module.get_stats().blocks_processed, 0);
+    module.process_blocks();
+    assert_eq!(    module.get_stats().blocks_processed, 1);
+
+    let mod_output: Vec<f32>  =  module.copy_output();
+    assert_eq!(mod_output, & [0.880797, 0.95257413]);  // single process would be 0.9241418
+}
+
+#[test]
+fn module_build_run_xor()
+{
+    let mut module = Module::new_from_input(vec! [1f32 ;2] ,4);
+    let blk1 = module.add_block_w_data_and_output(Box::new(LogisticBlock::new(1, 2, 2)), vec![ 1f32, 1f32, 2f32, 2f32] , 8);
+    let blk2 = module.add_block_w_data(Box::new(LogisticBlock::new(2 , 1, 2))  , vec![-1000f32, 850f32] );  // no output as we use module output
+    module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
+    assert_eq!(    module.get_stats().blocks_processed, 0);
+    module.process_blocks();
+    assert_eq!(    module.get_stats().blocks_processed, 2);
+    let mod_output: Vec<f32>  =  module.copy_output();
+    assert!(mod_output[0] < 0.01f32 && mod_output[0] > -0.01f32  )
+}
+
+#[test]
+fn module_build_run_i8()
+{
+    let mut module = Module::new_from_input(vec! [1u8 , 1u8] ,1);
+    let blk1 = module.add_block_w_data_and_output(Box::new(LinearByteBlock::new(1, 2, 2)), vec![ 2i8 , -1i8 , -1i8 , 2i8 ] , 2);
+    let blk2 = module.add_block_w_data(Box::new(LinearByteBlock::new(2 , 1, 2))  , vec![2i8, 2i8] );  // no output as we use module output
+    module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
+    module.process_blocks();
+    let mod_output: Vec<u8>  =  module.copy_output();
+    assert_eq!(mod_output, & [4u8]);
+}
+
+
+
+//FIX BIAS
+#[test]
+fn module_build_run_i8_bias()
+{
+    let mut module = Module::new_from_input(vec! [1u8 , 1u8] ,1);
+    let blk1 = module.add_block_w_data_and_output(Box::new(ThreshholdByteBiasBlock::new(1, 2, 6)), vec![ 1i8 , 1 ,0 , 0 , 0 , 0, 1 , 1  ,0 , 0 , 0 , -1] , 2);
+    let blk2 = module.add_block_w_data(Box::new(ThreshholdByteBiasBlock::new(2 , 1, 6))  , vec![3i8, -2 , 0 , 0 , 0 , -2] );  // no output as we use module output
+    module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
+    module.process_blocks();
+    let mod_output: Vec<u8>  =  module.copy_output();
+    assert_eq!(mod_output, & [1u8]);
+}
+
+
+#[test]
+fn module_build_rerun_i8_xor()
+{
+    let mut module = Module::new_from_input(vec! [1u8 , 1u8] ,1);
+    let blk1 = module.add_block_w_data_and_output(Box::new(ThreshholdByteBiasBlock::new(1, 2, 6)), vec![ 1i8 , 1 ,0 , 0 , 0 , 1, 1 , 1  ,0 , 0 , 0 , 0] , 2);
+    let blk2 = module.add_block_w_data(Box::new(ThreshholdByteBiasBlock::new(2 , 1, 6))  , vec![-1i8, 1, 0 , 0 , 0 , 0] );  // no output as we use module output
+    module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
+    module.process_blocks();
+
+    let mod_output: Vec<u8>  =  module.copy_output();
+    assert_eq!(mod_output, & [0u8]);
+
+    // set to 0 , 0
+    module.set_input( &[0u8, 0u8]);
+    module.process_blocks();
+    let mod_output: Vec<u8>  =  module.copy_output();
+    assert_eq!(mod_output, & [0u8]);
+
+    module.set_input( &[0u8, 1u8]);
+    module.process_blocks();
+    let mod_output: Vec<u8>  =  module.copy_output();
+    assert_eq!(mod_output, & [1u8]);
+
+    module.set_input( &[1u8, 0u8]);
+    module.process_blocks();
+    let mod_output: Vec<u8>  =  module.copy_output();
+    assert_eq!(mod_output, & [1u8]);
+
+    assert_eq!(    module.get_stats().blocks_processed, 8);
+}
+
+#[test]
+fn module_build_rerun_xor_change_input()
+{
+    let mut module = Module::new_from_input(vec! [1f32 ;2] ,4);
+    let blk1 = module.add_block_w_data_and_output(Box::new(LogisticBlock::new(1, 2, 2)), vec![ 1f32, 1f32, 2f32, 2f32] , 8);
+    let blk2 = module.add_block_w_data(Box::new(LogisticBlock::new(2 , 1, 2))  , vec![-1000f32, 850f32] );  // no output as we use module output
+    module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
+    module.process_blocks();
+
+    let mod_output: Vec<f32>  =  module.copy_output();
+    assert!(mod_output[0] < 0.01f32 && mod_output[0] > -0.01f32  );
+
+    // set to 0 , 0
+    module.set_input( &[0f32, 0f32]);
+    module.process_blocks();
+    let mod_output: Vec<f32>  =  module.copy_output();
+    assert!(mod_output[0] < 0.01f32 && mod_output[0] > -0.01f32  );
+
+    module.set_input( &[0f32, 1f32]);
+    module.process_blocks();
+    let mod_output: Vec<f32>  =  module.copy_output();
+    assert!(mod_output[0] < 1.01f32 && mod_output[0] > 0.099f32  );
+    assert_eq!(    module.get_stats().blocks_processed, 6);
+}
+
+
+
 
 // // this should fail
 // #[test]
@@ -311,34 +399,6 @@ fn module_build_add_4imm_module_process()
 
 // Logistic_mut
 
-// #[test]
-// fn module_build_add_2blocks_diff_data_process_no_link()
-// {
-//     let weights =   & [ 0.5f32  ; 25];
-//     let weights2 =   & [ 0.2f32  ; 25];
-//
-//     //let mut outvec = vec! [0f32 ;5];
-//     let mut output = & mut  [0f32 ;5];
-//     let mut output2 = & mut  [0f32 ;5];
-//
-//     let inputs  =  &[1f32 ;5][..];
-//     let inputs2 =  &[0.3f32 ;5][..];
-//
-//     {
-//         let mut block1 = LogisticBlock::new_late(BlockData::new(2 , 5, 5));
-//         block1.set_buffers(weights , inputs , output );
-//         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block2.set_buffers(weights2 , inputs2 , output2 );
-//
-//         let mut module = Module::new();
-//         module.add_block(Box::new(block1) );
-//         module.add_block(Box::new(block2) );
-//         module.process_blocks();
-//
-//     }
-//     assert_eq!(output, & [0.9241418; 5]);
-//     assert_eq!(output2, & [0.0; 5]);  // should not process as no link
-// }
 //
 // #[test]
 // fn module_build_add_2blocks_diff_data_process()
@@ -369,64 +429,12 @@ fn module_build_add_4imm_module_process()
 //     assert_eq!(output2, & [0.5744425; 5]);
 // }
 
-// #[test]
-// fn module_build_add_2blocks_staged()
-// {
-//     let weights =   & [ 0.5f32  ; 25];
-//     let weights2 =   & [ 0.2f32  ; 25];
-//
-//     let mut output_buf =  vec! [0f32 ;5];
-//     let mut output = & mut  output_buf[..];
-// //    let inputs2 = &[ output];
-//     let mut output2 = & mut  [0f32 ;5];
-//
-//     let mut inputs2data  = vec!  [ & mut output_buf[..] ];
-//     let mut inputs2 = & inputs2data [..] as &[&[f32]];
-//
-//     let inputs  = &[ &[1f32 ;5][..]];
-//
-//
-//     {
-//         let mut block1 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block1.set_buffers(weights , inputs , output );
-//         let mut block2 = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block2.set_buffers(weights2 , inputs2 , output2 );
-//
-//         let mut module = Module::new();
-//         let from = module.add_block( &(block1.as_blocktype()) );
-//         let to = module.add_block( &(block2.as_blocktype()) );
-//         module.add_link(from, to);
-//         module.process_blocks();
-//
-//     }
-//     assert_eq!(output, & [0.9241418; 5]);
-//
-// }
-//
-// ///TODO add blocks with output buf is input
-// ///TODO  add blocks with output buf is input process
-//
-// #[test]
-// fn module_build_add_node_process()
-// {
-//
-//     let weights =   & [ 0.5f32  ; 25];
-//     let mut outvec = vec! [0f32 ;5];
-//     let mut output = & mut outvec [..];
-//     let input  = vec! [2f32 ;5];
-//     let inputs  = vec! [ &input[..]];
-//
-//     {
-//         let mut block = LogisticMutBlock::new_late(BlockData::new(2 , 5, 5));
-//         block.set_buffers(weights , &inputs[..] , output );
-//
-//         let mut module = Module::new();
-//         module.add_block(Box::new( block) );
-//         module.process_blocks();
-//     }
-//
-//     assert_eq!(output, & [0.9933072f32; 5]);
-// }
+
+
+// TODO add blocks with output buf is input
+// TODO  add blocks with output buf is input process
+
+
 
 
 //
