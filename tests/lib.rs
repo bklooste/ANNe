@@ -1,5 +1,6 @@
 extern crate anne;
 
+pub mod tst_train;
 pub mod tst_module;
 pub mod tst_mut_block;
 

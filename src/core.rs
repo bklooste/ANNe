@@ -1,5 +1,5 @@
 use num::traits::Num;
-// 
+//
 // use std::mem;
 // use std::slice;
 
@@ -119,6 +119,7 @@ pub trait NeuronBlock <  W: Num , O: Num  >
 //     fn getid(&self) -> i8 { self.get_id() }
 // }
 
+// interface for T
 // impl <T >  IBlock for T
 // where T:NeuronBlock<f32,f32>
 // {

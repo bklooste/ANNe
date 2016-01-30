@@ -14,7 +14,7 @@
 
 //! let mut module = Module::new_from_input(vec! [1f32 ;2] ,4);
 //! let blk1 = module.add_block_w_data_and_output(Box::new(LogisticBlock::new(1, 2, 2)), vec![ 1f32, 1f32, 2f32, 2f32] , 8);
-//! let blk2 = module.add_block_w_data(Box::new(LogisticBlock::new(2 , 1, 2))  , vec![-1000f32, 850f32] ); 
+//! let blk2 = module.add_block_w_data(Box::new(LogisticBlock::new(2 , 1, 2))  , vec![-1000f32, 850f32] );
 //! module.add_simple_connections( blk1, blk2, &[ (blk1, blk2)] );
 //! module.process_blocks();
 //! assert_eq!(    module.get_stats().blocks_processed, 2);
@@ -37,6 +37,8 @@
 extern crate num;
 extern crate rand;
 extern crate rustc_serialize;
+extern crate num_cpus;
+extern crate scoped_threadpool;
 
 #[macro_use]
 extern crate log;
@@ -50,6 +52,9 @@ pub mod graph;
 pub mod module;
 pub mod core;
 pub mod prelude;
+//pub mod training;
+pub mod trainer;
+//pub mod solver;
 
 
 /// This function adds two to its argument.

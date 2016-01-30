@@ -12,21 +12,20 @@ aNNe is written in Rust, a language which is well suited for state-of-the-art ma
 However these frameworks have the goal to produce the best solutions for a given training set , aNNe takes a very different approach  from a philosophy point of view aNNe takes the view of having more small human designed reusable components is more desirable even if a lower result is obtained and in the long term these components will give a better result in a more flexible manner.   The goal of the framework is to research this as it will be highly valuable in the automation and robotics field.
 
 Here are some of the key differences.
-- Drop in / reusable modules that can be integrated into other networks.
+- Modules are drop in independent deployable units that are deployable and can be wired into any network. Think of them as a shared library with associated data with improved support for working within a larger neural net or as part of a traditional application .
 - Blocks may contain traditional code.
 - More general approach a system can be very interconnected , eg control system  rather than produce a result.
 - Support for hard limits.
 - Support for immediate training while running to support hard limits.   
-- No use of CUDA and GPUs . These are not suitable for embedded environments. Instead optional SIMD is used and its worth noting SIMD with bytes can give CUDA GPU like performance , with a lot more flexibility in scheduling.
+- No use of CUDA and GPUs . These are not suitable for embedded environments. Instead optional SIMD is used and its worth noting SIMD with bytes can give CUDA GPU like performance , with a lot more flexibility in scheduling and when dealing with lots of small blocks performance will be much higher.
 - Support for many types eg signed byte weights , f64 or bit input / outputs and these can be combined in a single module.
-- Modules are independent deployable units that are deployable and can be wired into any network. Think of them as a shared library with associated data with improved support for working within a larger neural net or as part of a traditional application .
 - While stochastic back-propagation is supported a lot more emphasizes is given to  investigation of other methods which may not give a better solution but will work better as a large complex unit. Specifically Hebbian learning with weight handling.
 - It will features a higher level and likely graphical design component which will work with higher level logical types and a lower level run time .  We see this as allowing users to use pre made components without having a high skill level.
 
-The architecture  is composed of Networks of blocks, blocks  represent operations over n-dimensional numerical inputs into the network. Blocks usually implement mathematical operations, but can be used for many more such as feeding in data, logging, or returning results. You can use the  Blocks that ship with aNNe (e.g. Convolutional, ReLU  etc.) or thanks to Rust, easily extend aNNe with your own blocks.
+The architecture  is an application is composed of a number of independent / re-usable  module components each consisting of a number of connected  blocks, blocks  represent operations over n-dimensional numerical inputs into the network. Blocks usually implement mathematical operations, but can be used for many more such as feeding in data, logging, or returning results. You can use the  Blocks that ship with aNNe (e.g. Convolutional, ReLU  etc.) or thanks to Rust, easily extend aNNe with your own blocks.
 
 A list of current blocks:
-  Function (run any rust function)
+  FunctionBlock (run any rust function)
   MeshBlock standard mesh layer block , can be used with a variety of weight / activation behaviour.
   FullMeshBlock  as Mesh block but manages   its own mutable data.
 

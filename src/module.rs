@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::{mem , slice};
+use std::{mem , slice , fmt};
 
 use core::{IBlock , BlockBehaviour , BlockIndex};
 use graph::{Graph , NodeIndex};
@@ -16,6 +16,7 @@ pub struct ModuleStats
 
 pub struct Module
 {
+    pub name: String,
     //data mutable on creation ..eg add block , edges
     graph: Graph<BlockIndex>,
     //buffers_for_node: HashMap< BlockIndex, Vec<usize>>, // vector is staticdata , return/output , inputs..
@@ -25,6 +26,14 @@ pub struct Module
     //buffers: Vec<RefCell<Vec<u8>>>,
     buffer_mgr: BufferManager,
     stats: ModuleStats,
+
+}
+
+impl fmt::Debug for Module
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       write!(f, "Module {{ blocks: {}}}", self.blocks.len())
+   }
 }
 
 impl Module
@@ -33,7 +42,7 @@ impl Module
         let mut  buffers =  Vec::new();
         buffers.push( RefCell::new( Vec::<u8>::new())); //module input
         buffers.push( RefCell::new( Vec::<u8>::new())); //module output
-        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new()
+        let module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() , name: "No Name".to_string()
             , buffer_mgr: BufferManager::new() , stats : ModuleStats{ ..Default::default()} };
 
         // block input 1
@@ -48,7 +57,7 @@ impl Module
         // unsafe { input.set_len(bytes_size as usize); }
 
 
-        let mut  module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() ,
+        let mut  module = Module { graph: Graph::<BlockIndex>::new() , blocks: Vec::new() ,  name: "No Name".to_string(),
              buffer_mgr: BufferManager::new() , stats : ModuleStats{ ..Default::default()} };
 
         module.buffer_mgr.add_module_input::<T>(input);
