@@ -21,10 +21,12 @@ pub struct Module
     graph: Graph<BlockIndex>,
     //buffers_for_node: HashMap< BlockIndex, Vec<usize>>, // vector is staticdata , return/output , inputs..
     // data mutable durring run  (note ...Vec should not change ) , with these changes self should be immutable
-    blocks:  Vec<RefCell<Box<IBlock>>>, // we may be able to remove refcell here ...
+    pub blocks:  Vec<RefCell<Box<IBlock>>>, // we may be able to remove refcell here ...
     //eventually we can do something like variable/ flow anylysis on this.
     //buffers: Vec<RefCell<Vec<u8>>>,
-    buffer_mgr: BufferManager,
+
+    //fixme hide
+    pub buffer_mgr: BufferManager,
     stats: ModuleStats,
 
 }
@@ -247,6 +249,8 @@ impl Module
         for i in successor_ids { self.process_rec(i);}
     }
 
+
+
     fn get_block_behaviour(&self ,block_index: BlockIndex) -> BlockBehaviour
     {
         let block = self.blocks[block_index as usize].borrow();
@@ -260,7 +264,6 @@ impl Module
         {
             BlockBehaviour::Immutable => {
                 let block_ref = self.blocks[block_index as usize].borrow();
-
                 let block_buffer_data = self.buffer_mgr.get_buffer_block_data(block_index);
 
                 // should be allowed later
@@ -270,13 +273,12 @@ impl Module
                 let mut stat_data = self.buffer_mgr.get_buffer(block_buffer_data.data_buffer_id).borrow_mut();
                 let mut output  = self.buffer_mgr.get_buffer(block_buffer_data.output_buffer_id).borrow_mut();
 
+                //FIXME this should be legal lately but good for finding problems
                 if output.len() == 0 {
                     println!("empty output  {:?} :buffer id  {:?}", output , block_buffer_data.output_buffer_id  );
                 }
 
-                if block_buffer_data.inputs_buffer_ids.len() == 0 { panic!("no input for buffer")} ;
-                let inputs  =self.buffer_mgr.get_buffer(*block_buffer_data.inputs_buffer_ids.first().unwrap()).borrow();
-
+                let inputs = self.buffer_mgr.get_buffer(*block_buffer_data.inputs_buffer_ids.first().unwrap()).borrow();
 
                 process(  &*block_ref ,  & mut stat_data[..], &[ & inputs[..]][..],  & mut output[..]);
             } ,
@@ -330,6 +332,21 @@ impl Module
     // }
 } //impl
 
+//TODO
+//impl Iterator for Module {
+    // type Item = IBlock;
+    // fn next(&mut self) -> Option<IBlock> {
+    //
+    //     self.blocks.iter().next()
+    //     // let new_next = self.curr + self.next;
+    //     //
+    //     // self.blocks.curr = self.next;
+    //     // self.next = new_next;
+    //     //
+    //     // // 'Some' is always returned, this is an infinite value generator
+    //     // Some(self.curr)
+    // }
+//}
 
 fn process( block: &Box<IBlock>   , static_data: & mut [u8]  , input : &[&  [u8]]   , output: & mut [u8]    )
 {

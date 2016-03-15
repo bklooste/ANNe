@@ -39,6 +39,7 @@ extern crate rand;
 extern crate rustc_serialize;
 extern crate num_cpus;
 extern crate scoped_threadpool;
+extern crate time;
 
 #[macro_use]
 extern crate log;
@@ -53,8 +54,10 @@ pub mod module;
 pub mod core;
 pub mod prelude;
 //pub mod training;
+//pub mod trainer;
+pub mod solver;
 pub mod trainer;
-//pub mod solver;
+pub mod solvers;
 
 
 /// This function adds two to its argument.

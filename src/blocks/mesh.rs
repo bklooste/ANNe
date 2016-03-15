@@ -148,6 +148,8 @@ where W: Num + Debug  , O: Num + Debug  , N: Neuron <W,O>
             panic!("no buffers setup or NeuronBlocks cant be  mutable ");
     }
 
+        fn get_prop_info(& self) -> Option<Box<ErrorInfo>> { None}
+
 }
 
 

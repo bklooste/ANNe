@@ -72,25 +72,25 @@ pub trait NeuralNetTrainer : Iterator {
   #[inline(always)] fn train(&mut self) -> Option<Self::Item> { self.last() }
 }
 
-
-/// Layers
-///
-pub enum Layer {
-  #[allow(missing_docs)] Input,
-  #[allow(missing_docs)] Hidden,
-  #[allow(missing_docs)] Output
-}
-
-
-/// Coordinates for a node in a specified layer.
-///
-pub enum Node {
-  #[allow(missing_docs)] Input(usize),
-  #[allow(missing_docs)] Hidden(usize),
-  #[allow(missing_docs)] Output(usize),
-  #[allow(missing_docs)] WeightInputHidden(usize, usize),
-  #[allow(missing_docs)] WeightHiddenOutput(usize, usize)
-}
+//
+// /// Layers
+// ///
+// pub enum Layer {
+//   #[allow(missing_docs)] Input,
+//   #[allow(missing_docs)] Hidden,
+//   #[allow(missing_docs)] Output
+// }
+//
+//
+// /// Coordinates for a node in a specified layer.
+// ///
+// pub enum Node {
+//   #[allow(missing_docs)] Input(usize),
+//   #[allow(missing_docs)] Hidden(usize),
+//   #[allow(missing_docs)] Output(usize),
+//   #[allow(missing_docs)] WeightInputHidden(usize, usize),
+//   #[allow(missing_docs)] WeightHiddenOutput(usize, usize)
+// }
 
 
 /// A single-layer neural network.
@@ -108,17 +108,17 @@ pub trait NeuralNet<P> where P : NeuralNetParameters {
   ///
   fn dim_hidden() -> usize;
 
-  /// Returns the value of a node in a layer at a specified coordinate.
-  ///
-  fn node(&self, i: Node) -> f64;
-
-  /// Returns a mutable reference to a node in a layer.
-  ///
-  fn node_mut(&mut self, i: Node) -> &mut f64;
-
-  /// Returns the specified layer.
-  ///
-  fn layer(&self, layer: Layer) -> &[f64];
+  // /// Returns the value of a node in a layer at a specified coordinate.
+  // ///
+  // fn node(&self, i: Node) -> f64;
+  //
+  // /// Returns a mutable reference to a node in a layer.
+  // ///
+  // fn node_mut(&mut self, i: Node) -> &mut f64;
+  //
+  // /// Returns the specified layer.
+  // ///
+  // fn layer(&self, layer: Layer) -> &[f64];
 
   /// Computes the predicted value for a given input and stores it
   /// internally. The prediction can be retrieved using `layer`.

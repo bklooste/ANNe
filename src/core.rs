@@ -1,4 +1,5 @@
 use num::traits::Num;
+//use core::marker::Sized;
 //
 // use std::mem;
 // use std::slice;
@@ -85,6 +86,27 @@ pub enum BlockBehaviour
     Mutable { copy_out: bool}
 }
 
+// this will be created with module passing in modulebuffer,
+pub trait ErrorInfo
+{
+    fn support_back_prop(&self) ->  bool;
+
+    fn get_buffers(&self);
+//    fn get_derivative(&self) -> BlockId;
+
+    //caller stores , gets rought  errors , than applies detivative iun bulk to set network errors.
+    // can then set buffer.
+    // pass in slice ?
+    // should have access to weights via module buffer or internal
+    // errors should be floats regardless
+    fn get_error(&self , next_layer_errors: &[f32] ) -> Box<[f32]>;
+
+
+    //how to set weights? or expose mutable weights
+    fn add_weights_update(&self , update_weights: Vec<&[f32]>) ;
+
+}
+
 // we can probably design this blcok behaviour and process better
 pub trait IBlock
 {
@@ -93,6 +115,10 @@ pub trait IBlock
     fn get_id(&self) -> BlockId;
     fn process(&self , data: & mut [u8] , inputs: &[ & [u8]] , outputs: & mut [u8]) ;  // or an array ????
     fn process_self_copy_output(& mut self) -> Vec<u8> ;
+    fn get_prop_info(& self) -> Option<Box<ErrorInfo>>;
+    // GetBackProOption ? yes but module needs to wrap to get buffers
+    //
+    // when creating past in buffer manager,
 }
 
  //buffers: [& mut [u8] ;3])

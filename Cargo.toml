@@ -23,6 +23,7 @@ rustc-serialize = "*"
 # clippy = "0.0.23"
 num_cpus = "*"
 scoped_threadpool = "*"
+time ="*"
 
 
 [features]

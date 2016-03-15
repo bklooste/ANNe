@@ -147,6 +147,9 @@ where W: Num  +Debug +Copy, O: Num  +Debug +Copy  , N: Neuron <W,O>
     {
         panic!("not supported for mutable blocks");
     }
+
+    fn get_prop_info(& self) -> Option<Box<ErrorInfo>> { None}
+
 }
 
 
